@@ -179,7 +179,6 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
 
   renderForms(lang) {
     const defaultData = { title: "", columns: 2, default_sort: "alpha", show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, ...this._config };
-    //const labels = { entity: lang.ed_lbl_entity, title: lang.ed_lbl_title, columns: lang.ed_lbl_columns, show_summary: lang.ed_lbl_show_summary, show_items: lang.ed_lbl_show_items, show_add_form: lang.add_trigger_label || "Aggiungi", show_search: lang.ed_lbl_show_search, show_sort: lang.ed_lbl_show_sort, show_ico_total: lang.ed_lbl_ico_total, show_ico_expired: lang.ed_lbl_ico_expired, show_ico_10d: lang.ed_lbl_ico_10d, show_ico_30d: lang.ed_lbl_ico_30d, show_ico_qty0: lang.ed_lbl_ico_qty0, show_ico_qty1: lang.ed_lbl_ico_qty1, show_ico_qty3: lang.ed_lbl_ico_qty3 };
     const labels = { 
       entity: lang.ed_lbl_entity, 
       title: lang.ed_lbl_title, 
@@ -222,20 +221,6 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   setupForm(formId, schema, data) { const haForm = this.shadowRoot.getElementById(formId); if (!haForm) return; haForm.hass = this._hass; haForm.schema = schema; haForm.data = data; haForm.computeLabel = this._computeLabel; haForm.addEventListener("value-changed", (e) => { e.stopPropagation(); this._config = { ...this._config, ...e.detail.value }; this.fireConfigChanged(); }); }
   setupSortListener() { const selectSort = this.shadowRoot.getElementById("default_sort"); if (!selectSort) return; selectSort.addEventListener("change", () => { this._config = { ...this._config, default_sort: selectSort.value }; this.fireConfigChanged(); }); }
   fireConfigChanged() { this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._config }, bubbles: true, composed: true })); }
-  
-  // Sincronizzazione protetta: allinea i moduli lasciando che gli input leggano i dati dall'attributo value nativo
-  /*syncData() { 
-    const shadow = this.shadowRoot; if (!shadow) return;
-    const currentData = { ...this._config }; shadow.querySelectorAll("ha-form").forEach(form => { form.data = { ...form.data, ...currentData }; }); 
-    const selectSort = shadow.getElementById("default_sort"); if (selectSort) { selectSort.value = this._config.default_sort || "alpha"; } 
-    
-    ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
-      const el = shadow.getElementById(`${id}_input`); if (el && this._config[id]) el.value = this._config[id];
-    });
-    ["alpha_expired", "alpha_10d", "alpha_30d", "alpha_qty0", "alpha_qty1", "alpha_qty3"].forEach(id => {
-      const el = shadow.getElementById(`${id}_input`); if (el && this._config[id] !== undefined) el.value = this._config[id];
-    });
-  }*/
   
     syncData() { 
     const shadow = this.shadowRoot; 

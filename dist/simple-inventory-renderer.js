@@ -93,13 +93,11 @@ export function renderCardContent(cardInstance) {
     }
   }
 
-  // AGGANCIO E CREAZIONE DINAMICA TASTO SCANNER A FIANCO AD AGGIUNGI
   const addTriggerBtn = cardInstance.shadowRoot.getElementById("add-trigger-btn");
   if (addTriggerBtn) { 
     addTriggerBtn.innerText = lang.btn_add;
     addTriggerBtn.style.display = cardInstance.config.show_add_form ? "flex" : "none"; 
     
-    // Iniezione del pulsante scanner se non esiste già nell'header della card
     let scanBtn = cardInstance.shadowRoot.getElementById("header-scan-btn");
     if (!scanBtn && cardInstance.config.show_add_form) {
       scanBtn = document.createElement("button");
@@ -165,9 +163,6 @@ export function renderCardContent(cardInstance) {
     summaryArea.innerHTML = htmlContent || `<div style='color:var(--secondary-text-color); font-size:0.8rem; padding:2px;'>${lang.no_counter_active}</div>`;
   } else { summaryArea.classList.remove("visible"); }
 
-  // NUOVI IMPORT ESTERNI PER SNELIRE IL FILE ED EVITARE TRONCAMENTI
-
-
   const items = filterAndSortItems(cardInstance);
 
   const categoriesListArray = [];
@@ -179,7 +174,6 @@ export function renderCardContent(cardInstance) {
     });
   }
 
-  // Generazione ultraleggera della griglia tramite il nuovo modulo esterno delle tessere
   cardInstance.content.innerHTML = items.map(item => renderSingleItemCard(item, cardInstance, lang, categoriesListArray)).join('');
 
   cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { btn.addEventListener("click", () => cardInstance.adjustQuantity(btn.dataset.name, 1)); });

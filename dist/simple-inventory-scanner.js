@@ -43,9 +43,7 @@ export async function startCameraScanner(cardInstance, lang) {
   `;
   document.body.appendChild(overlay);
 
-  // SANATORIA PULIZIA BOTTONI BLOCCATI: Forza lo stop hardware del sensore e rade al suolo l'intera istanza video liberando i click
   const html5Qrcode = new Html5Qrcode("camera-preview-region", {
-    // ABILITAZIONE CODICI A BARRE: Costringe il motore a cercare i formati dei prodotti (EAN 13 ed EAN 8) e non solo i QR
     formatsToSupport: [ 
       Html5QrcodeSupportedFormats.EAN_13, 
       Html5QrcodeSupportedFormats.EAN_8, 
@@ -55,8 +53,8 @@ export async function startCameraScanner(cardInstance, lang) {
 
   const closeScanner = () => { 
     html5Qrcode.stop().catch(() => {}).then(() => { 
-      html5Qrcode.clear(); // Sradica la cache visiva
-      overlay.remove();    // Elimina lo scudo trasparente dal display
+      html5Qrcode.clear(); 
+      overlay.remove();    
     }); 
   };
   
@@ -75,7 +73,6 @@ export async function startCameraScanner(cardInstance, lang) {
       if (navigator.vibrate) navigator.vibrate(100);
       barcodeText = barcodeText.trim();
       
-      // Arresto immediato e bonifica dello schermo prima di caricare il popup
       await html5Qrcode.stop();
       html5Qrcode.clear();
       overlay.remove();

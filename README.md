@@ -1,5 +1,117 @@
 # 📦 Simple Inventory Enhanced Card
 
+[![hacs_badge](https://shields.io)](https://github.com)
+[![License: MIT](https://shields.io)](https://opensource.org)
+
+🌐 **Select Language:**  
+*   [English Version 🇬🇧](#-english-version)
+*   [Versione Italiana 🇮🇹](#-versione-italiana)
+
+---
+
+# 🇬🇧 English Version
+
+An advanced, modular, and multilingual frontend card for **Home Assistant**, designed to extend and elevate the user experience of the **Simple Inventory** custom integration. This card transforms pantry management into a professional tracking system for stocks, expiries, and automatic grocery list generation.
+
+## 📌 Table of Contents
+1. [✨ Main Features](#-main-features)
+2. [⚙️ Visual Editor & Dashboard Customization](#️-visual-editor--dashboard-customization)
+3. [🚀 Future Roadmap](#-future-roadmap)
+4. [🛠️ Technologies Used](#️-technologies-used)
+5. [🔐 Security Requirements & Camera Settings](#-security-requirements--camera-settings)
+6. [📥 HACS Installation Guide](#-hacs-installation-guide)
+7. [⚙️ Lovelace Configuration (Example)](#️-lovelace-configuration-example)
+
+### ✨ Main Features
+* **🎨 Smart Pastel Graphics:** Dynamically changes card background colors based on alerts (imminent expiries, already expired products, critical or out-of-stock items) using advanced HEX transparency settings.
+* **🛒 Local Barcode Scanner:** Native camera integration optimized for Android mobile devices to instantly scan EAN barcodes on products.
+* **📡 Smart Open Food Facts Integration:** When scanning a new item, the card queries the public worldwide database in real time, automatically fetching the Item Name, Category, and Net Packaging (e.g., *500 Grams*, *1 Liter*) to pre-fill the form.
+* **🔄 Automatic Duplicate Detection:** If you scan a barcode that already exists in your catalog, the system bypasses creation and immediately opens the Edit Form to let you update current stocks.
+* **📋 HA To-Do List Integration:** A dynamic dropdown menu queries Home Assistant, allowing you to link your items directly to real To-Do entities (e.g., *todo.grocery_list*) combined with an automatic reorder threshold.
+* **🌍 Internationalization (i18n):** 100% full specular support for 5 native languages: Italian, English, French, German, and Spanish.
+* **📱 Responsive Layout & Android Fixed Grid:** Designed to prevent layout breaking or text wrapping on narrow smartphone screens, bypassing Shadow DOM styling bugs on Android.
+
+### ⚙️ Visual Editor & Dashboard Customization
+All configuration properties can be managed directly via the **Lovelace Interactive Visual Editor**, with no manual YAML coding needed:
+* **📐 Dynamic Grid & Columns:** Customize the number of grid columns to optimize product display on any screen size (PC, Tablet, or Smartphone).
+* **📥 Import & Export:** Built-in actions to quickly export your entire pantry database into a portable text layout or batch-import massive product stocks.
+* **🔌 Selective Component Hiding:** Use visual toggles in the editor to individually show or hide different card elements:
+    * Summary Icons Section (Total item counters, expired, low stock, etc.).
+    * Search Bar (Instant typing filter and quick camera scanner trigger).
+    * Sorting Dropdown (Menu for sorting criteria and dynamic category filters).
+    * Product Grid (The main panel displaying item cards).
+    * Product Input (Toggles the visibility of the top-right "Add Product" button).
+
+### 🚀 Future Roadmap
+* ⚡ **Editor Optimization:** Refactor configuration scripts to dramatically increase the initial rendering speed of the visual editor.
+* 📦 **HACS Default Catalog:** Register the card as an official default archive in HACS for single-click installation without adding custom URLs.
+* 🔗 **To-Do List Shortcut:** Add the ability to click on the shopping list icon of an item card to instantly open the related Home Assistant To-Do list inside a popup.
+* 🔔 **Dynamic Warning Days Logics:** Upgrade expiration alert badges to trigger exactly when the custom "warning days" threshold is met, rather than using fixed 10 or 30-day default thresholds.
+* 📐 **Import/Export Restyling:** Reposition the database import and export buttons into a more strategic and seamless area of the card layout.
+
+### 🛠️ Technologies Used
+1. **Backend Core:** Simple Inventory Python Integration (Home Assistant custom component).
+2. **Scanning Engine:** Html5-QRCode (A local, lightweight JavaScript library loaded *on-demand* to decode EAN-13, EAN-8, and Code-128 formats).
+3. **Information Database:** Open Food Facts API v3 (An open-source public service for product technical sheet extraction).
+
+### 🔐 Security Requirements & Camera Settings
+Due to strict sandbox and privacy policies enforced by modern browsers (Google Chrome, Android WebView, etc.), **the camera scanner will only start within a secure context**.
+
+#### 1. Secure Connection (Recommended)
+Access your Home Assistant instance using a protected **`https://`** URL (e.g., via *Nabu Casa Cloud*, *DuckDNS Let's Encrypt*, or a local reverse SSL proxy).
+
+#### 2. Local IP Bypass (Workaround for unsecured `http://` connections)
+If you access Home Assistant solely via an internal IP address (e.g., `http://1.xx`), you must explicitly force your browser to trust it:
+1. Open **Google Chrome** on your Android device or PC.
+2. Navigate to: `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
+3. Change the dropdown setting to **`Enabled`**.
+4. Enter your exact Home Assistant IP address and port inside the text box (e.g., `http://1.xx`).
+5. Click **`Relaunch`** at the bottom right to restart Chrome.
+
+#### 3. Android App Permissions
+Ensure the official Home Assistant app (or your mobile browser) has system-level permission to use the camera hardware (*Settings ➡️ Apps ➡️ Home Assistant ➡️ Permissions ➡️ Camera ➡️ Allow while using the app*).
+
+### 📥 HACS Installation Guide
+Thanks to HACS integration compliance, installation and future updates are handled fully automatically.
+
+#### 1. Add the Custom Repository
+1. Open Home Assistant and click on **HACS** in the sidebar.
+2. Click the **three dots** in the top-right corner and select **Custom repositories**.
+3. Paste your GitHub repository URL into the text box:  
+   `https://github.com`
+4. Under **Category**, select **Plugin** (or *Lovelace*).
+5. Click **Add**.
+
+#### 2. Download and Register the Module
+1. The card will instantly show up under the HACS new repositories list.
+2. Click on the card name, select **Download** at the bottom right, and pick the latest stable release tag.
+3. HACS will handle the file layout inside `/config/www/community/simple-inventory-enhanced-card/`.
+4. Once completed, click **Reload browser** if prompted to flush Home Assistant's local UI cache.
+
+### ⚙️ Lovelace Configuration (Example)
+```yaml
+type: custom:simple-inventory-enhanced-card
+entity: sensor.simple_inventory_pantry # Your entity generated by the Python backend
+columns: 2
+show_search: true
+show_sort: true
+show_summary: true
+show_items: true
+show_add_form: true
+color_expired: "#db4437"
+alpha_expired: 20
+color_10d: "#e6a23c"
+alpha_10d: 15
+color_qty0: "#db4437"
+alpha_qty0: 30
+
+
+---
+
+# Versione Italiana
+
+# 📦 Simple Inventory Enhanced Card
+
 Un'interfaccia grafica avanzata, modulare e multilingua per **Home Assistant**, progettata per estendere ed elevare l'esperienza d'uso dell'integrazione personalizzata **Simple Inventory**. Questa card trasforma la gestione della dispensa in un sistema professionale di tracciamento scorte, scadenze e automazione delle liste della spesa.
 
 ---
@@ -20,7 +132,7 @@ Un'interfaccia grafica avanzata, modulare e multilingua per **Home Assistant**, 
 
 * **🎨 Grafica Pastello Intelligente:** Cambia colore di sfondo in base alle allerte (scadenze imminenti, prodotti già scaduti, scorte critiche o esaurite) con trasparenze HEX avanzate configurabili direttamente dall'editor Lovelace.
 * **🛒 Scanner di Codici a Barre Locale:** Integrazione nativa della fotocamera su dispositivi mobili Android per rilevare all'istante i codici EAN dei prodotti al supermercato o in casa.
-* **📡 Integrazione Smart Open Food Facts:** Se inquadri un... prodotto inedito, la card interroga in tempo reale l'API mondiale recuperando istantaneamente Nome Prodotto, Categoria e Confezione netta (es. *500 Grammi*, *1 Litro*) precompilando il form.
+* **📡 Integrazione Smart Open Food Facts:** Se inquadri un prodotto inedito, la card interroga in tempo reale l'API mondiale recuperando istantaneamente Nome Prodotto, Categoria e Confezione netta (es. *500 Grammi*, *1 Litro*) precompilando il form.
 * **🔄 Riconoscimento Duplicati Automatico:** Se scansioni un codice a barre già presente in inventario, il sistema salta la creazione e ti apre direttamente il form di modifica per aggiornare le scorte.
 * **📋 Integrazione To-Do List di HA:** Un menu a tendina dinamico interroga Home Assistant per farti scegliere direttamente una delle tue liste To-Do reali (es. *todo.grocery_list*) a cui agganciare la soglia di riordino automatica.
 * **🌍 Internazionalizzazione (i18n):** Supporto nativo speculare al 100% per 5 lingue: Italiano, Inglese, Francese, Tedesco e Spagnolo.

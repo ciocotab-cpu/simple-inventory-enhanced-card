@@ -1,7 +1,6 @@
 export function getEditFormHtml(item, lang, dataObj = {}) {
   const currentBarcode = item.barcode || item.barcodes || item.barcode_id || "";
-  
-  // Estrazione sicura: se dataObj è l'oggetto combinato prende la chiave interna, altrimenti fa il fallback
+
   const categoriesList = Array.isArray(dataObj) ? dataObj : (dataObj.categories || []);
   const todoLists = dataObj.todoLists || [];
   
@@ -90,10 +89,8 @@ export function getEditFormHtml(item, lang, dataObj = {}) {
   `;
 }
 export function getAddPopupHtml(lang, existingCategories = [], dataObj = {}) {
-  // Sanificazione robusta per impedire qualsiasi ReferenceError o crash dei bottoni
   const categoriesList = Array.isArray(existingCategories) ? existingCategories : [];
   
-  // Estrae l'array delle liste To-Do controllando sia la cache interna sia l'oggetto passato
   const todoLists = (dataObj && dataObj.todoLists) ? dataObj.todoLists : [];
   
   let catOptions = categoriesList.map(cat => `<option value="${cat}">${cat}</option>`).join('');

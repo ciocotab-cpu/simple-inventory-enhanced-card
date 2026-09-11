@@ -49,7 +49,6 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       color_qty0: baseConfig.color_qty0 || "#db4437",
       color_qty1: baseConfig.color_qty1 || "#f44336",
       color_qty3: baseConfig.color_qty3 || "#ff9800",
-      // ACQUISIZIONE DELLE TRASPARENZE NELLA CARD:
       alpha_expired: baseConfig.alpha_expired !== undefined ? baseConfig.alpha_expired : 100,
       alpha_10d: baseConfig.alpha_10d !== undefined ? baseConfig.alpha_10d : 100,
       alpha_30d: baseConfig.alpha_30d !== undefined ? baseConfig.alpha_30d : 100,
@@ -140,7 +139,6 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       downloadAnchor.remove();
     });
 
-    // LOGICA DI IMPORTAZIONE: Legge il file JSON caricato dall'utente e invia sequenzialmente gli elementi al backend
     this.shadowRoot.getElementById("import-btn").addEventListener("click", () => {
       const fileInput = document.createElement('input');
       fileInput.type = 'file'; fileInput.accept = '.json';

@@ -1,7 +1,3 @@
-// ==========================================
-// FUNZIONI DI SERVIZIO PER SIMPLE INVENTORY
-// ==========================================
-
 export async function handleSaveEditService(cardInstance, itemId, oldName) {
   const shadow = cardInstance.shadowRoot;
   if (!shadow) return;
@@ -37,7 +33,6 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
     return;
   }
 
-  // Estrazione della categoria compatibile con Android nell'edit
   let finalCategory = "";
   if (catSelectEl) {
     if (catSelectEl.value === "__NEW_CAT__" && catCustomEl) {
@@ -123,7 +118,6 @@ export async function handleAddItemService(cardInstance) {
     return;
   }
 
-  // LOGICA ESTRAZIONE COMPATIBILE ANDROID: Se ha scelto la voce di creazione legge l'input di testo, altrimenti la selezione dropdown
   let finalCategory = "";
   if (catSelectEl) {
     if (catSelectEl.value === "__NEW_CAT__" && catCustomEl) {
@@ -142,7 +136,6 @@ export async function handleAddItemService(cardInstance) {
     auto_add_id_to_description_enabled: isAutoAddChecked
   };
 
-  // Sanificazione preventivo dei campi opzionali per evitare errori di validazione Python
   if (finalCategory !== "") serviceData.category = finalCategory;
   if (expiryEl && expiryEl.value.trim() !== "") serviceData.expiry_date = expiryEl.value.trim();
   if (expAlertEl && expAlertEl.value.trim() !== "") serviceData.expiry_alert_days = parseInt(expAlertEl.value) || 0;
@@ -152,7 +145,6 @@ export async function handleAddItemService(cardInstance) {
   if (descEl && descEl.value.trim() !== "") serviceData.description = descEl.value.trim();
   if (barcodeEl && barcodeEl.value.trim() !== "") serviceData.barcode = barcodeEl.value.trim();
   
-  // Campi abilitati condizionalmente dalla spunta della checkbox
   if (isAutoAddChecked) {
     if (todoEl && todoEl.value !== "") serviceData.todo_list = todoEl.value;
     if (todoPlaceEl && todoPlaceEl.value) serviceData.todo_quantity_placement = todoPlaceEl.value;
