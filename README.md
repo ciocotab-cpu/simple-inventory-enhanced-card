@@ -1,12 +1,18 @@
 # 📦 Simple Inventory Enhanced Card
 
-[![hacs_badge](https://shields.io)](https://github.com)
-[![License: MIT](https://shields.io)](https://opensource.org)
+<p align="left">
+  <img src="https://shields.io" alt="HACS Badge">
+  <img src="https://shields.io" alt="MIT License Badge">
+</p>
 
 🌐 **Select Language:**  
 *   [English Version 🇬🇧](#-english-version)
 *   [Versione Italiana 🇮🇹](#-versione-italiana)
 
+![Card](./img/Visual.png)
+![Setting1](./img/Setting1.png)
+![Setting2](./img/Setting2.png)
+![Setting3](./img/Setting3.png)
 ---
 
 # 🇬🇧 English Version
