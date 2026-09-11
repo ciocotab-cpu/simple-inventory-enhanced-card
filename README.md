@@ -15,7 +15,7 @@
 
 # 🇬🇧 English Version
 
-An advanced, modular, and multilingual frontend card for **Home Assistant**, designed to extend and elevate the user experience of the **Simple Inventory** custom integration. This card transforms pantry management into a professional tracking system for stocks, expiries, and automatic grocery list generation.
+An advanced, modular, and multilingual frontend card for **Home Assistant**, designed to extend and elevate the user experience of the [**Simple Inventory**](https://github.com/blaineventurine/simple_inventory) custom integration. This card transforms pantry management into a professional tracking system for stocks, expiries, and automatic grocery list generation.
 
 ## 📌 Table of Contents
 1. [✨ Main Features](#-main-features)
@@ -116,7 +116,7 @@ alpha_qty0: 30
 
 # 📦 Simple Inventory Enhanced Card
 
-Un'interfaccia grafica avanzata, modulare e multilingua per **Home Assistant**, progettata per estendere ed elevare l'esperienza d'uso dell'integrazione personalizzata **Simple Inventory**. Questa card trasforma la gestione della dispensa in un sistema professionale di tracciamento scorte, scadenze e automazione delle liste della spesa.
+Un'interfaccia grafica avanzata, modulare e multilingua per **Home Assistant**, progettata per estendere ed elevare l'esperienza d'uso dell'integrazione personalizzata [**Simple Inventory**](https://github.com/blaineventurine/simple_inventory). Questa card trasforma la gestione della dispensa in un sistema professionale di tracciamento scorte, scadenze e automazione delle liste della spesa.
 
 ---
 
