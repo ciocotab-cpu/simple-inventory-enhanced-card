@@ -1,0 +1,264 @@
+import { getTranslation } from './simple-inventory-lang.js';
+
+export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
+  setConfig(config) { this._config = config || {}; }
+  get config() { return this._config; }
+  set config(config) { this._config = config || {}; if (this._initialized) { this.syncData(); } }
+  set hass(hass) { this._hass = hass; if (!this._initialized && this._config) { this.initEditor(); } else if (this._initialized) { this.shadowRoot.querySelectorAll("ha-form").forEach(form => { form.hass = this._hass; }); } }
+
+  initEditor() {
+    if (!this._hass || !this._config) return;
+    this._initialized = true; this.attachShadow({ mode: 'open' });
+    const lang = getTranslation(this._hass);
+    
+    this.shadowRoot.innerHTML = `
+      <style>
+        .editor-container { display: flex; flex-direction: column; gap: 12px; font-family: var(--paper-font-body1_-_font-family, sans-serif); color: var(--primary-text-color); }
+        ha-expansion-panel { --expansion-panel-summary-padding: 0 8px; border: 1px solid var(--divider-color); border-radius: 6px; }
+        .panel-header { font-weight: bold; font-size: 0.95rem; color: var(--primary-text-color); }
+        .form-row { padding: 12px; display: flex; flex-direction: column; gap: 14px; }
+        .select-option { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+        .select-label { font-size: 0.85rem; color: var(--secondary-text-color); font-weight: 500; }
+        
+        .coppia-row {
+          display: flex !important; flex-direction: row !important; gap: 12px !important; width: 100% !important; align-items: flex-end !important;
+        }
+        .coppia-row ha-form { flex: 1 !important; min-width: 0 !important; }
+
+        .color-row {
+          display: grid !important;
+          grid-template-columns: 2fr 1fr !important;
+          gap: 12px !important;
+          width: 100% !important;
+          align-items: center !important;
+          padding: 4px 0;
+        }
+        .input-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        .input-label { font-size: 0.85rem; color: var(--secondary-text-color); font-weight: 500; }
+        
+        input[type="color"] {
+          -webkit-appearance: none; border: 1px solid var(--divider-color); border-radius: 4px;
+          width: 100%; height: 44px; cursor: pointer; background: var(--card-background-color); padding: 4px; box-sizing: border-box;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 2px; }
+        
+        input[type="number"] {
+          width: 100%; padding: 12px; border-radius: 4px; border: 1px solid var(--divider-color);
+          background: var(--card-background-color); color: var(--primary-text-color); font-size: 1rem;
+          font-family: inherit; box-sizing: border-box; outline: none; height: 44px;
+        }
+
+        ha-form { display: flex !important; flex-direction: column !important; gap: 2px !important; }
+        ha-form * { --form-row-margin-bottom: 2px !important; margin-bottom: 2px !important; }
+        select.custom-dropdown { width: 100%; padding: 12px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-size: 1rem; font-family: inherit; box-sizing: border-box; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg fill='%23999999' height='24' viewBox='0 0 24 24' width='24' xmlns='http://w3.org'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat: no-repeat; background-position: right 8px center; }
+      </style>
+      <div class="editor-container">
+        <ha-expansion-panel expanded>
+          <div slot="header" class="panel-header">${lang.ed_panel_base}</div>
+          <div class="form-row">
+            <ha-form id="form-base-ent"></ha-form>
+            <div class="coppia-row">
+              <ha-form id="form-base-title"></ha-form>
+              <ha-form id="form-base-cols"></ha-form>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-base-t1"></ha-form>
+              <ha-form id="form-base-t2"></ha-form>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-base-t3"></ha-form>
+              <ha-form id="form-base-t4"></ha-form>
+            </div>
+            <ha-form id="form-base-t5"></ha-form>
+            <!--<div class="select-option">
+              <span class="select-label">${lang.ed_sort_label}</span>
+              <select id="default_sort" class="custom-dropdown">
+                <option value="alpha">${lang.sort_alpha}</option>
+                <option value="alpha_avail">${lang.sort_alpha_avail}</option>
+                <option value="threshold">${lang.sort_threshold}</option>
+                <option value="threshold_avail">${lang.sort_threshold_avail}</option>
+                <option value="expiry">${lang.sort_expiry}</option>
+                <option value="only_expired">${lang.sort_only_expired}</option>
+                <option value="only_empty">${lang.sort_only_empty}</option>
+              </select>-->
+            <div class="select-option">
+              <span class="select-label">${lang.ed_sort_label}</span>
+              <select id="default_sort" class="custom-dropdown">
+                <option value="alpha" ${this._config && this._config.default_sort === 'alpha' ? 'selected' : ''}>${lang.sort_alpha}</option>
+                <option value="alpha_avail" ${this._config && this._config.default_sort === 'alpha_avail' ? 'selected' : ''}>${lang.sort_alpha_avail}</option>
+                <option value="threshold" ${this._config && this._config.default_sort === 'threshold' ? 'selected' : ''}>${lang.sort_threshold}</option>
+                <option value="threshold_avail" ${this._config && this._config.default_sort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
+                <option value="expiry" ${this._config && this._config.default_sort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
+                <option value="only_expired" ${this._config && this._config.default_sort === 'only_expired' ? 'selected' : ''}>${lang.sort_only_expired}</option>
+                <option value="only_empty" ${this._config && this._config.default_sort === 'only_empty' ? 'selected' : ''}>${lang.sort_only_empty}</option>
+              </select>
+            </div>
+            </div>
+          </div>
+        </ha-expansion-panel>
+
+        <ha-expansion-panel>
+          <div slot="header" class="panel-header">${lang.ed_panel_summary}</div>
+          <div class="form-row">
+            <div class="coppia-row">
+              <ha-form id="form-sum-t1"></ha-form>
+              <ha-form id="form-sum-t2"></ha-form>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-sum-t3"></ha-form>
+              <ha-form id="form-sum-t4"></ha-form>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-sum-t5"></ha-form>
+              <ha-form id="form-sum-t6"></ha-form>
+            </div>
+            <ha-form id="form-sum-t7"></ha-form>
+          </div>
+        </ha-expansion-panel>
+        <ha-expansion-panel>
+          <div slot="header" class="panel-header">${lang.ed_panel_expiry}</div>
+          <div class="form-row">
+            ${this._createColorBlock("color_expired", "alpha_expired", "Colore Scaduto", "#db4437")}
+            ${this._createColorBlock("color_10d", "alpha_10d", "Colore Allerta (10g)", "#e6a23c")}
+            ${this._createColorBlock("color_30d", "alpha_30d", "Colore Avviso (30g)", "#ffeb3b")}
+          </div>
+        </ha-expansion-panel>
+
+        <ha-expansion-panel>
+          <div slot="header" class="panel-header">${lang.ed_panel_qty}</div>
+          <div class="form-row">
+            ${this._createColorBlock("color_qty0", "alpha_qty0", "Colore Esaurito (Q.tà 0)", "#db4437")}
+            ${this._createColorBlock("color_qty1", "alpha_qty1", "Colore Critico (Q.tà 1)", "#f44336")}
+            ${this._createColorBlock("color_qty3", "alpha_qty3", "Colore Minimo (Q.tà 3)", "#ff9800")}
+          </div>
+        </ha-expansion-panel>
+      </div>
+    `;
+    this.renderForms(lang); this.setupSortListener(); this._attachColorListeners();
+  }
+
+  _createColorBlock(colorId, alphaId, labelKey, fallbackHex) {
+    const shadow = this.shadowRoot;
+    const lang = getTranslation(this._hass);
+    
+    // Prende la traduzione ufficiale dal dizionario (es. lang.ed_lbl_col_expired) o usa la chiave come ruota di scorta
+    const labelText = lang[`ed_lbl_${colorId}`] || lang[colorId] || colorId;
+    const alphaText = lang.ed_lbl_alpha_pct || "% Trasparenza";
+    
+    const currentHex = this._config[colorId] || fallbackHex;
+    const currentAlpha = this._config[alphaId] !== undefined ? this._config[alphaId] : 100;
+    return `
+      <div class="color-row">
+        <div class="input-group">
+          <span class="input-label">${labelText}</span>
+          <input type="color" id="${colorId}_input" value="${currentHex}">
+        </div>
+        <div class="input-group">
+          <span class="input-label">${alphaText}</span>
+          <input type="number" id="${alphaId}_input" min="0" max="100" step="5" value="${currentAlpha}">
+        </div>
+      </div>
+    `;
+  }
+
+
+  _attachColorListeners() {
+    const shadow = this.shadowRoot;
+    ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
+      shadow.getElementById(`${id}_input`).addEventListener("change", (e) => {
+        this._config = { ...this._config, [id]: e.target.value }; this.fireConfigChanged();
+      });
+    });
+    ["alpha_expired", "alpha_10d", "alpha_30d", "alpha_qty0", "alpha_qty1", "alpha_qty3"].forEach(id => {
+      shadow.getElementById(`${id}_input`).addEventListener("change", (e) => {
+        this._config = { ...this._config, [id]: parseInt(e.target.value) !== undefined ? parseInt(e.target.value) : 100 }; this.fireConfigChanged();
+      });
+    });
+  }
+
+  renderForms(lang) {
+    const defaultData = { title: "", columns: 2, default_sort: "alpha", show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, ...this._config };
+    //const labels = { entity: lang.ed_lbl_entity, title: lang.ed_lbl_title, columns: lang.ed_lbl_columns, show_summary: lang.ed_lbl_show_summary, show_items: lang.ed_lbl_show_items, show_add_form: lang.add_trigger_label || "Aggiungi", show_search: lang.ed_lbl_show_search, show_sort: lang.ed_lbl_show_sort, show_ico_total: lang.ed_lbl_ico_total, show_ico_expired: lang.ed_lbl_ico_expired, show_ico_10d: lang.ed_lbl_ico_10d, show_ico_30d: lang.ed_lbl_ico_30d, show_ico_qty0: lang.ed_lbl_ico_qty0, show_ico_qty1: lang.ed_lbl_ico_qty1, show_ico_qty3: lang.ed_lbl_ico_qty3 };
+    const labels = { 
+      entity: lang.ed_lbl_entity, 
+      title: lang.ed_lbl_title, 
+      columns: lang.ed_lbl_columns, 
+      show_summary: lang.ed_lbl_show_summary, 
+      show_items: lang.ed_lbl_show_items, 
+      show_add_form: lang.add_trigger_label || "Aggiungi", 
+      show_search: lang.ed_lbl_show_search, 
+      show_sort: lang.ed_lbl_show_sort, 
+      show_ico_total: lang.ed_lbl_ico_total, 
+      show_ico_expired: lang.ed_lbl_ico_expired, 
+      show_ico_10d: lang.ed_lbl_ico_10d, 
+      show_ico_30d: lang.ed_lbl_ico_30d, 
+      show_ico_qty0: lang.ed_lbl_ico_qty0, 
+      show_ico_qty1: lang.ed_lbl_ico_qty1, 
+      show_ico_qty3: lang.ed_lbl_ico_qty3 
+    };
+    this._computeLabel = (schemaItem) => labels[schemaItem.name] || schemaItem.name;
+    
+    this.setupForm("form-base-ent", [{ name: "entity", selector: { entity: { domain: "sensor", filter: { integration: "simple_inventory" } } } }], defaultData);
+    this.setupForm("form-base-title", [{ name: "title", selector: { text: {} } }], defaultData);
+    this.setupForm("form-base-cols", [{ name: "columns", selector: { number: { min: 1, max: 6, mode: "box" } } }], defaultData);
+    
+    this.setupForm("form-base-t1", [{ name: "show_summary", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-base-t2", [{ name: "show_items", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-base-t3", [{ name: "show_add_form", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-base-t4", [{ name: "show_search", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-base-t5", [{ name: "show_sort", selector: { boolean: {} } }], defaultData);
+
+    this.setupForm("form-sum-t1", [{ name: "show_ico_total", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sum-t2", [{ name: "show_ico_expired", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sum-t3", [{ name: "show_ico_10d", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sum-t4", [{ name: "show_ico_30d", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sum-t5", [{ name: "show_ico_qty0", selector: { boolean: {} } }], defaultData);
+    this.shadowRoot.querySelectorAll("ha-form").forEach(form => { form.hass = this._hass; });
+    this.setupForm("form-sum-t6", [{ name: "show_ico_qty1", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sum-t7", [{ name: "show_ico_qty3", selector: { boolean: {} } }], defaultData);
+  }
+
+  setupForm(formId, schema, data) { const haForm = this.shadowRoot.getElementById(formId); if (!haForm) return; haForm.hass = this._hass; haForm.schema = schema; haForm.data = data; haForm.computeLabel = this._computeLabel; haForm.addEventListener("value-changed", (e) => { e.stopPropagation(); this._config = { ...this._config, ...e.detail.value }; this.fireConfigChanged(); }); }
+  setupSortListener() { const selectSort = this.shadowRoot.getElementById("default_sort"); if (!selectSort) return; selectSort.addEventListener("change", () => { this._config = { ...this._config, default_sort: selectSort.value }; this.fireConfigChanged(); }); }
+  fireConfigChanged() { this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._config }, bubbles: true, composed: true })); }
+  
+  // Sincronizzazione protetta: allinea i moduli lasciando che gli input leggano i dati dall'attributo value nativo
+  /*syncData() { 
+    const shadow = this.shadowRoot; if (!shadow) return;
+    const currentData = { ...this._config }; shadow.querySelectorAll("ha-form").forEach(form => { form.data = { ...form.data, ...currentData }; }); 
+    const selectSort = shadow.getElementById("default_sort"); if (selectSort) { selectSort.value = this._config.default_sort || "alpha"; } 
+    
+    ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
+      const el = shadow.getElementById(`${id}_input`); if (el && this._config[id]) el.value = this._config[id];
+    });
+    ["alpha_expired", "alpha_10d", "alpha_30d", "alpha_qty0", "alpha_qty1", "alpha_qty3"].forEach(id => {
+      const el = shadow.getElementById(`${id}_input`); if (el && this._config[id] !== undefined) el.value = this._config[id];
+    });
+  }*/
+  
+    syncData() { 
+    const shadow = this.shadowRoot; 
+    if (!shadow) return;
+    const currentData = { ...this._config }; 
+    
+    shadow.querySelectorAll("ha-form").forEach(form => { 
+      form.data = { ...form.data, ...currentData }; 
+    }); 
+    
+    // Sincronizzazione atomica dell'ordinamento allo YAML effettivo
+    const selectSort = shadow.getElementById("default_sort"); 
+    if (selectSort) { 
+      selectSort.value = this._config.default_sort || "alpha"; 
+    } 
+    
+    ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
+      const el = shadow.getElementById(`${id}_input`); if (el && this._config[id]) el.value = this._config[id];
+    });
+    ["alpha_expired", "alpha_10d", "alpha_30d", "alpha_qty0", "alpha_qty1", "alpha_qty3"].forEach(id => {
+      const el = shadow.getElementById(`${id}_input`); if (el && this._config[id] !== undefined) el.value = this._config[id];
+    });
+  }
+
+}
+customElements.define("simple-inventory-enhanced-card-editor", SimpleInventoryEnhancedCardEditor);
