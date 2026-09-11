@@ -1,6 +1,5 @@
 {
   "name": "Simple Inventory Enhanced Card",
-  "content_type": "plugin",
-  "filename": "simple-inventory-enhanced-card.js",
-  "render_readme": true
+  "render_readme": true,
+  "filename": "simple-inventory-enhanced-card.js"
 }
