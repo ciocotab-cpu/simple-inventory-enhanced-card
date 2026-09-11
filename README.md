@@ -1,9 +1,7 @@
 # 📦 Simple Inventory Enhanced Card
 
-<p align="left">
-  <img src="https://shields.io" alt="HACS Badge">
-  <img src="https://shields.io" alt="MIT License Badge">
-</p>
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange?style=for-the-badge&logo=homeassistant)](https://gitlab.com)
+[![license_badge](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=mit)](https://opensource.org/licenses/MIT)
 
 🌐 **Select Language:**  
 *   [English Version 🇬🇧](#-english-version)
