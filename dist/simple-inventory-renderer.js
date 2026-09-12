@@ -4,7 +4,7 @@ import { getTranslation } from './simple-inventory-lang.js';
 import { startCameraScanner } from './simple-inventory-scanner.js'; 
 import { filterAndSortItems } from './simple-inventory-filters.js';
 import { renderSingleItemCard } from './simple-inventory-cards.js';
-  
+
 export function renderCardContent(cardInstance) {
   if (!cardInstance.config) return;
   const lang = getTranslation(cardInstance._hass);
@@ -105,7 +105,6 @@ export function renderCardContent(cardInstance) {
       scanBtn.innerHTML = `<ha-icon icon="mdi:barcode-scan"></ha-icon>`;
       scanBtn.style = "background:var(--primary-color); border:none; color:white; padding:0 8px; border-radius:4px; height:34px; margin-left:6px; cursor:pointer; display:flex; align-items:center; justify-content:center;";
       addTriggerBtn.parentNode.insertBefore(scanBtn, addTriggerBtn.nextSibling);
-      
       scanBtn.addEventListener("click", () => { startCameraScanner(cardInstance, lang); });
     }
   }
@@ -138,13 +137,9 @@ export function renderCardContent(cardInstance) {
   });
 
   const summaryArea = cardInstance.shadowRoot.getElementById("summary-area");
-  const toggleBtn = cardInstance.shadowRoot.getElementById("summary-toggle");
-  if (toggleBtn) { toggleBtn.style.display = "none"; }
-
   if (cardInstance.config.show_summary) {
     summaryArea.classList.add("visible");
     let htmlContent = "";
-    
     const cExp = cardInstance.config.color_expired || "#db4437";
     const c10d = cardInstance.config.color_10d || "#e6a23c";
     const c30d = cardInstance.config.color_30d || "#ffeb3b";
@@ -159,10 +154,8 @@ export function renderCardContent(cardInstance) {
     if (cardInstance.config.show_ico_qty0) { htmlContent += `<div class="summary-item" style="color: ${cQ0};"><ha-icon icon="mdi:numeric-0-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "0")}: ${qty0Count}</div>`; }
     if (cardInstance.config.show_ico_qty1) { htmlContent += `<div class="summary-item" style="color: ${cQ1};"><ha-icon icon="mdi:numeric-1-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "1")}: ${qty1Count}</div>`; }
     if (cardInstance.config.show_ico_qty3) { htmlContent += `<div class="summary-item" style="color: ${cQ3};"><ha-icon icon="mdi:numeric-3-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "3")}: ${qty3Count}</div>`; }
-    
     summaryArea.innerHTML = htmlContent || `<div style='color:var(--secondary-text-color); font-size:0.8rem; padding:2px;'>${lang.no_counter_active}</div>`;
   } else { summaryArea.classList.remove("visible"); }
-
   const items = filterAndSortItems(cardInstance);
 
   const categoriesListArray = [];
@@ -176,12 +169,20 @@ export function renderCardContent(cardInstance) {
 
   cardInstance.content.innerHTML = items.map(item => renderSingleItemCard(item, cardInstance, lang, categoriesListArray)).join('');
 
-  cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { btn.addEventListener("click", () => cardInstance.adjustQuantity(btn.dataset.name, 1)); });
-  cardInstance.content.querySelectorAll(".btn-dec").forEach(btn => { btn.addEventListener("click", () => cardInstance.adjustQuantity(btn.dataset.name, -1)); });
-  cardInstance.content.querySelectorAll(".btn-delete").forEach(btn => { btn.addEventListener("click", () => deleteItemDefinitivelyService(cardInstance, btn.dataset.name)); });
-  cardInstance.content.querySelectorAll(".edit-icon-btn").forEach(btn => { btn.addEventListener("click", () => { cardInstance._editingItemId = btn.dataset.id; cardInstance.updateCard(); }); });
-  cardInstance.content.querySelectorAll(".btn-cancel-edit").forEach(btn => { btn.addEventListener("click", () => { cardInstance._editingItemId = null; cardInstance.updateCard(); }); });
-  cardInstance.content.querySelectorAll(".btn-save-edit").forEach(btn => { btn.addEventListener("click", () => handleSaveEditService(cardInstance, btn.dataset.id, btn.dataset.oldname)); });
+  cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance.adjustQuantity(btn.dataset.name, 1); }); });
+  cardInstance.content.querySelectorAll(".btn-dec").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance.adjustQuantity(btn.dataset.name, -1); }); });
+  cardInstance.content.querySelectorAll(".btn-delete").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); deleteItemDefinitivelyService(cardInstance, btn.dataset.name); }); });
+  
+  cardInstance.content.querySelectorAll(".edit-icon-btn").forEach(btn => { 
+    btn.addEventListener("click", (e) => { 
+      e.stopPropagation(); 
+      cardInstance._editingItemId = btn.dataset.id; 
+      cardInstance.updateCard(); 
+    }); 
+  });
+  
+  cardInstance.content.querySelectorAll(".btn-cancel-edit").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance._editingItemId = null; cardInstance.updateCard(); }); });
+  cardInstance.content.querySelectorAll(".btn-save-edit").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); handleSaveEditService(cardInstance, btn.dataset.id, btn.dataset.oldname); }); });
 
   if (cardInstance._editingItemId) {
     const shadow = cardInstance.shadowRoot;
@@ -189,8 +190,8 @@ export function renderCardContent(cardInstance) {
     const editIncBtn = shadow.getElementById("edit-qty-inc");
     const editDecBtn = shadow.getElementById("edit-qty-dec");
     if (editQtyInput && editIncBtn && editDecBtn) {
-      editIncBtn.addEventListener("click", () => { editQtyInput.value = (parseFloat(editQtyInput.value) || 0) + 1; });
-      editDecBtn.addEventListener("click", () => { const cur = parseFloat(editQtyInput.value) || 0; if (cur > 0) editQtyInput.value = cur - 1; });
+      editIncBtn.addEventListener("click", (e) => { e.preventDefault(); editQtyInput.value = (parseFloat(editQtyInput.value) || 0) + 1; });
+      editDecBtn.addEventListener("click", (e) => { e.preventDefault(); const cur = parseFloat(editQtyInput.value) || 0; if (cur > 0) editQtyInput.value = cur - 1; });
     }
     const editCatSelect = shadow.getElementById("edit_cat_select");
     const editCatContainer = shadow.getElementById("edit_cat_custom_container");
@@ -211,7 +212,9 @@ export function renderCardContent(cardInstance) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {
       if (entityId.startsWith("todo.")) {
         const stateObj = cardInstance._hass.states[entityId];
-        const friendlyName = (stateObj.attributes && stateObj.attributes.friendly_name) ? stateObj.attributes.friendly_name : entityId;
+        const friendlyName = (stateObj.attributes && stateObj.attributes.friendly_name) 
+          ? stateObj.attributes.friendly_name 
+          : entityId;
         todoListsArray.push({ entity_id: entityId, name: friendlyName });
       }
     });
