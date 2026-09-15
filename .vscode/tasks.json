@@ -4,7 +4,7 @@
     {
       "label": "Copia dist in altra cartella",
       "type": "shell",
-      "command": "Copy-Item -Path './dist/*' -Destination 'C:/percorso/della/destinazione' -Recurse -Force",
+      "command": "Copy-Item -Path './dist/*' -Destination '../config/www/community/simple-inventory-enhanced-card' -Recurse -Force",
       "problemMatcher": []
     }
   ]
