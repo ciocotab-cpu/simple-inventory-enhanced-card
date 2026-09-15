@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Copia dist in altra cartella",
+      "type": "shell",
+      "command": "Copy-Item -Path './dist/*' -Destination 'C:/percorso/della/destinazione' -Recurse -Force",
+      "problemMatcher": []
+    }
+  ]
+}
+/*
+Ctrl + K, Ctrl + S, Clicca sull'icona con il foglio e la freccia in alto a destra.
+Incolla questo codice all'interno delle parentesi [...]:
+
+JSON
+{
+  "key": "ctrl+alt+d",
+  "command": "workbench.action.tasks.runTask",
+  "args": "Copia dist in altra cartella"
+}
+*/
