@@ -4,7 +4,10 @@
     {
       "label": "Copia dist in altra cartella",
       "type": "shell",
-      "command": "Copy-Item -Path './dist/*' -Destination '../config/www/community/simple-inventory-enhanced-card' -Recurse -Force",
+      "command": "Write-Host \"[$(Get-Date -Format 'HH:mm:ss')] Avvio copia...\"; Copy-Item -Path './dist/*' -Destination '../config/www/community/simple-inventory-enhanced-card' -Recurse -Force; Write-Host \"[$(Get-Date -Format 'HH:mm:ss')] Copia completata!\"",
+      "presentation": {
+        "echo": false
+      },
       "problemMatcher": []
     }
   ]
