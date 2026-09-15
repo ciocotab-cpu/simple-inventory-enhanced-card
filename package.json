@@ -1,0 +1,7 @@
+{
+  "name": "@ciocotab-cpu/simple-inventory-enhanced-card",
+  "version": "1.0.2",
+  "files": [
+    "dist"
+  ]
+}
