@@ -19,6 +19,13 @@ export function filterAndSortItems(cardInstance) {
     items = items.filter(item => (item.quantity || 0) > 0);
     items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   } 
+  else if (sortCriteria === "alpha_desc") {
+    items.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+  } 
+  else if (sortCriteria === "alpha_desc_avail") {
+    items = items.filter(item => (item.quantity || 0) > 0);
+    items.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+  } 
   else if (sortCriteria === "threshold") {
     items.sort((a, b) => {
       const aLow = (a.quantity || 0) <= (a.auto_add_to_list_quantity || 0) ? 1 : 0;

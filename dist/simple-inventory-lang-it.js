@@ -19,6 +19,8 @@ export const langIt = {
     // Opzioni Dropdown Ordinamento
     sort_alpha: "Ordinamento A-Z (Tutti)",
     sort_alpha_avail: "Ordinamento A-Z (Solo Disponibili)",
+    sort_alpha_desc: "Ordinamento Z-A (Tutti)",
+    sort_alpha_desc_avail: "Ordinamento Z-A (Solo Disponibili)",
     sort_threshold: "Sotto Soglia (Tutti)",
     sort_threshold_avail: "Sotto Soglia (Solo Disponibili)",
     sort_expiry: "In Scadenza (Solo disponibili)",
@@ -54,12 +56,12 @@ export const langIt = {
     ed_lbl_ico_qty3: "Quantità rimasta = {num}",
     
     // Gestione etichette Colori scaduti
-    color_expired: "Codice Scaduto",
-    color_10d: "Codice Allerta",
-    color_30d: "Codice Avviso",
-    color_qty0: "Codice Esaurito (Q.tà 0)",
-    color_qty1: "Codice Critico",
-    color_qty3: "Codice Minimo",
+    color_expired: "Codice HEX Scaduto",
+    color_10d: "Codice HEX Allerta",
+    color_30d: "Codice HEX Avviso",
+    color_qty0: "Codice HEX Esaurito (Q.tà 0)",
+    color_qty1: "Codice HEX Critico",
+    color_qty3: "Codice HEX Minimo",
 
     // Gestione etichette Colori e % Trasparenza nell'editor
     ed_lbl_alpha_pct: "% Trasparenza",

@@ -108,6 +108,8 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
               <select id="default_sort" class="custom-dropdown">
                 <option value="alpha" ${this._config && this._config.default_sort === 'alpha' ? 'selected' : ''}>${lang.sort_alpha}</option>
                 <option value="alpha_avail" ${this._config && this._config.default_sort === 'alpha_avail' ? 'selected' : ''}>${lang.sort_alpha_avail}</option>
+                <option value="alpha_desc" ${this._config && this._config.default_sort === 'alpha_desc' ? 'selected' : ''}>${lang.sort_alpha_desc}</option>
+                <option value="alpha_desc_avail" ${this._config && this._config.default_sort === 'alpha_desc_avail' ? 'selected' : ''}>${lang.sort_alpha_desc_avail}</option>
                 <option value="threshold" ${this._config && this._config.default_sort === 'threshold' ? 'selected' : ''}>${lang.sort_threshold}</option>
                 <option value="threshold_avail" ${this._config && this._config.default_sort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
                 <option value="expiry" ${this._config && this._config.default_sort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
