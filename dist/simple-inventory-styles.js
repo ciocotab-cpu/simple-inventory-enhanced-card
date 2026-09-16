@@ -9,7 +9,6 @@ export const cardStyles = `
   .title-row { display: flex; justify-content: space-between; align-items: center; position: relative; }
   .card-header-text { font-size: 1.2rem; font-weight: bold; color: var(--primary-text-color); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   
-  /* Contenitore pulsanti allineati a destra del titolo */
   .header-buttons {
     display: flex; gap: 6px; align-items: center;
   }
@@ -49,7 +48,7 @@ export const cardStyles = `
   }
   .item-name { font-weight: 500; font-size: 0.9rem; margin-bottom: 2px; word-break: break-word; }
   .item-meta { font-size: 0.75rem; color: var(--secondary-text-color); margin-bottom: 0px; }
-  .item-actions { display: flex; align-items: center; justify-content: space-between; background: var(--card-background-color); border-radius: 4px; padding: 2px; }
+  .item-actions { display: flex; align-items: center; justify-content: space-between; background: rgba(0, 0, 0, 0.12); border-radius: 4px; padding: 2px; }
   .item-actions button { background: transparent; border: none; color: var(--primary-text-color); cursor: pointer; font-weight: bold; width: 26px; height: 26px; font-size: 1.1rem; }
   .qty-display { font-weight: bold; font-size: 0.9rem; }
   .btn-delete { color: var(--error-color, #db4437) !important; }
