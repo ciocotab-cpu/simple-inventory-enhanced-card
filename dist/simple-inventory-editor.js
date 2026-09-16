@@ -3,7 +3,6 @@ import { getTranslation } from './simple-inventory-lang.js';
 export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   setConfig(config) { 
     this._config = config || {}; 
-    // Forza la build o la sincronizzazione immediata dei componenti appena HA invia i dati
     if (this._hass && !this._initialized) {
       this.initEditor();
     } else if (this._initialized) {
@@ -57,6 +56,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
           align-items: center !important;
           padding: 4px 0;
         }
+        .color-row.with-days {
+          grid-template-columns: 1fr 2fr 1fr !important;
+        }
         .input-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .input-label { font-size: 0.85rem; color: var(--secondary-text-color); font-weight: 500; }
         
@@ -71,6 +73,12 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
           width: 100%; padding: 12px; border-radius: 4px; border: 1px solid var(--divider-color);
           background: var(--card-background-color); color: var(--primary-text-color); font-size: 1rem;
           font-family: inherit; box-sizing: border-box; outline: none; height: 44px;
+        }
+
+        input[type="number"]:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: var(--secondary-background-color);
         }
 
         ha-form { display: flex !important; flex-direction: column !important; gap: 2px !important; }
@@ -132,9 +140,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_expiry}</div>
           <div class="form-row">
-            ${this._createColorBlock("color_expired", "alpha_expired", "Colore Scaduto", "#db4437")}
-            ${this._createColorBlock("color_10d", "alpha_10d", "Colore Allerta (10g)", "#e6a23c")}
-            ${this._createColorBlock("color_30d", "alpha_30d", "Colore Avviso (30g)", "#ffeb3b")}
+            ${this._createColorBlock("color_expired", "alpha_expired", "Colore Scaduto", "#db4437", "disabled_days_0", 0, true)}
+            ${this._createColorBlock("color_10d", "alpha_10d", "Colore Allerta", "#e6a23c", "days_10d", 10)}
+            ${this._createColorBlock("color_30d", "alpha_30d", "Colore Avviso", "#ffeb3b", "days_30d", 30)}
           </div>
         </ha-expansion-panel>
 
@@ -153,13 +161,35 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this._attachColorListeners();
   }
 
-  _createColorBlock(colorId, alphaId, labelKey, fallbackHex) {
+  _createColorBlock(colorId, alphaId, labelKey, fallbackHex, daysId = null, fallbackDays = null, isDisabled = false) {
     const lang = getTranslation(this._hass);
     const labelText = lang[`ed_lbl_${colorId}`] || lang[colorId] || colorId;
     const alphaText = lang.ed_lbl_alpha_pct || "% Trasparenza";
+    const daysText = lang.ed_lbl_days || "Giorni";
     
     const currentHex = this._config[colorId] || fallbackHex;
     const currentAlpha = this._config[alphaId] !== undefined ? this._config[alphaId] : 100;
+    const currentDays = daysId ? (this._config[daysId] !== undefined ? this._config[daysId] : fallbackDays) : null;
+
+    if (daysId) {
+      return `
+        <div class="color-row with-days">
+          <div class="input-group">
+            <span class="input-label">${daysText}</span>
+            <input type="number" id="${daysId}_input" min="0" max="365" step="1" value="${currentDays}" ${isDisabled ? 'disabled' : ''}>
+          </div>
+          <div class="input-group">
+            <span class="input-label">${labelText}</span>
+            <input type="color" id="${colorId}_input" value="${currentHex}">
+          </div>
+          <div class="input-group">
+            <span class="input-label">${alphaText}</span>
+            <input type="number" id="${alphaId}_input" min="0" max="100" step="5" value="${currentAlpha}">
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="color-row">
         <div class="input-group">
@@ -194,10 +224,24 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         });
       }
     });
+    ["days_10d", "days_30d"].forEach(id => {
+      const el = shadow.getElementById(`${id}_input`);
+      if (el) {
+        el.addEventListener("change", (e) => {
+          this._config = { ...this._config, [id]: parseInt(e.target.value, 10) || 0 }; 
+          this.fireConfigChanged();
+          this.renderForms(getTranslation(this._hass));
+        });
+      }
+    });
   }
 
   renderForms(lang) {
     const defaultData = { title: "", columns: 2, default_sort: "alpha", show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, ...this._config };
+    
+    const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
+    const days30d = this._config.days_30d !== undefined ? this._config.days_30d : 30;
+
     const labels = { 
       entity: lang.ed_lbl_entity, 
       title: lang.ed_lbl_title, 
@@ -209,8 +253,8 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_sort: lang.ed_lbl_show_sort, 
       show_ico_total: lang.ed_lbl_ico_total, 
       show_ico_expired: lang.ed_lbl_ico_expired, 
-      show_ico_10d: lang.ed_lbl_ico_10d, 
-      show_ico_30d: lang.ed_lbl_ico_30d, 
+      show_ico_10d: (lang.ed_lbl_ico_10d || "Scadenze entro {days}gg").replace("{days}", days10d), 
+      show_ico_30d: (lang.ed_lbl_ico_30d || "Scadenze entro {days}gg").replace("{days}", days30d), 
       show_ico_qty0: lang.ed_lbl_ico_qty0, 
       show_ico_qty1: lang.ed_lbl_ico_qty1, 
       show_ico_qty3: lang.ed_lbl_ico_qty3 
@@ -284,6 +328,10 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       if (el && this._config[id]) el.value = this._config[id];
     });
     ["alpha_expired", "alpha_10d", "alpha_30d", "alpha_qty0", "alpha_qty1", "alpha_qty3"].forEach(id => {
+      const el = shadow.getElementById(`${id}_input`); 
+      if (el && this._config[id] !== undefined) el.value = this._config[id];
+    });
+    ["days_10d", "days_30d"].forEach(id => {
       const el = shadow.getElementById(`${id}_input`); 
       if (el && this._config[id] !== undefined) el.value = this._config[id];
     });

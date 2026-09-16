@@ -35,6 +35,7 @@ export const langIt = {
     ed_lbl_title: "Titolo personalizzato",
     ed_lbl_columns: "Numero colonne (Griglia)",
     ed_sort_label: "Criterio di ordinamento predefinito",
+    ed_lbl_days: "Giorni",
     
     // Toggle visibilità base
     ed_lbl_show_summary: "Sezione Icone di Riepilogo",
@@ -45,28 +46,22 @@ export const langIt = {
     // Icone Riepilogo Toggle
     ed_lbl_ico_total: "Oggetti totali",
     ed_lbl_ico_expired: "Prodotti scaduti",
-    ed_lbl_ico_10d: "Scadenze entro 10gg",
-    ed_lbl_ico_30d: "Scadenze entro 30gg",
+    ed_lbl_ico_10d: "Scadenze entro {days}gg",
+    ed_lbl_ico_30d: "Scadenze entro {days}gg",
     ed_lbl_ico_qty0: "Quantità rimasta = 0",
     ed_lbl_ico_qty1: "Quantità rimasta = 1",
     ed_lbl_ico_qty3: "Quantità rimasta = 3",
     
     // Gestione etichette Colori scaduti
-    ed_lbl_col_expired: "Prodotto già scaduto",
-    ed_lbl_col_10d: "Allerta (Mancano 10 giorni)",
-    ed_lbl_col_30d: "Avviso (Mancano 30 giorni)",
-    ed_lbl_col_qty0: "Scorte esaurite (Q.tà = 0)",
-    ed_lbl_col_qty1: "Scorte critiche (Q.tà = 1)",
-    ed_lbl_col_qty3: "Scorte minime (Q.tà = 3)",
-
-    // Gestione etichette Colori e % Trasparenza nell'editor
-    ed_lbl_alpha_pct: "% Trasparenza",
     color_expired: "Codice HEX Scaduto",
-    color_10d: "Codice HEX Allerta (10g)",
-    color_30d: "Codice HEX Avviso (30g)",
+    color_10d: "Codice HEX Allerta",
+    color_30d: "Codice HEX Avviso",
     color_qty0: "Codice HEX Esaurito (Q.tà 0)",
     color_qty1: "Codice HEX Critico (Q.tà 1)",
     color_qty3: "Codice HEX Minimo (Q.tà 3)",
+
+    // Gestione etichette Colori e % Trasparenza nell'editor
+    ed_lbl_alpha_pct: "% Trasparenza",
     
     // Popup Nuovo prodotto o modifica
     popup_add_title: "✨ Aggiungi Nuovo Prodotto",
@@ -108,5 +103,4 @@ export const langIt = {
     lbl_todo_placement: "Posizione Quantità",
     opt_placement_name: "Nel nome",
     opt_placement_desc: "Nella descrizione"
-
 };
