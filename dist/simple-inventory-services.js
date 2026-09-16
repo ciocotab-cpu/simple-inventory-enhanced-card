@@ -71,7 +71,6 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
     if (!isNaN(parsedPrice)) serviceData.price = parsedPrice;
   }
 
-
   try {
     await cardInstance._hass.callService("simple_inventory", "update_item", serviceData);
     cardInstance._editingItemId = null;
@@ -159,6 +158,7 @@ export async function handleAddItemService(cardInstance) {
   try {
     await cardInstance._hass.callService("simple_inventory", "add_item", serviceData);
     cardInstance._showAddPopup = false;
+    cardInstance.updateCard();
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
   } catch (err) {
@@ -166,7 +166,6 @@ export async function handleAddItemService(cardInstance) {
     alert("Impossibile aggiungere l'articolo.\nErrore Backend: " + err.message);
   }
 }
-
 
 export async function deleteItemDefinitivelyService(cardInstance, itemName) {
   if (!cardInstance.config || !cardInstance.config.entity) return;
@@ -190,4 +189,3 @@ export async function deleteItemDefinitivelyService(cardInstance, itemName) {
     alert("Impossibile eliminare l'articolo.\nErrore Backend: " + err.message);
   }
 }
-

@@ -36,6 +36,7 @@ export const langIt = {
     ed_lbl_columns: "Numero colonne (Griglia)",
     ed_sort_label: "Criterio di ordinamento predefinito",
     ed_lbl_days: "Giorni",
+    ed_lbl_qty: "Quantità",
     
     // Toggle visibilità base
     ed_lbl_show_summary: "Sezione Icone di Riepilogo",
@@ -49,16 +50,16 @@ export const langIt = {
     ed_lbl_ico_10d: "Scadenze entro {days}gg",
     ed_lbl_ico_30d: "Scadenze entro {days}gg",
     ed_lbl_ico_qty0: "Quantità rimasta = 0",
-    ed_lbl_ico_qty1: "Quantità rimasta = 1",
-    ed_lbl_ico_qty3: "Quantità rimasta = 3",
+    ed_lbl_ico_qty1: "Quantità rimasta = {num}",
+    ed_lbl_ico_qty3: "Quantità rimasta = {num}",
     
     // Gestione etichette Colori scaduti
-    color_expired: "Codice HEX Scaduto",
-    color_10d: "Codice HEX Allerta",
-    color_30d: "Codice HEX Avviso",
-    color_qty0: "Codice HEX Esaurito (Q.tà 0)",
-    color_qty1: "Codice HEX Critico (Q.tà 1)",
-    color_qty3: "Codice HEX Minimo (Q.tà 3)",
+    color_expired: "Codice Scaduto",
+    color_10d: "Codice Allerta",
+    color_30d: "Codice Avviso",
+    color_qty0: "Codice Esaurito (Q.tà 0)",
+    color_qty1: "Codice Critico",
+    color_qty3: "Codice Minimo",
 
     // Gestione etichette Colori e % Trasparenza nell'editor
     ed_lbl_alpha_pct: "% Trasparenza",

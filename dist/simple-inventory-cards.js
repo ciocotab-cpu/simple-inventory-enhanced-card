@@ -19,6 +19,10 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
   const days30d = cardInstance.config.days_30d !== undefined ? cardInstance.config.days_30d : 30;
 
+  const qty0Val = cardInstance.config.qty_0 !== undefined ? cardInstance.config.qty_0 : 0;
+  const qty1Val = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
+  const qty3Val = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
+
   if (item.expiry_date && currentQty > 0) {
     const today = new Date(); today.setHours(0,0,0,0);
     const expiry = new Date(item.expiry_date); expiry.setHours(0,0,0,0);
@@ -49,13 +53,13 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
     }
   }
 
-  if (currentQty === 0) {
+  if (currentQty === qty0Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty0, cardInstance.config.alpha_qty0);
     customBorder = getRgbaColor(cardInstance.config.color_qty0, 50);
-  } else if (currentQty === 1) {
+  } else if (currentQty === qty1Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty1, cardInstance.config.alpha_qty1);
     customBorder = getRgbaColor(cardInstance.config.color_qty1, 50);
-  } else if (currentQty === 3) {
+  } else if (currentQty === qty3Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty3, cardInstance.config.alpha_qty3);
     customBorder = getRgbaColor(cardInstance.config.color_qty3, 50);
   }

@@ -140,18 +140,18 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_expiry}</div>
           <div class="form-row">
-            ${this._createColorBlock("color_expired", "alpha_expired", "Colore Scaduto", "#db4437", "disabled_days_0", 0, true)}
-            ${this._createColorBlock("color_10d", "alpha_10d", "Colore Allerta", "#e6a23c", "days_10d", 10)}
-            ${this._createColorBlock("color_30d", "alpha_30d", "Colore Avviso", "#ffeb3b", "days_30d", 30)}
+            ${this._createColorBlock("color_expired", "alpha_expired", "Colore Scaduto", "#db4437", "disabled_days_0", 0, true, "Giorni")}
+            ${this._createColorBlock("color_10d", "alpha_10d", "Colore Allerta", "#e6a23c", "days_10d", 10, false, "Giorni")}
+            ${this._createColorBlock("color_30d", "alpha_30d", "Colore Avviso", "#ffeb3b", "days_30d", 30, false, "Giorni")}
           </div>
         </ha-expansion-panel>
 
         <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_qty}</div>
           <div class="form-row">
-            ${this._createColorBlock("color_qty0", "alpha_qty0", "Colore Esaurito (Q.tà 0)", "#db4437")}
-            ${this._createColorBlock("color_qty1", "alpha_qty1", "Colore Critico (Q.tà 1)", "#f44336")}
-            ${this._createColorBlock("color_qty3", "alpha_qty3", "Colore Minimo (Q.tà 3)", "#ff9800")}
+            ${this._createColorBlock("color_qty0", "alpha_qty0", "Colore Esaurito", "#db4437", "disabled_qty_0", 0, true, "Quantità")}
+            ${this._createColorBlock("color_qty1", "alpha_qty1", "Colore Critico", "#f44336", "qty_1", 1, false, "Quantità")}
+            ${this._createColorBlock("color_qty3", "alpha_qty3", "Colore Minimo", "#ff9800", "qty_3", 3, false, "Quantità")}
           </div>
         </ha-expansion-panel>
       </div>
@@ -161,11 +161,11 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this._attachColorListeners();
   }
 
-  _createColorBlock(colorId, alphaId, labelKey, fallbackHex, daysId = null, fallbackDays = null, isDisabled = false) {
+  _createColorBlock(colorId, alphaId, labelKey, fallbackHex, daysId = null, fallbackDays = null, isDisabled = false, daysLabel = "Giorni") {
     const lang = getTranslation(this._hass);
     const labelText = lang[`ed_lbl_${colorId}`] || lang[colorId] || colorId;
     const alphaText = lang.ed_lbl_alpha_pct || "% Trasparenza";
-    const daysText = lang.ed_lbl_days || "Giorni";
+    const daysText = daysLabel === "Quantità" ? (lang.ed_lbl_qty || "Quantità") : (lang.ed_lbl_days || "Giorni");
     
     const currentHex = this._config[colorId] || fallbackHex;
     const currentAlpha = this._config[alphaId] !== undefined ? this._config[alphaId] : 100;
@@ -224,7 +224,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         });
       }
     });
-    ["days_10d", "days_30d"].forEach(id => {
+    ["days_10d", "days_30d", "qty_1", "qty_3"].forEach(id => {
       const el = shadow.getElementById(`${id}_input`);
       if (el) {
         el.addEventListener("change", (e) => {
@@ -241,6 +241,8 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     
     const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
     const days30d = this._config.days_30d !== undefined ? this._config.days_30d : 30;
+    const qty1Val = this._config.qty_1 !== undefined ? this._config.qty_1 : 1;
+    const qty3Val = this._config.qty_3 !== undefined ? this._config.qty_3 : 3;
 
     const labels = { 
       entity: lang.ed_lbl_entity, 
@@ -255,9 +257,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_ico_expired: lang.ed_lbl_ico_expired, 
       show_ico_10d: (lang.ed_lbl_ico_10d || "Scadenze entro {days}gg").replace("{days}", days10d), 
       show_ico_30d: (lang.ed_lbl_ico_30d || "Scadenze entro {days}gg").replace("{days}", days30d), 
-      show_ico_qty0: lang.ed_lbl_ico_qty0, 
-      show_ico_qty1: lang.ed_lbl_ico_qty1, 
-      show_ico_qty3: lang.ed_lbl_ico_qty3 
+      show_ico_qty0: (lang.ed_lbl_ico_qty0 || "Quantità rimasta = 0"), 
+      show_ico_qty1: (lang.ed_lbl_ico_qty1 || "Quantità rimasta = {num}").replace("{num}", qty1Val), 
+      show_ico_qty3: (lang.ed_lbl_ico_qty3 || "Quantità rimasta = {num}").replace("{num}", qty3Val) 
     };
     this._computeLabel = (schemaItem) => labels[schemaItem.name] || schemaItem.name;
     
@@ -331,7 +333,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       const el = shadow.getElementById(`${id}_input`); 
       if (el && this._config[id] !== undefined) el.value = this._config[id];
     });
-    ["days_10d", "days_30d"].forEach(id => {
+    ["days_10d", "days_30d", "qty_1", "qty_3"].forEach(id => {
       const el = shadow.getElementById(`${id}_input`); 
       if (el && this._config[id] !== undefined) el.value = this._config[id];
     });

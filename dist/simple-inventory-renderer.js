@@ -134,18 +134,23 @@ export function renderCardContent(cardInstance) {
     else cardInstance.content.classList.remove("visible");
   }
 
-  // 6. CALCOLO E RENDERING RIEPILOGO
-  let totalItems = 0, expiredCount = 0, exp10Count = 0, exp30Count = 0, qty0Count = 0, qty1Count = 0, qty3Count = 0;
+  // 6. CALCOLO E RENDERING RIEPILOGO (Soglie Dinamiche Scadenze e Quantità)
+  let totalItems = 0, expiredCount = 0, exp10Count = 0, exp30Count = 0, qty0Count = 0, qtyLowCount = 0, qtyWarningCount = 0;
+  
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
   const days30d = cardInstance.config.days_30d !== undefined ? cardInstance.config.days_30d : 30;
+  
+  const qtyLowVal = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
+  const qtyWarningVal = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
 
   if (cardInstance.inventoryItems && Array.isArray(cardInstance.inventoryItems)) {
     cardInstance.inventoryItems.forEach(item => {
       const q = item.quantity !== undefined ? item.quantity : 0;
       totalItems += q;
       if (q === 0) qty0Count++;
-      if (q === 1) qty1Count++;
-      if (q === 3) qty3Count++;
+      if (q === qtyLowVal) qtyLowCount++;
+      if (q === qtyWarningVal) qtyWarningCount++;
+      
       if (item.expiry_date && q > 0) {
         const today = new Date(); today.setHours(0,0,0,0);
         const expiry = new Date(item.expiry_date); expiry.setHours(0,0,0,0);
@@ -174,8 +179,8 @@ export function renderCardContent(cardInstance) {
     if (cardInstance.config.show_ico_10d) { htmlContent += `<div class="summary-item" style="color: ${c10d};"><ha-icon icon="mdi:calendar-clock"></ha-icon> ${lang.ico_days_lbl.replace("{days}", days10d)}: ${exp10Count}</div>`; }
     if (cardInstance.config.show_ico_30d) { htmlContent += `<div class="summary-item" style="color: ${c30d};"><ha-icon icon="mdi:calendar-month"></ha-icon> ${lang.ico_days_lbl.replace("{days}", days30d)}: ${exp30Count}</div>`; }
     if (cardInstance.config.show_ico_qty0) { htmlContent += `<div class="summary-item" style="color: ${cQ0};"><ha-icon icon="mdi:numeric-0-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "0")}: ${qty0Count}</div>`; }
-    if (cardInstance.config.show_ico_qty1) { htmlContent += `<div class="summary-item" style="color: ${cQ1};"><ha-icon icon="mdi:numeric-1-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "1")}: ${qty1Count}</div>`; }
-    if (cardInstance.config.show_ico_qty3) { htmlContent += `<div class="summary-item" style="color: ${cQ3};"><ha-icon icon="mdi:numeric-3-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "3")}: ${qty3Count}</div>`; }
+    if (cardInstance.config.show_ico_qty1) { htmlContent += `<div class="summary-item" style="color: ${cQ1};"><ha-icon icon="mdi:numeric-${qtyLowVal}-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", qtyLowVal)}: ${qtyLowCount}</div>`; }
+    if (cardInstance.config.show_ico_qty3) { htmlContent += `<div class="summary-item" style="color: ${cQ3};"><ha-icon icon="mdi:numeric-${qtyWarningVal}-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", qtyWarningVal)}: ${qtyWarningCount}</div>`; }
     summaryArea.innerHTML = htmlContent || `<div style='color:var(--secondary-text-color); font-size:0.8rem; padding:2px;'>${lang.no_counter_active}</div>`;
   } else { summaryArea.classList.remove("visible"); }
 
@@ -232,71 +237,75 @@ export function renderCardContent(cardInstance) {
   }
 
   // 8. POPUP PER L'INSERIMENTO DI NUOVI PRODOTTI
-  const todoListsArray = [];
-  if (cardInstance._hass && cardInstance._hass.states) {
-    Object.keys(cardInstance._hass.states).forEach(entityId => {
-      if (entityId.startsWith("todo.")) {
-        const stateObj = cardInstance._hass.states[entityId];
-        const friendlyName = (stateObj.attributes && stateObj.attributes.friendly_name) 
-          ? stateObj.attributes.friendly_name 
-          : entityId;
-        todoListsArray.push({ entity_id: entityId, name: friendlyName });
+  if (addPopupContainer) {
+    if (!cardInstance._showAddPopup) {
+      addPopupContainer.innerHTML = "";
+    } else {
+      const todoListsArray = [];
+      if (cardInstance._hass && cardInstance._hass.states) {
+        Object.keys(cardInstance._hass.states).forEach(entityId => {
+          if (entityId.startsWith("todo.")) {
+            const stateObj = cardInstance._hass.states[entityId];
+            const friendlyName = (stateObj.attributes && stateObj.attributes.friendly_name) 
+              ? stateObj.attributes.friendly_name 
+              : entityId;
+            todoListsArray.push({ entity_id: entityId, name: friendlyName });
+          }
+        });
       }
-    });
-  }
-  todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
+      todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-  if (addPopupContainer && cardInstance._showAddPopup) {
-    const categoriesListArray = [];
-    if (cardInstance.inventoryItems) {
-      cardInstance.inventoryItems.forEach(i => {
-        if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
-          categoriesListArray.push(i.category.trim());
-        }
-      });
-    }
-
-    addPopupContainer.innerHTML = getAddPopupHtml(lang, categoriesListArray, { todoLists: todoListsArray });
-    const shadow = cardInstance.shadowRoot;
-    
-    if (cardInstance._scannedBarcodeCache) {
-      const bInput = shadow.getElementById("new_barcode"); if (bInput) bInput.value = cardInstance._scannedBarcodeCache;
-      if (cardInstance._scannedDataCache) {
-        const nInput = shadow.getElementById("new-name"); if (nInput && cardInstance._scannedDataCache.name) nInput.value = cardInstance._scannedDataCache.name;
-        const cSelect = shadow.getElementById("new_cat_select");
-        if (cSelect && cardInstance._scannedDataCache.category) {
-          let exists = Array.from(cSelect.options).some(o => o.value === cardInstance._scannedDataCache.category);
-          if (exists) { cSelect.value = cardInstance._scannedDataCache.category; cSelect.className = ""; }
-          else { cSelect.value = "__NEW_CAT__"; cSelect.className = ""; const cCont = shadow.getElementById("new_cat_custom_container"); const cCust = shadow.getElementById("new_cat_custom"); if (cCont && cCust) { cCont.style.display = "block"; cCust.value = cardInstance._scannedDataCache.category; } }
-        }
-        const uInput = shadow.getElementById("new_unit"); if (uInput && cardInstance._scannedDataCache.unit) uInput.value = cardInstance._scannedDataCache.unit;
+      const categoriesListArray = [];
+      if (cardInstance.inventoryItems) {
+        cardInstance.inventoryItems.forEach(i => {
+          if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
+            categoriesListArray.push(i.category.trim());
+          }
+        });
       }
-      cardInstance._scannedBarcodeCache = null; cardInstance._scannedDataCache = null;
-    }
 
-    const qtyInput = shadow.getElementById("new-qty");
-    const incBtn = shadow.getElementById("add-qty-inc");
-    const decBtn = shadow.getElementById("add-qty-dec");
-    if (qtyInput && incBtn && decBtn) {
-      incBtn.addEventListener("click", () => { qtyInput.value = (parseFloat(qtyInput.value) || 0) + 1; });
-      decBtn.addEventListener("click", () => { const cur = parseFloat(qtyInput.value) || 0; if (cur > 0) qtyInput.value = cur - 1; });
-    }
-    const catSelect = shadow.getElementById("new_cat_select");
-    const catCustomContainer = shadow.getElementById("new_cat_custom_container");
-    const catCustomInput = shadow.getElementById("new_cat_custom");
-    if (catSelect && catCustomContainer && catCustomInput) {
-      catSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { catCustomContainer.style.display = "block"; catCustomInput.value = ""; catCustomInput.focus(); } else { catCustomContainer.style.display = "none"; } });
-    }
-    const autoAddCheckbox = shadow.getElementById("new_auto_add_checkbox");
-    const subRow = shadow.getElementById("new_auto_add_subrow");
-    if (autoAddCheckbox && subRow) {
-      const subInputs = subRow.querySelectorAll("input, select");
-      autoAddCheckbox.addEventListener("change", (e) => { const isChecked = e.target.checked; subRow.style.opacity = isChecked ? "1" : "0.5"; subInputs.forEach(input => { if (isChecked) input.removeAttribute("disabled"); else input.setAttribute("disabled", "true"); }); });
-    }
+      addPopupContainer.innerHTML = getAddPopupHtml(lang, categoriesListArray, { todoLists: todoListsArray });
+      const shadow = cardInstance.shadowRoot;
+      
+      if (cardInstance._scannedBarcodeCache) {
+        const bInput = shadow.getElementById("new_barcode"); if (bInput) bInput.value = cardInstance._scannedBarcodeCache;
+        if (cardInstance._scannedDataCache) {
+          const nInput = shadow.getElementById("new-name"); if (nInput && cardInstance._scannedDataCache.name) nInput.value = cardInstance._scannedDataCache.name;
+          const cSelect = shadow.getElementById("new_cat_select");
+          if (cSelect && cardInstance._scannedDataCache.category) {
+            let exists = Array.from(cSelect.options).some(o => o.value === cardInstance._scannedDataCache.category);
+            if (exists) { cSelect.value = cardInstance._scannedDataCache.category; cSelect.className = ""; }
+            else { cSelect.value = "__NEW_CAT__"; cSelect.className = ""; const cCont = shadow.getElementById("new_cat_custom_container"); const cCust = shadow.getElementById("new_cat_custom"); if (cCont && cCust) { cCont.style.display = "block"; cCust.value = cardInstance._scannedDataCache.category; } }
+          }
+          const uInput = shadow.getElementById("new_unit"); if (uInput && cardInstance._scannedDataCache.unit) uInput.value = cardInstance._scannedDataCache.unit;
+        }
+        cardInstance._scannedBarcodeCache = null; cardInstance._scannedDataCache = null;
+      }
 
-    const addButtons = addPopupContainer.querySelectorAll(".btn-save-add, .btn-add, #btn-add-save");
-    addButtons.forEach(btn => { btn.addEventListener("click", () => handleAddItemService(cardInstance)); });
-    const cancelButtons = addPopupContainer.querySelectorAll(".btn-cancel-add, .btn-cancel, #btn-add-cancel");
-    cancelButtons.forEach(btn => { btn.addEventListener("click", () => { cardInstance._showAddPopup = false; cardInstance.updateCard(); }); });
+      const qtyInput = shadow.getElementById("new-qty");
+      const incBtn = shadow.getElementById("add-qty-inc");
+      const decBtn = shadow.getElementById("add-qty-dec");
+      if (qtyInput && incBtn && decBtn) {
+        incBtn.addEventListener("click", () => { qtyInput.value = (parseFloat(qtyInput.value) || 0) + 1; });
+        decBtn.addEventListener("click", () => { const cur = parseFloat(qtyInput.value) || 0; if (cur > 0) qtyInput.value = cur - 1; });
+      }
+      const catSelect = shadow.getElementById("new_cat_select");
+      const catCustomContainer = shadow.getElementById("new_cat_custom_container");
+      const catCustomInput = shadow.getElementById("new_cat_custom");
+      if (catSelect && catCustomContainer && catCustomInput) {
+        catSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { catCustomContainer.style.display = "block"; catCustomInput.value = ""; catCustomInput.focus(); } else { catCustomContainer.style.display = "none"; } });
+      }
+      const autoAddCheckbox = shadow.getElementById("new_auto_add_checkbox");
+      const subRow = shadow.getElementById("new_auto_add_subrow");
+      if (autoAddCheckbox && subRow) {
+        const subInputs = subRow.querySelectorAll("input, select");
+        autoAddCheckbox.addEventListener("change", (e) => { const isChecked = e.target.checked; subRow.style.opacity = isChecked ? "1" : "0.5"; subInputs.forEach(input => { if (isChecked) input.removeAttribute("disabled"); else input.setAttribute("disabled", "true"); }); });
+      }
+
+      const addButtons = addPopupContainer.querySelectorAll(".btn-save-add, .btn-add, #btn-add-save");
+      addButtons.forEach(btn => { btn.addEventListener("click", () => handleAddItemService(cardInstance)); });
+      const cancelButtons = addPopupContainer.querySelectorAll(".btn-cancel-add, .btn-cancel, #btn-add-cancel");
+      cancelButtons.forEach(btn => { btn.addEventListener("click", () => { cardInstance._showAddPopup = false; cardInstance.updateCard(); }); });
+    }
   }
 }
