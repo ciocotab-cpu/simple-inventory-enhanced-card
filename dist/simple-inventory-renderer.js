@@ -232,71 +232,75 @@ export function renderCardContent(cardInstance) {
   }
 
   // 8. POPUP PER L'INSERIMENTO DI NUOVI PRODOTTI
-  const todoListsArray = [];
-  if (cardInstance._hass && cardInstance._hass.states) {
-    Object.keys(cardInstance._hass.states).forEach(entityId => {
-      if (entityId.startsWith("todo.")) {
-        const stateObj = cardInstance._hass.states[entityId];
-        const friendlyName = (stateObj.attributes && stateObj.attributes.friendly_name) 
-          ? stateObj.attributes.friendly_name 
-          : entityId;
-        todoListsArray.push({ entity_id: entityId, name: friendlyName });
+  if (addPopupContainer) {
+    if (!cardInstance._showAddPopup) {
+      addPopupContainer.innerHTML = "";
+    } else {
+      const todoListsArray = [];
+      if (cardInstance._hass && cardInstance._hass.states) {
+        Object.keys(cardInstance._hass.states).forEach(entityId => {
+          if (entityId.startsWith("todo.")) {
+            const stateObj = cardInstance._hass.states[entityId];
+            const friendlyName = (stateObj.attributes && stateObj.attributes.friendly_name) 
+              ? stateObj.attributes.friendly_name 
+              : entityId;
+            todoListsArray.push({ entity_id: entityId, name: friendlyName });
+          }
+        });
       }
-    });
-  }
-  todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
+      todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-  if (addPopupContainer && cardInstance._showAddPopup) {
-    const categoriesListArray = [];
-    if (cardInstance.inventoryItems) {
-      cardInstance.inventoryItems.forEach(i => {
-        if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
-          categoriesListArray.push(i.category.trim());
-        }
-      });
-    }
-
-    addPopupContainer.innerHTML = getAddPopupHtml(lang, categoriesListArray, { todoLists: todoListsArray });
-    const shadow = cardInstance.shadowRoot;
-    
-    if (cardInstance._scannedBarcodeCache) {
-      const bInput = shadow.getElementById("new_barcode"); if (bInput) bInput.value = cardInstance._scannedBarcodeCache;
-      if (cardInstance._scannedDataCache) {
-        const nInput = shadow.getElementById("new-name"); if (nInput && cardInstance._scannedDataCache.name) nInput.value = cardInstance._scannedDataCache.name;
-        const cSelect = shadow.getElementById("new_cat_select");
-        if (cSelect && cardInstance._scannedDataCache.category) {
-          let exists = Array.from(cSelect.options).some(o => o.value === cardInstance._scannedDataCache.category);
-          if (exists) { cSelect.value = cardInstance._scannedDataCache.category; cSelect.className = ""; }
-          else { cSelect.value = "__NEW_CAT__"; cSelect.className = ""; const cCont = shadow.getElementById("new_cat_custom_container"); const cCust = shadow.getElementById("new_cat_custom"); if (cCont && cCust) { cCont.style.display = "block"; cCust.value = cardInstance._scannedDataCache.category; } }
-        }
-        const uInput = shadow.getElementById("new_unit"); if (uInput && cardInstance._scannedDataCache.unit) uInput.value = cardInstance._scannedDataCache.unit;
+      const categoriesListArray = [];
+      if (cardInstance.inventoryItems) {
+        cardInstance.inventoryItems.forEach(i => {
+          if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
+            categoriesListArray.push(i.category.trim());
+          }
+        });
       }
-      cardInstance._scannedBarcodeCache = null; cardInstance._scannedDataCache = null;
-    }
 
-    const qtyInput = shadow.getElementById("new-qty");
-    const incBtn = shadow.getElementById("add-qty-inc");
-    const decBtn = shadow.getElementById("add-qty-dec");
-    if (qtyInput && incBtn && decBtn) {
-      incBtn.addEventListener("click", () => { qtyInput.value = (parseFloat(qtyInput.value) || 0) + 1; });
-      decBtn.addEventListener("click", () => { const cur = parseFloat(qtyInput.value) || 0; if (cur > 0) qtyInput.value = cur - 1; });
-    }
-    const catSelect = shadow.getElementById("new_cat_select");
-    const catCustomContainer = shadow.getElementById("new_cat_custom_container");
-    const catCustomInput = shadow.getElementById("new_cat_custom");
-    if (catSelect && catCustomContainer && catCustomInput) {
-      catSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { catCustomContainer.style.display = "block"; catCustomInput.value = ""; catCustomInput.focus(); } else { catCustomContainer.style.display = "none"; } });
-    }
-    const autoAddCheckbox = shadow.getElementById("new_auto_add_checkbox");
-    const subRow = shadow.getElementById("new_auto_add_subrow");
-    if (autoAddCheckbox && subRow) {
-      const subInputs = subRow.querySelectorAll("input, select");
-      autoAddCheckbox.addEventListener("change", (e) => { const isChecked = e.target.checked; subRow.style.opacity = isChecked ? "1" : "0.5"; subInputs.forEach(input => { if (isChecked) input.removeAttribute("disabled"); else input.setAttribute("disabled", "true"); }); });
-    }
+      addPopupContainer.innerHTML = getAddPopupHtml(lang, categoriesListArray, { todoLists: todoListsArray });
+      const shadow = cardInstance.shadowRoot;
+      
+      if (cardInstance._scannedBarcodeCache) {
+        const bInput = shadow.getElementById("new_barcode"); if (bInput) bInput.value = cardInstance._scannedBarcodeCache;
+        if (cardInstance._scannedDataCache) {
+          const nInput = shadow.getElementById("new-name"); if (nInput && cardInstance._scannedDataCache.name) nInput.value = cardInstance._scannedDataCache.name;
+          const cSelect = shadow.getElementById("new_cat_select");
+          if (cSelect && cardInstance._scannedDataCache.category) {
+            let exists = Array.from(cSelect.options).some(o => o.value === cardInstance._scannedDataCache.category);
+            if (exists) { cSelect.value = cardInstance._scannedDataCache.category; cSelect.className = ""; }
+            else { cSelect.value = "__NEW_CAT__"; cSelect.className = ""; const cCont = shadow.getElementById("new_cat_custom_container"); const cCust = shadow.getElementById("new_cat_custom"); if (cCont && cCust) { cCont.style.display = "block"; cCust.value = cardInstance._scannedDataCache.category; } }
+          }
+          const uInput = shadow.getElementById("new_unit"); if (uInput && cardInstance._scannedDataCache.unit) uInput.value = cardInstance._scannedDataCache.unit;
+        }
+        cardInstance._scannedBarcodeCache = null; cardInstance._scannedDataCache = null;
+      }
 
-    const addButtons = addPopupContainer.querySelectorAll(".btn-save-add, .btn-add, #btn-add-save");
-    addButtons.forEach(btn => { btn.addEventListener("click", () => handleAddItemService(cardInstance)); });
-    const cancelButtons = addPopupContainer.querySelectorAll(".btn-cancel-add, .btn-cancel, #btn-add-cancel");
-    cancelButtons.forEach(btn => { btn.addEventListener("click", () => { cardInstance._showAddPopup = false; cardInstance.updateCard(); }); });
+      const qtyInput = shadow.getElementById("new-qty");
+      const incBtn = shadow.getElementById("add-qty-inc");
+      const decBtn = shadow.getElementById("add-qty-dec");
+      if (qtyInput && incBtn && decBtn) {
+        incBtn.addEventListener("click", () => { qtyInput.value = (parseFloat(qtyInput.value) || 0) + 1; });
+        decBtn.addEventListener("click", () => { const cur = parseFloat(qtyInput.value) || 0; if (cur > 0) qtyInput.value = cur - 1; });
+      }
+      const catSelect = shadow.getElementById("new_cat_select");
+      const catCustomContainer = shadow.getElementById("new_cat_custom_container");
+      const catCustomInput = shadow.getElementById("new_cat_custom");
+      if (catSelect && catCustomContainer && catCustomInput) {
+        catSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { catCustomContainer.style.display = "block"; catCustomInput.value = ""; catCustomInput.focus(); } else { catCustomContainer.style.display = "none"; } });
+      }
+      const autoAddCheckbox = shadow.getElementById("new_auto_add_checkbox");
+      const subRow = shadow.getElementById("new_auto_add_subrow");
+      if (autoAddCheckbox && subRow) {
+        const subInputs = subRow.querySelectorAll("input, select");
+        autoAddCheckbox.addEventListener("change", (e) => { const isChecked = e.target.checked; subRow.style.opacity = isChecked ? "1" : "0.5"; subInputs.forEach(input => { if (isChecked) input.removeAttribute("disabled"); else input.setAttribute("disabled", "true"); }); });
+      }
+
+      const addButtons = addPopupContainer.querySelectorAll(".btn-save-add, .btn-add, #btn-add-save");
+      addButtons.forEach(btn => { btn.addEventListener("click", () => handleAddItemService(cardInstance)); });
+      const cancelButtons = addPopupContainer.querySelectorAll(".btn-cancel-add, .btn-cancel, #btn-add-cancel");
+      cancelButtons.forEach(btn => { btn.addEventListener("click", () => { cardInstance._showAddPopup = false; cardInstance.updateCard(); }); });
+    }
   }
 }
