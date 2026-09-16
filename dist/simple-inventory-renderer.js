@@ -56,6 +56,8 @@ export function renderCardContent(cardInstance) {
     let sortOptionsHtml = `
       <option value="alpha" ${cardInstance.currentSort === 'alpha' ? 'selected' : ''}>${lang.sort_alpha}</option>
       <option value="alpha_avail" ${cardInstance.currentSort === 'alpha_avail' ? 'selected' : ''}>${lang.sort_alpha_avail}</option>
+      <option value="alpha_desc" ${cardInstance.currentSort === 'alpha_desc' ? 'selected' : ''}>${lang.sort_alpha_desc}</option>
+      <option value="alpha_desc_avail" ${cardInstance.currentSort === 'alpha_desc_avail' ? 'selected' : ''}>${lang.sort_alpha_desc_avail}</option>
       <option value="threshold" ${cardInstance.currentSort === 'threshold' ? 'selected' : ''}>${lang.sort_threshold}</option>
       <option value="threshold_avail" ${cardInstance.currentSort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
       <option value="expiry" ${cardInstance.currentSort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
