@@ -134,18 +134,23 @@ export function renderCardContent(cardInstance) {
     else cardInstance.content.classList.remove("visible");
   }
 
-  // 6. CALCOLO E RENDERING RIEPILOGO
-  let totalItems = 0, expiredCount = 0, exp10Count = 0, exp30Count = 0, qty0Count = 0, qty1Count = 0, qty3Count = 0;
+  // 6. CALCOLO E RENDERING RIEPILOGO (Soglie Dinamiche Scadenze e Quantità)
+  let totalItems = 0, expiredCount = 0, exp10Count = 0, exp30Count = 0, qty0Count = 0, qtyLowCount = 0, qtyWarningCount = 0;
+  
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
   const days30d = cardInstance.config.days_30d !== undefined ? cardInstance.config.days_30d : 30;
+  
+  const qtyLowVal = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
+  const qtyWarningVal = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
 
   if (cardInstance.inventoryItems && Array.isArray(cardInstance.inventoryItems)) {
     cardInstance.inventoryItems.forEach(item => {
       const q = item.quantity !== undefined ? item.quantity : 0;
       totalItems += q;
       if (q === 0) qty0Count++;
-      if (q === 1) qty1Count++;
-      if (q === 3) qty3Count++;
+      if (q === qtyLowVal) qtyLowCount++;
+      if (q === qtyWarningVal) qtyWarningCount++;
+      
       if (item.expiry_date && q > 0) {
         const today = new Date(); today.setHours(0,0,0,0);
         const expiry = new Date(item.expiry_date); expiry.setHours(0,0,0,0);
@@ -174,8 +179,8 @@ export function renderCardContent(cardInstance) {
     if (cardInstance.config.show_ico_10d) { htmlContent += `<div class="summary-item" style="color: ${c10d};"><ha-icon icon="mdi:calendar-clock"></ha-icon> ${lang.ico_days_lbl.replace("{days}", days10d)}: ${exp10Count}</div>`; }
     if (cardInstance.config.show_ico_30d) { htmlContent += `<div class="summary-item" style="color: ${c30d};"><ha-icon icon="mdi:calendar-month"></ha-icon> ${lang.ico_days_lbl.replace("{days}", days30d)}: ${exp30Count}</div>`; }
     if (cardInstance.config.show_ico_qty0) { htmlContent += `<div class="summary-item" style="color: ${cQ0};"><ha-icon icon="mdi:numeric-0-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "0")}: ${qty0Count}</div>`; }
-    if (cardInstance.config.show_ico_qty1) { htmlContent += `<div class="summary-item" style="color: ${cQ1};"><ha-icon icon="mdi:numeric-1-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "1")}: ${qty1Count}</div>`; }
-    if (cardInstance.config.show_ico_qty3) { htmlContent += `<div class="summary-item" style="color: ${cQ3};"><ha-icon icon="mdi:numeric-3-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "3")}: ${qty3Count}</div>`; }
+    if (cardInstance.config.show_ico_qty1) { htmlContent += `<div class="summary-item" style="color: ${cQ1};"><ha-icon icon="mdi:numeric-${qtyLowVal}-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", qtyLowVal)}: ${qtyLowCount}</div>`; }
+    if (cardInstance.config.show_ico_qty3) { htmlContent += `<div class="summary-item" style="color: ${cQ3};"><ha-icon icon="mdi:numeric-${qtyWarningVal}-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", qtyWarningVal)}: ${qtyWarningCount}</div>`; }
     summaryArea.innerHTML = htmlContent || `<div style='color:var(--secondary-text-color); font-size:0.8rem; padding:2px;'>${lang.no_counter_active}</div>`;
   } else { summaryArea.classList.remove("visible"); }
 

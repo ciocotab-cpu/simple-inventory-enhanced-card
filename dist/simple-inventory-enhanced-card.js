@@ -13,7 +13,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       show_items: true, show_add_form: true, show_search: true, show_sort: true,
       show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true,
       show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true,
-      days_10d: 10, days_30d: 30,
+      days_10d: 10, days_30d: 30, qty_0: 0, qty_1: 1, qty_3: 3,
       color_expired: "#db4437", color_10d: "#e6a23c", color_30d: "#ffeb3b",
       color_qty0: "#db4437", color_qty1: "#f44336", color_qty3: "#ff9800",
       alpha_expired: 100, alpha_10d: 100, alpha_30d: 100, alpha_qty0: 100, alpha_qty1: 100, alpha_qty3: 100
@@ -52,6 +52,9 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       show_ico_qty3: baseConfig.show_ico_qty3 !== undefined ? baseConfig.show_ico_qty3 : true,
       days_10d: baseConfig.days_10d !== undefined ? baseConfig.days_10d : 10,
       days_30d: baseConfig.days_30d !== undefined ? baseConfig.days_30d : 30,
+      qty_0: baseConfig.qty_0 !== undefined ? baseConfig.qty_0 : 0,
+      qty_1: baseConfig.qty_1 !== undefined ? baseConfig.qty_1 : 1,
+      qty_3: baseConfig.qty_3 !== undefined ? baseConfig.qty_3 : 3,
       color_expired: baseConfig.color_expired || "#db4437",
       color_10d: baseConfig.color_10d || "#e6a23c",
       color_30d: baseConfig.color_30d || "#ffeb3b",
