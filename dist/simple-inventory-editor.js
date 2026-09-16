@@ -1,14 +1,38 @@
 import { getTranslation } from './simple-inventory-lang.js';
 
 export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
-  setConfig(config) { this._config = config || {}; }
+  setConfig(config) { 
+    this._config = config || {}; 
+    // Forza la build o la sincronizzazione immediata dei componenti appena HA invia i dati
+    if (this._hass && !this._initialized) {
+      this.initEditor();
+    } else if (this._initialized) {
+      this.syncData();
+    }
+  }
+
   get config() { return this._config; }
-  set config(config) { this._config = config || {}; if (this._initialized) { this.syncData(); } }
-  set hass(hass) { this._hass = hass; if (!this._initialized && this._config) { this.initEditor(); } else if (this._initialized) { this.shadowRoot.querySelectorAll("ha-form").forEach(form => { form.hass = this._hass; }); } }
+  
+  set config(config) { 
+    this._config = config || {}; 
+    if (this._initialized) { 
+      this.syncData(); 
+    } 
+  }
+
+  set hass(hass) { 
+    this._hass = hass; 
+    if (!this._initialized && this._config) { 
+      this.initEditor(); 
+    } else if (this._initialized) { 
+      this.shadowRoot.querySelectorAll("ha-form").forEach(form => { form.hass = this._hass; }); 
+    } 
+  }
 
   initEditor() {
     if (!this._hass || !this._config) return;
-    this._initialized = true; this.attachShadow({ mode: 'open' });
+    this._initialized = true; 
+    this.attachShadow({ mode: 'open' });
     const lang = getTranslation(this._hass);
     
     this.shadowRoot.innerHTML = `
@@ -71,17 +95,6 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
               <ha-form id="form-base-t4"></ha-form>
             </div>
             <ha-form id="form-base-t5"></ha-form>
-            <!--<div class="select-option">
-              <span class="select-label">${lang.ed_sort_label}</span>
-              <select id="default_sort" class="custom-dropdown">
-                <option value="alpha">${lang.sort_alpha}</option>
-                <option value="alpha_avail">${lang.sort_alpha_avail}</option>
-                <option value="threshold">${lang.sort_threshold}</option>
-                <option value="threshold_avail">${lang.sort_threshold_avail}</option>
-                <option value="expiry">${lang.sort_expiry}</option>
-                <option value="only_expired">${lang.sort_only_expired}</option>
-                <option value="only_empty">${lang.sort_only_empty}</option>
-              </select>-->
             <div class="select-option">
               <span class="select-label">${lang.ed_sort_label}</span>
               <select id="default_sort" class="custom-dropdown">
@@ -93,7 +106,6 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
                 <option value="only_expired" ${this._config && this._config.default_sort === 'only_expired' ? 'selected' : ''}>${lang.sort_only_expired}</option>
                 <option value="only_empty" ${this._config && this._config.default_sort === 'only_empty' ? 'selected' : ''}>${lang.sort_only_empty}</option>
               </select>
-            </div>
             </div>
           </div>
         </ha-expansion-panel>
@@ -116,6 +128,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
             <ha-form id="form-sum-t7"></ha-form>
           </div>
         </ha-expansion-panel>
+
         <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_expiry}</div>
           <div class="form-row">
@@ -135,14 +148,13 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         </ha-expansion-panel>
       </div>
     `;
-    this.renderForms(lang); this.setupSortListener(); this._attachColorListeners();
+    this.renderForms(lang); 
+    this.setupSortListener(); 
+    this._attachColorListeners();
   }
 
   _createColorBlock(colorId, alphaId, labelKey, fallbackHex) {
-    const shadow = this.shadowRoot;
     const lang = getTranslation(this._hass);
-    
-    // Prende la traduzione ufficiale dal dizionario (es. lang.ed_lbl_col_expired) o usa la chiave come ruota di scorta
     const labelText = lang[`ed_lbl_${colorId}`] || lang[colorId] || colorId;
     const alphaText = lang.ed_lbl_alpha_pct || "% Trasparenza";
     
@@ -162,18 +174,25 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     `;
   }
 
-
   _attachColorListeners() {
     const shadow = this.shadowRoot;
     ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
-      shadow.getElementById(`${id}_input`).addEventListener("change", (e) => {
-        this._config = { ...this._config, [id]: e.target.value }; this.fireConfigChanged();
-      });
+      const el = shadow.getElementById(`${id}_input`);
+      if (el) {
+        el.addEventListener("change", (e) => {
+          this._config = { ...this._config, [id]: e.target.value }; 
+          this.fireConfigChanged();
+        });
+      }
     });
     ["alpha_expired", "alpha_10d", "alpha_30d", "alpha_qty0", "alpha_qty1", "alpha_qty3"].forEach(id => {
-      shadow.getElementById(`${id}_input`).addEventListener("change", (e) => {
-        this._config = { ...this._config, [id]: parseInt(e.target.value) !== undefined ? parseInt(e.target.value) : 100 }; this.fireConfigChanged();
-      });
+      const el = shadow.getElementById(`${id}_input`);
+      if (el) {
+        el.addEventListener("change", (e) => {
+          this._config = { ...this._config, [id]: parseInt(e.target.value, 10) || 0 }; 
+          this.fireConfigChanged();
+        });
+      }
     });
   }
 
@@ -213,16 +232,40 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.setupForm("form-sum-t3", [{ name: "show_ico_10d", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-sum-t4", [{ name: "show_ico_30d", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-sum-t5", [{ name: "show_ico_qty0", selector: { boolean: {} } }], defaultData);
-    this.shadowRoot.querySelectorAll("ha-form").forEach(form => { form.hass = this._hass; });
     this.setupForm("form-sum-t6", [{ name: "show_ico_qty1", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-sum-t7", [{ name: "show_ico_qty3", selector: { boolean: {} } }], defaultData);
+    
+    this.shadowRoot.querySelectorAll("ha-form").forEach(form => { form.hass = this._hass; });
   }
 
-  setupForm(formId, schema, data) { const haForm = this.shadowRoot.getElementById(formId); if (!haForm) return; haForm.hass = this._hass; haForm.schema = schema; haForm.data = data; haForm.computeLabel = this._computeLabel; haForm.addEventListener("value-changed", (e) => { e.stopPropagation(); this._config = { ...this._config, ...e.detail.value }; this.fireConfigChanged(); }); }
-  setupSortListener() { const selectSort = this.shadowRoot.getElementById("default_sort"); if (!selectSort) return; selectSort.addEventListener("change", () => { this._config = { ...this._config, default_sort: selectSort.value }; this.fireConfigChanged(); }); }
-  fireConfigChanged() { this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._config }, bubbles: true, composed: true })); }
+  setupForm(formId, schema, data) { 
+    const haForm = this.shadowRoot.getElementById(formId); 
+    if (!haForm) return; 
+    haForm.hass = this._hass; 
+    haForm.schema = schema; 
+    haForm.data = data; 
+    haForm.computeLabel = this._computeLabel; 
+    haForm.addEventListener("value-changed", (e) => { 
+      e.stopPropagation(); 
+      this._config = { ...this._config, ...e.detail.value }; 
+      this.fireConfigChanged(); 
+    }); 
+  }
+
+  setupSortListener() { 
+    const selectSort = this.shadowRoot.getElementById("default_sort"); 
+    if (!selectSort) return; 
+    selectSort.addEventListener("change", () => { 
+      this._config = { ...this._config, default_sort: selectSort.value }; 
+      this.fireConfigChanged(); 
+    }); 
+  }
+
+  fireConfigChanged() { 
+    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._config }, bubbles: true, composed: true })); 
+  }
   
-    syncData() { 
+  syncData() { 
     const shadow = this.shadowRoot; 
     if (!shadow) return;
     const currentData = { ...this._config }; 
@@ -231,19 +274,22 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       form.data = { ...form.data, ...currentData }; 
     }); 
     
-    // Sincronizzazione atomica dell'ordinamento allo YAML effettivo
     const selectSort = shadow.getElementById("default_sort"); 
     if (selectSort) { 
       selectSort.value = this._config.default_sort || "alpha"; 
     } 
     
     ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
-      const el = shadow.getElementById(`${id}_input`); if (el && this._config[id]) el.value = this._config[id];
+      const el = shadow.getElementById(`${id}_input`); 
+      if (el && this._config[id]) el.value = this._config[id];
     });
     ["alpha_expired", "alpha_10d", "alpha_30d", "alpha_qty0", "alpha_qty1", "alpha_qty3"].forEach(id => {
-      const el = shadow.getElementById(`${id}_input`); if (el && this._config[id] !== undefined) el.value = this._config[id];
+      const el = shadow.getElementById(`${id}_input`); 
+      if (el && this._config[id] !== undefined) el.value = this._config[id];
     });
   }
-
 }
-customElements.define("simple-inventory-enhanced-card-editor", SimpleInventoryEnhancedCardEditor);
+
+if (!customElements.get("simple-inventory-enhanced-card-editor")) {
+  customElements.define("simple-inventory-enhanced-card-editor", SimpleInventoryEnhancedCardEditor);
+}

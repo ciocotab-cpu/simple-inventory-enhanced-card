@@ -6,35 +6,53 @@ import { filterAndSortItems } from './simple-inventory-filters.js';
 import { renderSingleItemCard } from './simple-inventory-cards.js';
 
 export function renderCardContent(cardInstance) {
-  if (!cardInstance.config) return;
+  if (!cardInstance || !cardInstance.config) return;
   const lang = getTranslation(cardInstance._hass);
   
-  let computedTitle = cardInstance.config.title;
-  if (!computedTitle || computedTitle.trim() === "") {
-    const stateObj = cardInstance._hass.states[cardInstance.config.entity];
-    computedTitle = (stateObj && stateObj.attributes && stateObj.attributes.friendly_name) 
-                    ? stateObj.attributes.friendly_name 
-                    : (cardInstance.config.entity || lang.title_default);
-  }
-  cardInstance.shadowRoot.getElementById("card-title").innerText = computedTitle;
-  
-  if (!cardInstance.inventoryItems || cardInstance.inventoryItems.length === 0) {
-    if (cardInstance.content) {
-      cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang.loading_items}</div>`;
+  // 1. GESTIONE TITOLO ROBUSTA
+  const titleEl = cardInstance.shadowRoot ? cardInstance.shadowRoot.getElementById("card-title") : null;
+  if (titleEl) {
+    let computedTitle = cardInstance.config.title;
+    
+    // Se il titolo da config è vuoto o contiene solo spazi
+    if (!computedTitle || computedTitle.trim() === "") {
+      const stateObj = (cardInstance._hass && cardInstance._hass.states && cardInstance.config.entity) 
+        ? cardInstance._hass.states[cardInstance.config.entity] 
+        : null;
+      
+      const friendlyName = stateObj && stateObj.attributes ? stateObj.attributes.friendly_name : null;
+      
+      // Fallback: Friendly Name -> Entity ID -> Messaggio o Titolo Default
+      computedTitle = friendlyName || cardInstance.config.entity || (lang && lang.select_entity_error ? lang.select_entity_error : "Seleziona Inventario");
     }
-    return;
+    
+    titleEl.textContent = computedTitle;
+  }
+
+  // 2. RENDERING MESSAGGIO INVENTARIO VUOTO / SENZA ENTITÀ SULLA GRIGLIA
+  if (!cardInstance.config.entity) {
+    if (cardInstance.content) {
+      cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang ? lang.select_entity_error : 'Seleziona un\'entità nelle impostazioni'}</div>`;
+    }
+  } else if (!cardInstance.inventoryItems || cardInstance.inventoryItems.length === 0) {
+    if (cardInstance.content) {
+      cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang ? lang.loading_items : 'Nessun articolo trovato'}</div>`;
+    }
   }
 
   const dynamicCategories = [];
-  cardInstance.inventoryItems.forEach(item => {
-    const q = item.quantity !== undefined ? item.quantity : 0;
-    if (q > 0) {
-      const catName = item.category && item.category.trim() !== "" ? item.category.trim() : lang.senza_categoria;
-      if (!dynamicCategories.includes(catName)) { dynamicCategories.push(catName); }
-    }
-  });
+  if (cardInstance.inventoryItems && Array.isArray(cardInstance.inventoryItems)) {
+    cardInstance.inventoryItems.forEach(item => {
+      const q = item.quantity !== undefined ? item.quantity : 0;
+      if (q > 0) {
+        const catName = item.category && item.category.trim() !== "" ? item.category.trim() : lang.senza_categoria;
+        if (!dynamicCategories.includes(catName)) { dynamicCategories.push(catName); }
+      }
+    });
+  }
   dynamicCategories.sort((a, b) => a.localeCompare(b));
 
+  // 3. DROPDOWN ORDINAMENTO
   const selectSort = cardInstance.shadowRoot.getElementById("sort-select");
   if (selectSort && cardInstance.config.show_sort) {
     let sortOptionsHtml = `
@@ -63,6 +81,7 @@ export function renderCardContent(cardInstance) {
     else selectSort.classList.remove("visible");
   }
 
+  // 4. BARRA DI RICERCA
   const searchBar = cardInstance.shadowRoot.getElementById("search-input");
   const controlsContainer = cardInstance.shadowRoot.getElementById("controls-container");
   if (searchBar && controlsContainer) {
@@ -76,7 +95,7 @@ export function renderCardContent(cardInstance) {
       searchBar.addEventListener("keydown", async (e) => {
         if (e.key === "Enter") {
           const rawCode = searchBar.value.trim();
-          if (!rawCode) return;
+          if (!rawCode || !cardInstance.inventoryItems) return;
           const exactMatch = cardInstance.inventoryItems.find(i => {
             const b = i.barcodes || i.barcode_id || i.barcode || "";
             return b.trim() === rawCode;
@@ -93,6 +112,7 @@ export function renderCardContent(cardInstance) {
     }
   }
 
+  // 5. PULSANTE AGGIUNGI E SCANNER BARCODE
   const addTriggerBtn = cardInstance.shadowRoot.getElementById("add-trigger-btn");
   if (addTriggerBtn) { 
     addTriggerBtn.innerText = lang.btn_add;
@@ -116,25 +136,23 @@ export function renderCardContent(cardInstance) {
     else cardInstance.content.classList.remove("visible");
   }
 
-  if (!cardInstance.config.entity) {
-    cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang.select_entity_error}</div>`;
-    return;
-  }
-
+  // 6. CALCOLO E RENDERING RIPILOGO
   let totalItems = 0, expiredCount = 0, exp10Count = 0, exp30Count = 0, qty0Count = 0, qty1Count = 0, qty3Count = 0;
-  cardInstance.inventoryItems.forEach(item => {
-    const q = item.quantity !== undefined ? item.quantity : 0;
-    totalItems += q;
-    if (q === 0) qty0Count++;
-    if (q === 1) qty1Count++;
-    if (q === 3) qty3Count++;
-    if (item.expiry_date) {
-      const days = (new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24);
-      if (days < 0) expiredCount++;
-      else if (days <= 10) exp10Count++;
-      else if (days <= 30) exp30Count++;
-    }
-  });
+  if (cardInstance.inventoryItems && Array.isArray(cardInstance.inventoryItems)) {
+    cardInstance.inventoryItems.forEach(item => {
+      const q = item.quantity !== undefined ? item.quantity : 0;
+      totalItems += q;
+      if (q === 0) qty0Count++;
+      if (q === 1) qty1Count++;
+      if (q === 3) qty3Count++;
+      if (item.expiry_date) {
+        const days = (new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24);
+        if (days < 0) expiredCount++;
+        else if (days <= 10) exp10Count++;
+        else if (days <= 30) exp30Count++;
+      }
+    });
+  }
 
   const summaryArea = cardInstance.shadowRoot.getElementById("summary-area");
   if (cardInstance.config.show_summary) {
@@ -156,57 +174,60 @@ export function renderCardContent(cardInstance) {
     if (cardInstance.config.show_ico_qty3) { htmlContent += `<div class="summary-item" style="color: ${cQ3};"><ha-icon icon="mdi:numeric-3-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "3")}: ${qty3Count}</div>`; }
     summaryArea.innerHTML = htmlContent || `<div style='color:var(--secondary-text-color); font-size:0.8rem; padding:2px;'>${lang.no_counter_active}</div>`;
   } else { summaryArea.classList.remove("visible"); }
-  const items = filterAndSortItems(cardInstance);
 
-  const categoriesListArray = [];
-  if (cardInstance.inventoryItems) {
+  // 7. GRIGLIA PRODOTTI
+  if (cardInstance.inventoryItems && cardInstance.inventoryItems.length > 0) {
+    const items = filterAndSortItems(cardInstance);
+
+    const categoriesListArray = [];
     cardInstance.inventoryItems.forEach(i => {
       if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
         categoriesListArray.push(i.category.trim());
       }
     });
+
+    cardInstance.content.innerHTML = items.map(item => renderSingleItemCard(item, cardInstance, lang, categoriesListArray)).join('');
+
+    cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance.adjustQuantity(btn.dataset.name, 1); }); });
+    cardInstance.content.querySelectorAll(".btn-dec").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance.adjustQuantity(btn.dataset.name, -1); }); });
+    cardInstance.content.querySelectorAll(".btn-delete").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); deleteItemDefinitivelyService(cardInstance, btn.dataset.name); }); });
+    
+    cardInstance.content.querySelectorAll(".edit-icon-btn").forEach(btn => { 
+      btn.addEventListener("click", (e) => { 
+        e.stopPropagation(); 
+        cardInstance._editingItemId = btn.dataset.id; 
+        cardInstance.updateCard(); 
+      }); 
+    });
+    
+    cardInstance.content.querySelectorAll(".btn-cancel-edit").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance._editingItemId = null; cardInstance.updateCard(); }); });
+    cardInstance.content.querySelectorAll(".btn-save-edit").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); handleSaveEditService(cardInstance, btn.dataset.id, btn.dataset.oldname); }); });
+
+    if (cardInstance._editingItemId) {
+      const shadow = cardInstance.shadowRoot;
+      const editQtyInput = shadow.getElementById("edit_qty");
+      const editIncBtn = shadow.getElementById("edit-qty-inc");
+      const editDecBtn = shadow.getElementById("edit-qty-dec");
+      if (editQtyInput && editIncBtn && editDecBtn) {
+        editIncBtn.addEventListener("click", (e) => { e.preventDefault(); editQtyInput.value = (parseFloat(editQtyInput.value) || 0) + 1; });
+        editDecBtn.addEventListener("click", (e) => { e.preventDefault(); const cur = parseFloat(editQtyInput.value) || 0; if (cur > 0) editQtyInput.value = cur - 1; });
+      }
+      const editCatSelect = shadow.getElementById("edit_cat_select");
+      const editCatContainer = shadow.getElementById("edit_cat_custom_container");
+      const editCatCustomInput = shadow.getElementById("edit_cat_custom");
+      if (editCatSelect && editCatContainer && editCatCustomInput) {
+        editCatSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { editCatContainer.style.display = "block"; editCatCustomInput.value = ""; editCatCustomInput.focus(); } else { editCatContainer.style.display = "none"; } });
+      }
+      const editCheckbox = shadow.getElementById("edit_auto_add_checkbox");
+      const editSubRow = shadow.getElementById("edit_auto_add_subrow");
+      if (editCheckbox && editSubRow) {
+        const editSubInputs = editSubRow.querySelectorAll("input, select");
+        editCheckbox.addEventListener("change", (e) => { const isChecked = e.target.checked; editSubRow.style.opacity = isChecked ? "1" : "0.5"; editSubInputs.forEach(input => { if (isChecked) { input.removeAttribute("disabled"); input.disabled = false; } else { input.setAttribute("disabled", "true"); input.disabled = true; } }); });
+      }
+    }
   }
 
-  cardInstance.content.innerHTML = items.map(item => renderSingleItemCard(item, cardInstance, lang, categoriesListArray)).join('');
-
-  cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance.adjustQuantity(btn.dataset.name, 1); }); });
-  cardInstance.content.querySelectorAll(".btn-dec").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance.adjustQuantity(btn.dataset.name, -1); }); });
-  cardInstance.content.querySelectorAll(".btn-delete").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); deleteItemDefinitivelyService(cardInstance, btn.dataset.name); }); });
-  
-  cardInstance.content.querySelectorAll(".edit-icon-btn").forEach(btn => { 
-    btn.addEventListener("click", (e) => { 
-      e.stopPropagation(); 
-      cardInstance._editingItemId = btn.dataset.id; 
-      cardInstance.updateCard(); 
-    }); 
-  });
-  
-  cardInstance.content.querySelectorAll(".btn-cancel-edit").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance._editingItemId = null; cardInstance.updateCard(); }); });
-  cardInstance.content.querySelectorAll(".btn-save-edit").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); handleSaveEditService(cardInstance, btn.dataset.id, btn.dataset.oldname); }); });
-
-  if (cardInstance._editingItemId) {
-    const shadow = cardInstance.shadowRoot;
-    const editQtyInput = shadow.getElementById("edit_qty");
-    const editIncBtn = shadow.getElementById("edit-qty-inc");
-    const editDecBtn = shadow.getElementById("edit-qty-dec");
-    if (editQtyInput && editIncBtn && editDecBtn) {
-      editIncBtn.addEventListener("click", (e) => { e.preventDefault(); editQtyInput.value = (parseFloat(editQtyInput.value) || 0) + 1; });
-      editDecBtn.addEventListener("click", (e) => { e.preventDefault(); const cur = parseFloat(editQtyInput.value) || 0; if (cur > 0) editQtyInput.value = cur - 1; });
-    }
-    const editCatSelect = shadow.getElementById("edit_cat_select");
-    const editCatContainer = shadow.getElementById("edit_cat_custom_container");
-    const editCatCustomInput = shadow.getElementById("edit_cat_custom");
-    if (editCatSelect && editCatContainer && editCatCustomInput) {
-      editCatSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { editCatContainer.style.display = "block"; editCatCustomInput.value = ""; editCatCustomInput.focus(); } else { editCatContainer.style.display = "none"; } });
-    }
-    const editCheckbox = shadow.getElementById("edit_auto_add_checkbox");
-    const editSubRow = shadow.getElementById("edit_auto_add_subrow");
-    if (editCheckbox && editSubRow) {
-      const editSubInputs = editSubRow.querySelectorAll("input, select");
-      editCheckbox.addEventListener("change", (e) => { const isChecked = e.target.checked; editSubRow.style.opacity = isChecked ? "1" : "0.5"; editSubInputs.forEach(input => { if (isChecked) { input.removeAttribute("disabled"); input.disabled = false; } else { input.setAttribute("disabled", "true"); input.disabled = true; } }); });
-    }
-  }
-
+  // 8. POPUP PER L'INSERIMENTO DI NUOVI PRODOTTI (Funziona anche a inventario vuoto)
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {
@@ -222,6 +243,15 @@ export function renderCardContent(cardInstance) {
   todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
   if (addPopupContainer && cardInstance._showAddPopup) {
+    const categoriesListArray = [];
+    if (cardInstance.inventoryItems) {
+      cardInstance.inventoryItems.forEach(i => {
+        if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
+          categoriesListArray.push(i.category.trim());
+        }
+      });
+    }
+
     addPopupContainer.innerHTML = getAddPopupHtml(lang, categoriesListArray, { todoLists: todoListsArray });
     const shadow = cardInstance.shadowRoot;
     
