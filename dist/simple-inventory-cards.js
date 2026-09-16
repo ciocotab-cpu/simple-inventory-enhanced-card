@@ -3,13 +3,16 @@ import { getEditFormHtml } from './simple-inventory-templates.js';
 export function renderSingleItemCard(item, cardInstance, lang, categoriesListArray) {
   const currentQty = item.quantity !== undefined ? item.quantity : 0;
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
-  let expiryText = "", expiryBg = "transparent", expiryBorder = "transparent";
+  let expiryText = "", expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
 
   const getRgbaColor = (hex, pct) => {
     if (!hex || typeof hex !== "string" || !hex.startsWith("#")) return "transparent";
     const percentInt = pct !== undefined ? parseInt(pct) : 100;
-    const alpha = (100 - percentInt) / 100;
-    return `rgba(${parseInt(hex.slice(1, 3), 16)}, ${parseInt(hex.slice(3, 5), 16)}, ${parseInt(hex.slice(5, 7), 16)}, ${alpha})`;
+    const alpha = Math.min(Math.max(percentInt / 100, 0), 1);
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
 
   if (item.expiry_date && currentQty > 0) {
@@ -19,8 +22,11 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
     const daysPast = Math.floor((today - expiry) / (1000 * 60 * 60 * 24));
 
     if (daysToExpiry < 0) {
-      expiryBg = getRgbaColor(cardInstance.config.color_expired, cardInstance.config.alpha_expired);
-      expiryBorder = "rgba(219, 68, 55, 0.3)";
+      customBg = getRgbaColor(cardInstance.config.color_expired, cardInstance.config.alpha_expired);
+      customBorder = getRgbaColor(cardInstance.config.color_expired, 50);
+      expiryBg = cardInstance.config.color_expired || "#db4437";
+      expiryTextColor = "#ffffff";
+      expiryBorder = "transparent";
       expiryText = daysPast === 0 ? lang.scaduto_oggi : lang.scaduto_da_giorni.replace("{days}", daysPast);
     } else {
       let formattedLocaleDate = item.expiry_date;
@@ -30,16 +36,31 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
       }
       expiryText = lang.scadenza_data.replace("{date}", formattedLocaleDate);
       if (daysToExpiry <= 10) { 
-        expiryBg = getRgbaColor(cardInstance.config.color_10d, cardInstance.config.alpha_10d); expiryBorder = "rgba(230, 162, 60, 0.3)";
+        customBg = getRgbaColor(cardInstance.config.color_10d, cardInstance.config.alpha_10d);
+        customBorder = getRgbaColor(cardInstance.config.color_10d, 50);
+        expiryBg = cardInstance.config.color_10d || "#e6a23c";
+        expiryTextColor = "#ffffff";
+        expiryBorder = "transparent";
       } else if (daysToExpiry <= 30) { 
-        expiryBg = getRgbaColor(cardInstance.config.color_30d, cardInstance.config.alpha_30d); expiryBorder = "rgba(255, 235, 59, 0.3)";
+        customBg = getRgbaColor(cardInstance.config.color_30d, cardInstance.config.alpha_30d);
+        customBorder = getRgbaColor(cardInstance.config.color_30d, 50);
+        expiryBg = cardInstance.config.color_30d || "#ffeb3b";
+        expiryTextColor = "#212121";
+        expiryBorder = "transparent";
       }
     }
   }
 
-  if (currentQty === 0) { customBg = getRgbaColor(cardInstance.config.color_qty0, cardInstance.config.alpha_qty0); customBorder = "rgba(219, 68, 55, 0.5)"; }
-  else if (currentQty === 1) { customBg = getRgbaColor(cardInstance.config.color_qty1, cardInstance.config.alpha_qty1); customBorder = "rgba(244, 67, 54, 0.4)"; }
-  else if (currentQty === 3) { customBg = getRgbaColor(cardInstance.config.color_qty3, cardInstance.config.alpha_qty3); customBorder = "rgba(255, 152, 0, 0.4)"; }
+  if (currentQty === 0) {
+    customBg = getRgbaColor(cardInstance.config.color_qty0, cardInstance.config.alpha_qty0);
+    customBorder = getRgbaColor(cardInstance.config.color_qty0, 50);
+  } else if (currentQty === 1) {
+    customBg = getRgbaColor(cardInstance.config.color_qty1, cardInstance.config.alpha_qty1);
+    customBorder = getRgbaColor(cardInstance.config.color_qty1, 50);
+  } else if (currentQty === 3) {
+    customBg = getRgbaColor(cardInstance.config.color_qty3, cardInstance.config.alpha_qty3);
+    customBorder = getRgbaColor(cardInstance.config.color_qty3, 50);
+  }
 
   let displayName = item.name || lang.senza_nome;
   if (item.unit) displayName += ` (${item.unit})`;
@@ -49,7 +70,7 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
     categoryHtml = `<span style="font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; text-align: right;">${item.category}</span>`;
   }
 
-  const expiryHtml = expiryText ? `<div class="item-meta" style="background-color: ${expiryBg} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
+  const expiryHtml = expiryText ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap; font-weight: 600;">${expiryText}</div>` : '';
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
   const editFormHtml = isEditing ? getEditFormHtml(item, lang, categoriesListArray) : "";
