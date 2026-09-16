@@ -14,7 +14,6 @@ export function renderCardContent(cardInstance) {
   if (titleEl) {
     let computedTitle = cardInstance.config.title;
     
-    // Se il titolo da config è vuoto o contiene solo spazi
     if (!computedTitle || computedTitle.trim() === "") {
       const stateObj = (cardInstance._hass && cardInstance._hass.states && cardInstance.config.entity) 
         ? cardInstance._hass.states[cardInstance.config.entity] 
@@ -22,7 +21,6 @@ export function renderCardContent(cardInstance) {
       
       const friendlyName = stateObj && stateObj.attributes ? stateObj.attributes.friendly_name : null;
       
-      // Fallback: Friendly Name -> Entity ID -> Messaggio o Titolo Default
       computedTitle = friendlyName || cardInstance.config.entity || (lang && lang.select_entity_error ? lang.select_entity_error : "Seleziona Inventario");
     }
     
@@ -136,8 +134,11 @@ export function renderCardContent(cardInstance) {
     else cardInstance.content.classList.remove("visible");
   }
 
-  // 6. CALCOLO E RENDERING RIPILOGO
+  // 6. CALCOLO E RENDERING RIEPILOGO
   let totalItems = 0, expiredCount = 0, exp10Count = 0, exp30Count = 0, qty0Count = 0, qty1Count = 0, qty3Count = 0;
+  const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
+  const days30d = cardInstance.config.days_30d !== undefined ? cardInstance.config.days_30d : 30;
+
   if (cardInstance.inventoryItems && Array.isArray(cardInstance.inventoryItems)) {
     cardInstance.inventoryItems.forEach(item => {
       const q = item.quantity !== undefined ? item.quantity : 0;
@@ -145,11 +146,14 @@ export function renderCardContent(cardInstance) {
       if (q === 0) qty0Count++;
       if (q === 1) qty1Count++;
       if (q === 3) qty3Count++;
-      if (item.expiry_date) {
-        const days = (new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24);
+      if (item.expiry_date && q > 0) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const expiry = new Date(item.expiry_date); expiry.setHours(0,0,0,0);
+        const days = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+        
         if (days < 0) expiredCount++;
-        else if (days <= 10) exp10Count++;
-        else if (days <= 30) exp30Count++;
+        else if (days <= days10d) exp10Count++;
+        else if (days <= days30d) exp30Count++;
       }
     });
   }
@@ -167,8 +171,8 @@ export function renderCardContent(cardInstance) {
 
     if (cardInstance.config.show_ico_total) { htmlContent += `<div class="summary-item"><ha-icon icon="mdi:package-variant-closed"></ha-icon> Tot: ${totalItems}</div>`; }
     if (cardInstance.config.show_ico_expired) { htmlContent += `<div class="summary-item" style="color: ${cExp};"><ha-icon icon="mdi:calendar-remove"></ha-icon> ${lang.ico_expired_lbl}: ${expiredCount}</div>`; }
-    if (cardInstance.config.show_ico_10d) { htmlContent += `<div class="summary-item" style="color: ${c10d};"><ha-icon icon="mdi:calendar-clock"></ha-icon> ${lang.ico_days_lbl.replace("{days}", "10")}: ${exp10Count}</div>`; }
-    if (cardInstance.config.show_ico_30d) { htmlContent += `<div class="summary-item" style="color: ${c30d};"><ha-icon icon="mdi:calendar-month"></ha-icon> ${lang.ico_days_lbl.replace("{days}", "30")}: ${exp30Count}</div>`; }
+    if (cardInstance.config.show_ico_10d) { htmlContent += `<div class="summary-item" style="color: ${c10d};"><ha-icon icon="mdi:calendar-clock"></ha-icon> ${lang.ico_days_lbl.replace("{days}", days10d)}: ${exp10Count}</div>`; }
+    if (cardInstance.config.show_ico_30d) { htmlContent += `<div class="summary-item" style="color: ${c30d};"><ha-icon icon="mdi:calendar-month"></ha-icon> ${lang.ico_days_lbl.replace("{days}", days30d)}: ${exp30Count}</div>`; }
     if (cardInstance.config.show_ico_qty0) { htmlContent += `<div class="summary-item" style="color: ${cQ0};"><ha-icon icon="mdi:numeric-0-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "0")}: ${qty0Count}</div>`; }
     if (cardInstance.config.show_ico_qty1) { htmlContent += `<div class="summary-item" style="color: ${cQ1};"><ha-icon icon="mdi:numeric-1-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "1")}: ${qty1Count}</div>`; }
     if (cardInstance.config.show_ico_qty3) { htmlContent += `<div class="summary-item" style="color: ${cQ3};"><ha-icon icon="mdi:numeric-3-box"></ha-icon> ${lang.ico_qty_lbl.replace("{num}", "3")}: ${qty3Count}</div>`; }
@@ -227,7 +231,7 @@ export function renderCardContent(cardInstance) {
     }
   }
 
-  // 8. POPUP PER L'INSERIMENTO DI NUOVI PRODOTTI (Funziona anche a inventario vuoto)
+  // 8. POPUP PER L'INSERIMENTO DI NUOVI PRODOTTI
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {

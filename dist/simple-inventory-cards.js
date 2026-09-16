@@ -5,15 +5,19 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
   let expiryText = "", expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
 
+  // Calcolo della trasparenza invertita: 0 -> opaco (1.0), 100 -> trasparente (0.0)
   const getRgbaColor = (hex, pct) => {
     if (!hex || typeof hex !== "string" || !hex.startsWith("#")) return "transparent";
-    const percentInt = pct !== undefined ? parseInt(pct) : 100;
-    const alpha = Math.min(Math.max(percentInt / 100, 0), 1);
+    const percentInt = pct !== undefined ? parseInt(pct) : 0;
+    const alpha = Math.min(Math.max((100 - percentInt) / 100, 0), 1);
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
+
+  const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
+  const days30d = cardInstance.config.days_30d !== undefined ? cardInstance.config.days_30d : 30;
 
   if (item.expiry_date && currentQty > 0) {
     const today = new Date(); today.setHours(0,0,0,0);
@@ -22,11 +26,9 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
     const daysPast = Math.floor((today - expiry) / (1000 * 60 * 60 * 24));
 
     if (daysToExpiry < 0) {
-      customBg = getRgbaColor(cardInstance.config.color_expired, cardInstance.config.alpha_expired);
-      customBorder = getRgbaColor(cardInstance.config.color_expired, 50);
-      expiryBg = cardInstance.config.color_expired || "#db4437";
+      expiryBg = getRgbaColor(cardInstance.config.color_expired, cardInstance.config.alpha_expired) || "#db4437";
       expiryTextColor = "#ffffff";
-      expiryBorder = "transparent";
+      expiryBorder = getRgbaColor(cardInstance.config.color_expired, 50);
       expiryText = daysPast === 0 ? lang.scaduto_oggi : lang.scaduto_da_giorni.replace("{days}", daysPast);
     } else {
       let formattedLocaleDate = item.expiry_date;
@@ -35,18 +37,14 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
         if (parts.length === 3) formattedLocaleDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
       expiryText = lang.scadenza_data.replace("{date}", formattedLocaleDate);
-      if (daysToExpiry <= 10) { 
-        customBg = getRgbaColor(cardInstance.config.color_10d, cardInstance.config.alpha_10d);
-        customBorder = getRgbaColor(cardInstance.config.color_10d, 50);
-        expiryBg = cardInstance.config.color_10d || "#e6a23c";
+      if (daysToExpiry <= days10d) { 
+        expiryBg = getRgbaColor(cardInstance.config.color_10d, cardInstance.config.alpha_10d) || "#e6a23c";
         expiryTextColor = "#ffffff";
-        expiryBorder = "transparent";
-      } else if (daysToExpiry <= 30) { 
-        customBg = getRgbaColor(cardInstance.config.color_30d, cardInstance.config.alpha_30d);
-        customBorder = getRgbaColor(cardInstance.config.color_30d, 50);
-        expiryBg = cardInstance.config.color_30d || "#ffeb3b";
+        expiryBorder = getRgbaColor(cardInstance.config.color_10d, 50);
+      } else if (daysToExpiry <= days30d) { 
+        expiryBg = getRgbaColor(cardInstance.config.color_30d, cardInstance.config.alpha_30d) || "#ffeb3b";
         expiryTextColor = "#212121";
-        expiryBorder = "transparent";
+        expiryBorder = getRgbaColor(cardInstance.config.color_30d, 50);
       }
     }
   }
