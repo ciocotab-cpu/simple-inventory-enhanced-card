@@ -56,12 +56,12 @@ export const langIt = {
     ed_lbl_ico_qty3: "Quantità rimasta = {num}",
     
     // Gestione etichette Colori scaduti
-    color_expired: "Codice HEX Scaduto",
-    color_10d: "Codice HEX Allerta",
-    color_30d: "Codice HEX Avviso",
-    color_qty0: "Codice HEX Esaurito (Q.tà 0)",
-    color_qty1: "Codice HEX Critico",
-    color_qty3: "Codice HEX Minimo",
+    color_expired: "Scaduto",
+    color_10d: "Allerta",
+    color_30d: "Avviso",
+    color_qty0: "Esaurito (Q.tà 0)",
+    color_qty1: "Critico",
+    color_qty3: "Minimo",
 
     // Gestione etichette Colori e % Trasparenza nell'editor
     ed_lbl_alpha_pct: "% Trasparenza",
