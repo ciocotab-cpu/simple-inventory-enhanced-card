@@ -84,8 +84,24 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         ha-form { display: flex !important; flex-direction: column !important; gap: 2px !important; }
         ha-form * { --form-row-margin-bottom: 2px !important; margin-bottom: 2px !important; }
         select.custom-dropdown { width: 100%; padding: 12px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); font-size: 1rem; font-family: inherit; box-sizing: border-box; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg fill='%23999999' height='24' viewBox='0 0 24 24' width='24' xmlns='http://w3.org'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat: no-repeat; background-position: right 8px center; }
+        
+        #secret-debug-container {
+          display: none;
+          background: rgba(255, 152, 0, 0.1);
+          border: 1px solid #ff9800;
+          border-radius: 6px;
+          padding: 10px;
+          margin-bottom: 12px;
+        }
+        #secret-debug-container.visible {
+          display: block;
+        }
       </style>
       <div class="editor-container">
+        <div id="secret-debug-container">
+          <ha-form id="form-debug-toggle"></ha-form>
+        </div>
+
         <ha-expansion-panel expanded>
           <div slot="header" class="panel-header">${lang.ed_panel_base}</div>
           <div class="form-row">
@@ -162,6 +178,31 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.renderForms(lang); 
     this.setupSortListener(); 
     this._attachColorListeners();
+    this._setupShiftListener();
+  }
+
+  _setupShiftListener() {
+    this._handleKeyDown = (e) => {
+      if (e.key === "Shift") {
+        const debugBox = this.shadowRoot.getElementById("secret-debug-container");
+        if (debugBox) debugBox.classList.add("visible");
+      }
+    };
+    this._handleKeyUp = (e) => {
+      if (e.key === "Shift") {
+        const debugBox = this.shadowRoot.getElementById("secret-debug-container");
+        if (debugBox && !this._config.debug_mode) {
+          debugBox.classList.remove("visible");
+        }
+      }
+    };
+    window.addEventListener("keydown", this._handleKeyDown);
+    window.addEventListener("keyup", this._handleKeyUp);
+  }
+
+  disconnectedCallback() {
+    if (this._handleKeyDown) window.removeEventListener("keydown", this._handleKeyDown);
+    if (this._handleKeyUp) window.removeEventListener("keyup", this._handleKeyUp);
   }
 
   _createColorBlock(colorId, alphaId, labelKey, fallbackHex, daysId = null, fallbackDays = null, isDisabled = false, daysLabel = "Giorni") {
@@ -240,7 +281,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   }
 
   renderForms(lang) {
-    const defaultData = { title: "", columns: 2, default_sort: "alpha", show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, ...this._config };
+    const defaultData = { title: "", columns: 2, default_sort: "alpha", show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, debug_mode: false, ...this._config };
     
     const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
     const days30d = this._config.days_30d !== undefined ? this._config.days_30d : 30;
@@ -262,10 +303,13 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_ico_30d: (lang.ed_lbl_ico_30d || "Scadenze entro {days}gg").replace("{days}", days30d), 
       show_ico_qty0: (lang.ed_lbl_ico_qty0 || "Quantità rimasta = 0"), 
       show_ico_qty1: (lang.ed_lbl_ico_qty1 || "Quantità rimasta = {num}").replace("{num}", qty1Val), 
-      show_ico_qty3: (lang.ed_lbl_ico_qty3 || "Quantità rimasta = {num}").replace("{num}", qty3Val) 
+      show_ico_qty3: (lang.ed_lbl_ico_qty3 || "Quantità rimasta = {num}").replace("{num}", qty3Val),
+      debug_mode: "Modalità Debug Log (console.log)"
     };
     this._computeLabel = (schemaItem) => labels[schemaItem.name] || schemaItem.name;
     
+    this.setupForm("form-debug-toggle", [{ name: "debug_mode", selector: { boolean: {} } }], defaultData);
+
     this.setupForm("form-base-ent", [{ name: "entity", selector: { entity: { domain: "sensor", filter: { integration: "simple_inventory" } } } }], defaultData);
     this.setupForm("form-base-title", [{ name: "title", selector: { text: {} } }], defaultData);
     this.setupForm("form-base-cols", [{ name: "columns", selector: { number: { min: 1, max: 6, mode: "box" } } }], defaultData);
@@ -285,6 +329,11 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.setupForm("form-sum-t7", [{ name: "show_ico_qty3", selector: { boolean: {} } }], defaultData);
     
     this.shadowRoot.querySelectorAll("ha-form").forEach(form => { form.hass = this._hass; });
+
+    const debugBox = this.shadowRoot.getElementById("secret-debug-container");
+    if (debugBox) {
+      if (this._config.debug_mode) debugBox.classList.add("visible");
+    }
   }
 
   setupForm(formId, schema, data) { 
@@ -340,6 +389,11 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       const el = shadow.getElementById(`${id}_input`); 
       if (el && this._config[id] !== undefined) el.value = this._config[id];
     });
+
+    const debugBox = shadow.getElementById("secret-debug-container");
+    if (debugBox) {
+      if (this._config.debug_mode) debugBox.classList.add("visible");
+    }
   }
 }
 
