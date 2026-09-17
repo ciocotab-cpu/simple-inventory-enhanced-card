@@ -2,6 +2,12 @@ import './simple-inventory-editor.js';
 import { cardStyles } from './simple-inventory-styles.js';
 import { renderCardContent } from './simple-inventory-renderer.js';
 
+console.info(
+  `%c SIMPLE-INVENTORY-ENHANCED-CARD %c v1.0.3 `,
+  'color: white; background: coral; font-weight: bold;',
+  'color: coral; background: white; font-weight: bold;'
+);
+
 class SimpleInventoryEnhancedCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement("simple-inventory-enhanced-card-editor");
