@@ -3,6 +3,7 @@ name: HACS Validation
 on:
   push:
     branches: [ main ]
+    tags: [ '*' ]
   pull_request:
     branches: [ main ]
 
@@ -13,7 +14,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 1. Azione Ufficiale HACS (Controlla la struttura generale e hacs.json)
       - name: HACS Action
         uses: "hacs/action@main"
         with:
           category: "plugin"
+
+      # 2. Controllo specifico del file compilato in dist/
+      - name: Check output file in dist
+        run: |
+          test -d dist || (echo "ERRORE: La cartella 'dist' non esiste" && exit 1)
+          test -f dist/simple-inventory-enhanced-card.js || (echo "ERRORE: Il file 'dist/simple-inventory-enhanced-card.js' non esiste" && exit 1)
