@@ -24,6 +24,7 @@ export const langIt = {
     sort_threshold: "Sotto Soglia (Tutti)",
     sort_threshold_avail: "Sotto Soglia (Solo Disponibili)",
     sort_expiry: "In Scadenza (Solo disponibili)",
+    sort_expiring_soon_desc: "In scadenza a breve",
     sort_only_expired: "Solo Scaduti",
     sort_only_empty: "Solo Esauriti",
     sort_cat_label: "Categoria: {cat}",

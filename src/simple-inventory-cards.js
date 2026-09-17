@@ -5,7 +5,6 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
   let expiryText = "", expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
 
-  // Calcolo della trasparenza invertita: 0 -> opaco (1.0), 100 -> trasparente (0.0)
   const getRgbaColor = (hex, pct) => {
     if (!hex || typeof hex !== "string" || !hex.startsWith("#")) return "transparent";
     const percentInt = pct !== undefined ? parseInt(pct) : 0;
@@ -75,7 +74,23 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
   const expiryHtml = expiryText ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap; font-weight: 600;">${expiryText}</div>` : '';
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
-  const editFormHtml = isEditing ? getEditFormHtml(item, lang, categoriesListArray) : "";
+
+  // Estrazione delle liste To-Do dallo stato globale per formattare la modale in modifica
+  const todoListsArray = [];
+  if (cardInstance._hass && cardInstance._hass.states) {
+    Object.keys(cardInstance._hass.states).forEach(entityId => {
+      if (entityId.startsWith("todo.")) {
+        const stateObj = cardInstance._hass.states[entityId];
+        const friendlyName = (stateObj.attributes && stateObj.attributes.friendly_name) 
+          ? stateObj.attributes.friendly_name 
+          : entityId;
+        todoListsArray.push({ entity_id: entityId, name: friendlyName });
+      }
+    });
+  }
+  todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
+
+  const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
   return `
     <div class="item-card" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};">

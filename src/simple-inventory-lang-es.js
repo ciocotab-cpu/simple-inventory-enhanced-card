@@ -24,6 +24,7 @@ export const langEs = {
     sort_threshold: "Bajo umbral (Todos)",
     sort_threshold_avail: "Bajo umbral (Solo disponibles)",
     sort_expiry: "Próximos a caducar (Solo disponibles)",
+    sort_expiring_soon_desc: "De pronta caducidad",
     sort_only_expired: "Solo caducados",
     sort_only_empty: "Solo agotados",
     sort_cat_label: "Categoría: {cat}",

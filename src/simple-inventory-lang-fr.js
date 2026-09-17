@@ -24,6 +24,7 @@ export const langFr = {
     sort_threshold: "Sous le seuil (Tous)",
     sort_threshold_avail: "Sous le seuil (Disponibles uniquement)",
     sort_expiry: "Expire bientôt (Disponibles uniquement)",
+    sort_expiring_soon_desc: "Échéance proche",
     sort_only_expired: "Expirés uniquement",
     sort_only_empty: "Épuisés uniquement",
     sort_cat_label: "Catégorie : {cat}",

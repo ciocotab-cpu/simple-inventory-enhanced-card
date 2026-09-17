@@ -24,6 +24,7 @@ export const langDe = {
     sort_threshold: "Unter Schwellenwert (Alle)",
     sort_threshold_avail: "Unter Schwellenwert (Nur verfügbare)",
     sort_expiry: "Läuft bald ab (Nur verfügbare)",
+    sort_expiring_soon_desc: "Läuft bald ab",
     sort_only_expired: "Nur abgelaufene",
     sort_only_empty: "Nur ausverkaufte",
     sort_cat_label: "Kategorie: {cat}",
