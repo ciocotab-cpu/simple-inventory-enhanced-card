@@ -61,6 +61,7 @@ export function renderCardContent(cardInstance) {
       <option value="threshold" ${cardInstance.currentSort === 'threshold' ? 'selected' : ''}>${lang.sort_threshold}</option>
       <option value="threshold_avail" ${cardInstance.currentSort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
       <option value="expiry" ${cardInstance.currentSort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
+      <option value="expiring_soon_desc" ${cardInstance.currentSort === 'expiring_soon_desc' ? 'selected' : ''}>${lang.sort_expiring_soon_desc}</option>
       <option value="only_expired" ${cardInstance.currentSort === 'only_expired' ? 'selected' : ''}>${lang.sort_only_expired}</option>
       <option value="only_empty" ${cardInstance.currentSort === 'only_empty' ? 'selected' : ''}>${lang.sort_only_empty}</option>
     `;

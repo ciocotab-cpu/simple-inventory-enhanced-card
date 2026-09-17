@@ -45,6 +45,25 @@ export function filterAndSortItems(cardInstance) {
     items = items.filter(item => (item.quantity || 0) > 0);
     items.sort((a, b) => new Date(a.expiry_date || '9999-12-31') - new Date(b.expiry_date || '9999-12-31'));
   } 
+  else if (sortCriteria === "expiring_soon_desc") {
+    const today = new Date(); 
+    today.setHours(0,0,0,0);
+    const defaultDays10 = cardInstance.config && cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
+
+    items = items.filter(item => {
+      if ((item.quantity || 0) <= 0 || !item.expiry_date) return false;
+      const expiry = new Date(item.expiry_date); 
+      expiry.setHours(0,0,0,0);
+      
+      const daysToExpiry = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+      const alertDays = (item.expiry_alert_days !== undefined && item.expiry_alert_days !== null && item.expiry_alert_days > 0) 
+        ? item.expiry_alert_days 
+        : defaultDays10;
+
+      return daysToExpiry >= 0 && daysToExpiry <= alertDays;
+    });
+    items.sort((a, b) => new Date(a.expiry_date) - new Date(b.expiry_date));
+  }
   else if (sortCriteria === "only_expired") {
     items = items.filter(item => {
       if ((item.quantity || 0) <= 0 || !item.expiry_date) return false;

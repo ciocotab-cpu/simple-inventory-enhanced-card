@@ -24,6 +24,7 @@ export const langEn = {
     sort_threshold: "Below Threshold (All)",
     sort_threshold_avail: "Below Threshold (Available Only)",
     sort_expiry: "Expiring Soon (Available Only)",
+    sort_expiring_soon_desc: "Expiring Soon",
     sort_only_expired: "Expired Only",
     sort_only_empty: "Out of Stock Only",
     sort_cat_label: "Category: {cat}",
