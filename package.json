@@ -1,7 +1,35 @@
 {
   "name": "@ciocotab-cpu/simple-inventory-enhanced-card",
-  "version": "1.0.2",
+  "version": "1.0.3",
+  "description": "Simple Inventory Enhanced Card for Home Assistant",
+  "main": "src/simple-inventory-enhanced-card.js",
+  "type": "module",
   "files": [
     "dist"
-  ]
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ciocotab-cpu/simple-inventory-enhanched-card.git"
+  },
+  "keywords": [
+    "home-assistant",
+    "lovelace",
+    "custom-card",
+    "hacs"
+  ],
+  "author": "ciocotab-cpu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ciocotab-cpu/simple-inventory-enhanched-card/issues"
+  },
+  "homepage": "https://github.com/ciocotab-cpu/simple-inventory-enhanched-card#readme",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.12.0"
+  }
 }
