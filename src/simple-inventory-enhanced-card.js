@@ -22,13 +22,32 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       days_10d: 10, days_30d: 30, qty_0: 0, qty_1: 1, qty_3: 3,
       color_expired: "#db4437", color_10d: "#e6a23c", color_30d: "#ffeb3b",
       color_qty0: "#db4437", color_qty1: "#f44336", color_qty3: "#ff9800",
-      alpha_expired: 100, alpha_10d: 100, alpha_30d: 100, alpha_qty0: 100, alpha_qty1: 100, alpha_qty3: 100
+      alpha_expired: 100, alpha_10d: 100, alpha_30d: 100, alpha_qty0: 100, alpha_qty1: 100, alpha_qty3: 100,
+      debug_mode: false
     };
+  }
+
+  log(...args) {
+    if (this.config && this.config.debug_mode) {
+      console.log(...args);
+    }
+  }
+
+  warn(...args) {
+    if (this.config && this.config.debug_mode) {
+      console.warn(...args);
+    }
+  }
+
+  error(...args) {
+    if (this.config && this.config.debug_mode) {
+      console.error(...args);
+    }
   }
 
   set hass(hass) {
     this._hass = hass;
-    console.log("%c[CARD] set hass() invocato", "color: #00bcd4", { entity: this.config?.entity, hassState: !!hass });
+    this.log("%c[CARD] set hass() invocato", "color: #00bcd4", { entity: this.config?.entity, hassState: !!hass });
     if (!this.content) { this.initCard(); }
     if (this.config && this.config.entity && !this._initialFetched) { 
       this.fetchInventoryItems(); 
@@ -38,7 +57,6 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
   }
 
   setConfig(config) {
-    console.log("%c[CARD] setConfig() invocato", "color: #00bcd4", config);
     const baseConfig = config || {};
     this.config = {
       title: baseConfig.title ? baseConfig.title : "",
@@ -73,8 +91,11 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       alpha_qty0: baseConfig.alpha_qty0 !== undefined ? baseConfig.alpha_qty0 : 100,
       alpha_qty1: baseConfig.alpha_qty1 !== undefined ? baseConfig.alpha_qty1 : 100,
       alpha_qty3: baseConfig.alpha_qty3 !== undefined ? baseConfig.alpha_qty3 : 100,
-      entity: baseConfig.entity || ""
+      entity: baseConfig.entity || "",
+      debug_mode: baseConfig.debug_mode !== undefined ? baseConfig.debug_mode : false
     };
+
+    this.log("%c[CARD] setConfig() invocato", "color: #00bcd4", config);
     
     this.inventoryItems = this.inventoryItems || [];
     this.searchQuery = this.searchQuery || "";
@@ -90,46 +111,46 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
   }
 
   async fetchInventoryItems() {
-    console.log("%c[CARD] Avvio fetchInventoryItems()", "color: #ff9800", { entity: this.config?.entity });
+    this.log("%c[CARD] Avvio fetchInventoryItems()", "color: #ff9800", { entity: this.config?.entity });
     if (!this.config || !this.config.entity) {
-      console.warn("[CARD] fetchInventoryItems annullato: Entità non configurata");
+      this.warn("[CARD] fetchInventoryItems annullato: Entità non configurata");
       return;
     }
     
     const stateObj = this._hass ? this._hass.states[this.config.entity] : null;
-    console.log("[CARD] Stato dell'entità recuperato da Home Assistant:", stateObj);
+    this.log("[CARD] Stato dell'entità recuperato da Home Assistant:", stateObj);
     
     if (!stateObj) {
-      console.warn("[CARD] Entità non trovata negli stati di HA!");
+      this.warn("[CARD] Entità non trovata negli stati di HA!");
       return;
     }
     
     const inventoryId = stateObj.attributes ? stateObj.attributes.inventory_id : null;
-    console.log("[CARD] Attribute inventory_id estratto:", inventoryId);
+    this.log("[CARD] Attribute inventory_id estratto:", inventoryId);
     
     if (!inventoryId) {
-      console.warn("[CARD] L'entità selezionata non possiede l'attributo inventory_id!");
+      this.warn("[CARD] L'entità selezionata non possiede l'attributo inventory_id!");
       return;
     }
 
     this._initialFetched = true;
     try {
-      console.log("[CARD] Invio richiesta WebSocket simple_inventory/list_items per ID:", inventoryId);
+      this.log("[CARD] Invio richiesta WebSocket simple_inventory/list_items per ID:", inventoryId);
       const result = await this._hass.connection.sendMessagePromise({
         type: "simple_inventory/list_items", inventory_id: inventoryId
       });
-      console.log("%c[CARD] Risposta WebSocket ricevuta:", "color: #4caf50", result);
+      this.log("%c[CARD] Risposta WebSocket ricevuta:", "color: #4caf50", result);
       
       if (result && result.items) { 
         this.inventoryItems = result.items; 
-        console.log(`[CARD] Impostati ${this.inventoryItems.length} articoli in memory`);
+        this.log(`[CARD] Impostati ${this.inventoryItems.length} articoli in memory`);
       } else {
         this.inventoryItems = [];
-        console.warn("[CARD] Risposta WebSocket senza elementi (Array vuoto)");
+        this.warn("[CARD] Risposta WebSocket senza elementi (Array vuoto)");
       }
       this.updateCard();
     } catch (e) { 
-      console.error("[CARD] Errore durante la chiamata WebSocket:", e); 
+      this.error("[CARD] Errore durante la chiamata WebSocket:", e); 
     }
   }
 
@@ -140,7 +161,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
   }
 
   initCard() {
-    console.log("%c[CARD] Inizializzazione Struttura HTML Card (initCard)", "color: #2196f3");
+    this.log("%c[CARD] Inizializzazione Struttura HTML Card (initCard)", "color: #2196f3");
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.innerHTML = `
       <style>${cardStyles}</style>
@@ -172,12 +193,12 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       this.searchQuery = e.target.value.toLowerCase(); this.updateCard();
     });
     this.shadowRoot.getElementById("add-trigger-btn").addEventListener("click", () => {
-      console.log("[CARD] Cliccato pulsante Aggiungi (+)");
+      this.log("[CARD] Cliccato pulsante Aggiungi (+)");
       this._showAddPopup = true; this.updateCard();
     });
 
     this.shadowRoot.getElementById("export-btn").addEventListener("click", () => {
-      console.log("[CARD] Cliccato Export");
+      this.log("[CARD] Cliccato Export");
       if (!this.inventoryItems || this.inventoryItems.length === 0) return;
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.inventoryItems, null, 2));
       const downloadAnchor = document.createElement('a');
@@ -189,7 +210,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     });
 
     this.shadowRoot.getElementById("import-btn").addEventListener("click", () => {
-      console.log("[CARD] Cliccato Import");
+      this.log("[CARD] Cliccato Import");
       const fileInput = document.createElement('input');
       fileInput.type = 'file'; fileInput.accept = '.json';
       fileInput.onchange = async (e) => {
@@ -233,7 +254,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
   }
 
   updateCard() { 
-    console.log("%c[CARD] updateCard() eseguito - Invocazione renderCardContent", "color: #e91e63");
+    this.log("%c[CARD] updateCard() eseguito - Invocazione renderCardContent", "color: #e91e63");
     renderCardContent(this); 
   }
 
