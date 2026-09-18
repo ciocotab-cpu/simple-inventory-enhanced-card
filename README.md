@@ -82,7 +82,7 @@ All card preferences can be managed and expanded via the integrated **Lovelace V
 ## 🛠️ Tech Stack
 
 1. **Core Backend:** Simple Inventory Python Integration (Home Assistant custom component).
-2. **Scanner Engine:** Html5-QRCode (Local JavaScript library loaded *on-demand* to decode EAN-13, EAN-8, and Code-128 formats).
+2. **Scanner Engine:** Html5-QRCode v 2.3.8 (Local JavaScript library loaded *on-demand* to decode EAN-13, EAN-8, and Code-128 formats).
 3. **Database Provider:** Open Food Facts API v3 (Open-source database used to pull product metadata).
 
 ---
@@ -111,10 +111,8 @@ Ensure the official Home Assistant app (or Chrome on mobile) has system permissi
 
 Upcoming card releases will focus on performance enhancements, interactive shortcuts, and refined UI layouts:
 
-* ⚡ **Editor Optimization:** Refactor the configuration script to accelerate initial loading times for the Lovelace visual editor.
 * 📦 **Official HACS Submission:** Register the card in the public HACS repository to enable direct installation without manual URL entries.
-* 🔗 **To-Do List Shortcut:** Allow tapping directly on a product's linked shopping list icon to open the corresponding Home Assistant list in a popup.
-* 🔔 **Custom Warning Days Logic:** Implement a feature using user-defined "warning days" so expiry alerts (yellow/orange card highlighting) trigger based on custom thresholds rather than fixed 10- or 30-day windows.
+* 🔗 **To-Do List Shortcut:** Allow tapping directly on a icon to open the corresponding list in a popup.
 * 📐 **Import/Export UI Redesign:** Relocate Import and Export controls to a more discreet, integrated location within the layout.
 
 ---
@@ -217,7 +215,7 @@ Tutte le preferenze della card possono essere gestite ed estese comodamente tram
 ## 🛠️ Tecnologie Utilizzate
 
 1. **Backend Core:** Simple Inventory Python Integration (componente personalizzato per Home Assistant).
-2. **Motore di Scansione:** Html5-QRCode (libreria JavaScript locale integrata *on-demand* per la decodifica dei formati EAN-13, EAN-8 e Code-128).
+2. **Motore di Scansione:** Html5-QRCode v 2.3.8 (libreria JavaScript locale integrata *on-demand* per la decodifica dei formati EAN-13, EAN-8 e Code-128).
 3. **Database Informazioni:** Open Food Facts API v3 (servizio open-source per l'estrazione delle schede tecniche dei prodotti).
 
 ---
@@ -246,10 +244,8 @@ Assicurati che l'applicazione ufficiale di Home Assistant (o Google Chrome su mo
 
 Le prossime versioni della card si concentreranno sull'ottimizzazione delle performance, su nuove scorciatoie interattive e su una migliore disposizione degli elementi:
 
-* ⚡ **Ottimizzazione Editor:** Ottimizzare lo script di configurazione per rendere molto più veloce e reattivo il caricamento iniziale dell'editor visuale Lovelace.
 * 📦 **Pubblicazione ufficiale su HACS:** Registrare la card come archivio ufficiale nel catalogo pubblico di HACS per consentire l'installazione automatica senza inserire l'URL.
-* 🔗 **Scorciatoia Liste To-Do:** Introdurre la possibilità di cliccare direttamente sull'icona della lista della spesa associata a un prodotto per aprire istantaneamente la relativa lista di Home Assistant in un popup.
-* 🔔 **Logica Giorni di Preavviso:** Sviluppare un sistema che sfrutti attivamente i "giorni di preavviso" impostati, in modo da far attivare l'allerta di scadenza (sfondo giallo/arancione della tessera) esattamente al raggiungimento della soglia personalizzata di giorni inserita dall'utente, anziché basarsi su intervalli fissi a 10 o 30 giorni.
+* 🔗 **Scorciatoia Liste To-Do:** Introdurre la possibilità di cliccare direttamente sull'icona del riepilogo per aprire istantaneamente la relativa lista di Home Assistant in un popup.
 * 📐 **Restyling Interfaccia Import/Export:** Riposizionare i tasti di Import ed Export in una zona più strategica, discreta e visivamente integrata nel layout della card.
 
 ---
