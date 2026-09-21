@@ -141,18 +141,21 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
           <div slot="header" class="panel-header">${lang.ed_panel_summary}</div>
           <div class="form-row">
             <div class="coppia-row">
+              <ha-form id="form-sum-cols"></ha-form>
               <ha-form id="form-sum-t1"></ha-form>
+            </div>
+            <div class="coppia-row">
               <ha-form id="form-sum-t2"></ha-form>
-            </div>
-            <div class="coppia-row">
               <ha-form id="form-sum-t3"></ha-form>
-              <ha-form id="form-sum-t4"></ha-form>
             </div>
             <div class="coppia-row">
+              <ha-form id="form-sum-t4"></ha-form>
               <ha-form id="form-sum-t5"></ha-form>
-              <ha-form id="form-sum-t6"></ha-form>
             </div>
-            <ha-form id="form-sum-t7"></ha-form>
+            <div class="coppia-row">
+              <ha-form id="form-sum-t6"></ha-form>
+              <ha-form id="form-sum-t7"></ha-form>
+            </div>
           </div>
         </ha-expansion-panel>
 
@@ -281,7 +284,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   }
 
   renderForms(lang) {
-    const defaultData = { title: "", columns: 2, default_sort: "alpha", show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, debug_mode: false, ...this._config };
+    const defaultData = { title: "", columns: 2, summary_columns: 4, default_sort: "alpha", show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, debug_mode: false, ...this._config };
     
     const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
     const days30d = this._config.days_30d !== undefined ? this._config.days_30d : 30;
@@ -292,6 +295,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       entity: lang.ed_lbl_entity, 
       title: lang.ed_lbl_title, 
       columns: lang.ed_lbl_columns, 
+      summary_columns: lang.ed_lbl_summary_columns,
       show_summary: lang.ed_lbl_show_summary, 
       show_items: lang.ed_lbl_show_items, 
       show_add_form: lang.add_trigger_label, 
@@ -299,11 +303,11 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_sort: lang.ed_lbl_show_sort, 
       show_ico_total: lang.ed_lbl_ico_total, 
       show_ico_expired: lang.ed_lbl_ico_expired, 
-      show_ico_10d: (lang.ed_lbl_ico_10d || "Scadenze entro {days}gg").replace("{days}", days10d), 
-      show_ico_30d: (lang.ed_lbl_ico_30d || "Scadenze entro {days}gg").replace("{days}", days30d), 
-      show_ico_qty0: (lang.ed_lbl_ico_qty0 || "Quantità rimasta = 0"), 
-      show_ico_qty1: (lang.ed_lbl_ico_qty1 || "Quantità rimasta = {num}").replace("{num}", qty1Val), 
-      show_ico_qty3: (lang.ed_lbl_ico_qty3 || "Quantità rimasta = {num}").replace("{num}", qty3Val),
+      show_ico_10d: (lang.ed_lbl_ico_10d, days10d), 
+      show_ico_30d: (lang.ed_lbl_ico_30d, days30d), 
+      show_ico_qty0: (lang.ed_lbl_ico_qty0), 
+      show_ico_qty1: (lang.ed_lbl_ico_qty1, qty1Val), 
+      show_ico_qty3: (lang.ed_lbl_ico_qty3, qty3Val),
       debug_mode: "Modalità Debug Log (console.log)"
     };
     this._computeLabel = (schemaItem) => labels[schemaItem.name] || schemaItem.name;
@@ -320,6 +324,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.setupForm("form-base-t4", [{ name: "show_search", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-base-t5", [{ name: "show_sort", selector: { boolean: {} } }], defaultData);
 
+    this.setupForm("form-sum-cols", [{ name: "summary_columns", selector: { number: { min: 0, max: 7, mode: "box" } } }], defaultData);
     this.setupForm("form-sum-t1", [{ name: "show_ico_total", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-sum-t2", [{ name: "show_ico_expired", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-sum-t3", [{ name: "show_ico_10d", selector: { boolean: {} } }], defaultData);

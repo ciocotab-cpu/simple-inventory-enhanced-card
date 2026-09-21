@@ -169,6 +169,15 @@ export function renderCardContent(cardInstance) {
   const summaryArea = cardInstance.shadowRoot.getElementById("summary-area");
   if (cardInstance.config.show_summary) {
     summaryArea.classList.add("visible");
+    
+    const sumCols = cardInstance.config.summary_columns !== undefined ? parseInt(cardInstance.config.summary_columns) : 4;
+    if (sumCols > 0) {
+      summaryArea.style.gridTemplateColumns = `repeat(${sumCols}, minmax(0, 1fr))`;
+    } else {
+      // Se il valore è 0 (o non impostato), imposta di default a 4 colonne
+      summaryArea.style.gridTemplateColumns = `repeat(4, minmax(0, 1fr))`;
+    }
+
     let htmlContent = "";
     const cExp = cardInstance.config.color_expired || "#db4437";
     const c10d = cardInstance.config.color_10d || "#e6a23c";
