@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/ciocotab-cpu/simple-inventory-enhanched-card#readme",
   "devDependencies": {
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.3.1",
     "@rollup/plugin-terser": "^0.4.4",
     "rollup": "^4.63.3",

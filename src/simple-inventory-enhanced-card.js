@@ -1,9 +1,11 @@
 import './simple-inventory-editor.js';
 import { cardStyles } from './simple-inventory-styles.js';
 import { renderCardContent } from './simple-inventory-renderer.js';
+import { version } from '../package.json';
+
 
 console.info(
-  `%c SIMPLE-INVENTORY-ENHANCED-CARD %c v1.0.3 `,
+  `%c SIMPLE-INVENTORY-ENHANCED-CARD %c v${version} `,
   'color: white; background: coral; font-weight: bold;',
   'color: coral; background: white; font-weight: bold;'
 );
@@ -171,9 +173,9 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
             <div class="card-header-text" id="card-title"></div>
             
             <div class="header-buttons">
-              <button id="export-btn" class="io-btn" title="Export JSON">Exp</button>
-              <button id="import-btn" class="io-btn" title="Import JSON">Imp</button>
-              <button id="add-trigger-btn" class="add-trigger-btn" style="display:none;"></button>
+              <button id="add-trigger-btn" class="add-trigger-btn"><ha-icon icon="mdi:plus"></ha-icon></button>
+              <button id="export-btn" class="io-btn" title="Export"><ha-icon icon="mdi:database-export-outline"></ha-icon></button>
+              <button id="import-btn" class="io-btn" title="Import"><ha-icon icon="mdi:database-import-outline"></ha-icon></button>
             </div>
           </div>
           <div id="summary-area" class="summary-box"></div>

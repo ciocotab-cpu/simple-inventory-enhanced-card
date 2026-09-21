@@ -294,7 +294,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       columns: lang.ed_lbl_columns, 
       show_summary: lang.ed_lbl_show_summary, 
       show_items: lang.ed_lbl_show_items, 
-      show_add_form: lang.add_trigger_label || "Aggiungi", 
+      show_add_form: lang.add_trigger_label, 
       show_search: lang.ed_lbl_show_search, 
       show_sort: lang.ed_lbl_show_sort, 
       show_ico_total: lang.ed_lbl_ico_total, 

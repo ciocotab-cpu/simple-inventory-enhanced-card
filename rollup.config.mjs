@@ -1,6 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import copy from 'rollup-plugin-copy';
+import json from '@rollup/plugin-json';
 
 const logBuildTime = () => ({
   name: 'log-build-time',
@@ -11,7 +12,6 @@ const logBuildTime = () => ({
 });
 
 export default {
-  
   input: 'src/simple-inventory-enhanced-card.js', // Il tuo file sorgente entry point
   output: {
     file: 'dist/simple-inventory-enhanced-card.js',
@@ -19,6 +19,7 @@ export default {
     sourcemap: false
   },
   plugins: [
+    json(),
     resolve(),
     terser({
       mangle: true,

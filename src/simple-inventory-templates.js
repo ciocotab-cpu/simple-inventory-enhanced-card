@@ -67,12 +67,12 @@ export function getEditFormHtml(item, lang, dataObj = {}) {
           </div>
           
           <div id="edit_auto_add_subrow" style="display: flex; gap: 10px; flex-wrap: wrap; opacity: ${item.auto_add_id_to_description_enabled ? '1' : '0.5'}; transition: opacity 0.2s;">
-            <div class="edit-field" style="flex: 1; min-width: 110px;">
+            <div class="edit-field" style="flex: 1; min-width: 160px;">
               <label>${lang.lbl_min_qty}</label>
               <input type="number" id="edit_min_qty" value="${item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : 2}" placeholder="${lang.lbl_min_qty_placeholder}" ${!item.auto_add_id_to_description_enabled ? 'disabled' : ''}>
             </div>
             
-            <div class="edit-field" style="flex: 2; min-width: 160px;">
+            <div class="edit-field" style="flex: 2; min-width: 110px;">
               <label>${lang.lbl_todo}</label>
               <select id="edit_todo" ${!item.auto_add_id_to_description_enabled ? 'disabled' : ''} style="width: 100%; padding: 6px 8px; border: 1px solid var(--divider-color); border-radius: 6px; background: var(--card-background-color); color: var(--primary-text-color); font-size: 0.85rem; height: 34px; outline: none; cursor: pointer;">
                 <option value="">${lang.lbl_todo_placeholder}</option>
