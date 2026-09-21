@@ -27,6 +27,17 @@ export function renderCardContent(cardInstance) {
     titleEl.textContent = computedTitle;
   }
 
+  // AGGIORNAMENTO TRADUZIONE TOOLTIP TASTI EXPORT/IMPORT
+  const exportBtn = cardInstance.shadowRoot ? cardInstance.shadowRoot.getElementById("export-btn") : null;
+  if (exportBtn) {
+    exportBtn.title = lang.btn_export_tooltip || "Export";
+  }
+
+  const importBtn = cardInstance.shadowRoot ? cardInstance.shadowRoot.getElementById("import-btn") : null;
+  if (importBtn) {
+    importBtn.title = lang.btn_import_tooltip || "Import";
+  }
+
   // 2. RENDERING MESSAGGIO INVENTARIO VUOTO / SENZA ENTITÀ SULLA GRIGLIA
   if (!cardInstance.config.entity) {
     if (cardInstance.content) {
@@ -123,8 +134,12 @@ export function renderCardContent(cardInstance) {
     if (!scanBtn && cardInstance.config.show_add_form) {
       scanBtn = document.createElement("button");
       scanBtn.id = "header-scan-btn";
+      scanBtn.className = "io-btn";
       scanBtn.innerHTML = `<ha-icon icon="mdi:barcode-scan"></ha-icon>`;
-      scanBtn.style = "background:var(--primary-color); border:none; color:white; padding:0 8px; border-radius:4px; height:34px; margin-left:6px; cursor:pointer; display:flex; align-items:center; justify-content:center;";
+      scanBtn.style.background = "var(--primary-color)";
+      scanBtn.style.color = "white";
+      scanBtn.style.border = "none";
+      scanBtn.style.marginLeft = "0px";
       addTriggerBtn.parentNode.insertBefore(scanBtn, addTriggerBtn.nextSibling);
       scanBtn.addEventListener("click", () => { startCameraScanner(cardInstance, lang); });
     }
@@ -174,7 +189,6 @@ export function renderCardContent(cardInstance) {
     if (sumCols > 0) {
       summaryArea.style.gridTemplateColumns = `repeat(${sumCols}, minmax(0, 1fr))`;
     } else {
-      // Se il valore è 0 (o non impostato), imposta di default a 4 colonne
       summaryArea.style.gridTemplateColumns = `repeat(4, minmax(0, 1fr))`;
     }
 

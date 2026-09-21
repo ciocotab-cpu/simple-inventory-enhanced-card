@@ -1,6 +1,10 @@
+import { getTranslation } from './simple-inventory-lang.js';
+
 export async function handleSaveEditService(cardInstance, itemId, oldName) {
   const shadow = cardInstance.shadowRoot;
   if (!shadow) return;
+
+  const lang = getTranslation(cardInstance._hass);
 
   const stateObj = cardInstance._hass.states[cardInstance.config.entity];
   if (!stateObj || !stateObj.attributes) return;
@@ -29,8 +33,19 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
   const newName = nameEl.value.trim();
 
   if (!newName) {
-    alert("Il nome del prodotto non può essere vuoto.");
+    alert(lang.error_empty_name || "Il nome del prodotto non può essere vuoto.");
     return;
+  }
+
+  const isAutoAddChecked = autoAddCheckbox ? autoAddCheckbox.checked : false;
+
+  // Controllo validazione lista To-Do obbligatoria se l'aggiunta automatica è attiva
+  if (isAutoAddChecked) {
+    const selectedTodo = todoEl ? todoEl.value.trim() : "";
+    if (!selectedTodo) {
+      alert(lang.error_select_todo || "Seleziona una lista To-Do valida per l'aggiunta automatica.");
+      return;
+    }
   }
 
   let finalCategory = "";
@@ -41,8 +56,6 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
       finalCategory = catSelectEl.value.trim();
     }
   }
-
-  const isAutoAddChecked = autoAddCheckbox ? autoAddCheckbox.checked : false;
 
   const serviceData = {
     inventory_id: inventoryId,
@@ -78,13 +91,15 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
     cardInstance.fetchInventoryItems();
   } catch (err) {
     console.error("Errore durante l'aggiornamento del prodotto:", err);
-    alert("Impossibile salvare le modifiche.\nErrore Backend: " + err.message);
+    alert((lang.error_edit_fail || "Impossibile salvare le modifiche.\nErrore Backend: ") + err.message);
   }
 }
 
 export async function handleAddItemService(cardInstance) {
   const shadow = cardInstance.shadowRoot;
   if (!shadow) return;
+
+  const lang = getTranslation(cardInstance._hass);
 
   const stateObj = cardInstance._hass.states[cardInstance.config.entity];
   if (!stateObj || !stateObj.attributes) return;
@@ -113,8 +128,19 @@ export async function handleAddItemService(cardInstance) {
   const name = nameEl.value.trim();
 
   if (!name) {
-    alert("Il nome del prodotto non può essere vuoto.");
+    alert(lang.error_empty_name || "Il nome del prodotto non può essere vuoto.");
     return;
+  }
+
+  const isAutoAddChecked = autoAddCheckbox ? autoAddCheckbox.checked : false;
+
+  // Controllo validazione lista To-Do obbligatoria se l'aggiunta automatica è attiva
+  if (isAutoAddChecked) {
+    const selectedTodo = todoEl ? todoEl.value.trim() : "";
+    if (!selectedTodo) {
+      alert(lang.error_select_todo || "Seleziona una lista To-Do valida per l'aggiunta automatica.");
+      return;
+    }
   }
 
   let finalCategory = "";
@@ -125,8 +151,6 @@ export async function handleAddItemService(cardInstance) {
       finalCategory = catSelectEl.value.trim();
     }
   }
-
-  const isAutoAddChecked = autoAddCheckbox ? autoAddCheckbox.checked : false;
 
   const serviceData = {
     inventory_id: inventoryId,
@@ -163,18 +187,20 @@ export async function handleAddItemService(cardInstance) {
     cardInstance.fetchInventoryItems();
   } catch (err) {
     console.error("Errore durante l'aggiunta del prodotto:", err);
-    alert("Impossibile aggiungere l'articolo.\nErrore Backend: " + err.message);
+    alert((lang.error_add_fail || "Impossibile aggiungere l'articolo.\nErrore Backend: ") + err.message);
   }
 }
 
 export async function deleteItemDefinitivelyService(cardInstance, itemName) {
+  const lang = getTranslation(cardInstance._hass);
   if (!cardInstance.config || !cardInstance.config.entity) return;
   const stateObj = cardInstance._hass.states[cardInstance.config.entity];
   if (!stateObj || !stateObj.attributes) return;
   const inventoryId = stateObj.attributes.inventory_id;
   if (!inventoryId) return;
 
-  if (!confirm(`Vuoi eliminare definitivamente '${itemName}' dall'inventario?`)) return;
+  const confirmMsg = (lang.confirm_delete || "Vuoi eliminare definitivamente '{itemName}' dall'inventario?").replace("{itemName}", itemName);
+  if (!confirm(confirmMsg)) return;
 
   try {
     await cardInstance._hass.callService("simple_inventory", "remove_item", {
@@ -186,6 +212,6 @@ export async function deleteItemDefinitivelyService(cardInstance, itemName) {
     cardInstance.fetchInventoryItems();
   } catch (err) {
     console.error("Errore durante l'eliminazione del prodotto:", err);
-    alert("Impossibile eliminare l'articolo.\nErrore Backend: " + err.message);
+    alert((lang.error_delete_fail || "Impossibile eliminare l'articolo.\nErrore Backend: ") + err.message);
   }
 }

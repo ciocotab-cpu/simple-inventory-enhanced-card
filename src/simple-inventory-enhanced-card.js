@@ -175,8 +175,8 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
             
             <div class="header-buttons">
               <button id="add-trigger-btn" class="add-trigger-btn"><ha-icon icon="mdi:plus"></ha-icon></button>
-              <button id="export-btn" class="io-btn" title="Export"><ha-icon icon="mdi:database-export-outline"></ha-icon></button>
-              <button id="import-btn" class="io-btn" title="Import"><ha-icon icon="mdi:database-import-outline"></ha-icon></button>
+              <button id="export-btn" class="io-btn"><ha-icon icon="mdi:database-export-outline"></ha-icon></button>
+              <button id="import-btn" class="io-btn"><ha-icon icon="mdi:database-import-outline"></ha-icon></button>
             </div>
           </div>
           <div id="summary-area" class="summary-box"></div>

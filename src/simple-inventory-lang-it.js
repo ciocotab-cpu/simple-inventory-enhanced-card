@@ -10,6 +10,7 @@ export const langIt = {
     scadenza_data: "Scad: {date}",
     senza_nome: "Senza Nome",
     senza_categoria: "Senza Categoria",
+    auto_add_tooltip: "{todo} quando {min_qty} oggetti rimanenti",
     
     // Sigle contatori superiori
     ico_expired_lbl: "Scad",
@@ -76,11 +77,12 @@ export const langIt = {
     field_qty: "Quantità",
     btn_cancel: "Annulla",
     btn_add: "Aggiungi",
-    btn_export: "Esporta Prodotti",
-    btn_import: "Importa Prodotti",
+    btn_export_tooltip: "Esporta Prodotti",
+    btn_import_tooltip: "Importa Prodotti",
     btn_save: "Salva Modifiche",
     add_trigger_label: "Tasto Aggiungi",
     error_empty_name: "Il nome del prodotto non può essere vuoto.",
+    error_select_todo: "Seleziona una lista To-Do valida per l'aggiunta automatica.",
     error_add_fail: "Impossibile aggiungere l'articolo.\\nErrore Backend: ",
     error_edit_fail: "Impossibile salvare le modifiche.\\nErrore Backend: ",
     error_delete_fail: "Impossibile eliminare l'articolo.\\nErrore Backend: ",

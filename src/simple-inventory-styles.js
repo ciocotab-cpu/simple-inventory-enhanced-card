@@ -16,8 +16,9 @@ export const cardStyles = `
   .add-trigger-btn, .io-btn {
     background: var(--variable-button-bg, var(--secondary-background-color));
     border: 1px solid var(--divider-color); border-radius: 6px;
-    color: var(--primary-text-color); cursor: pointer; padding: 4px 10px;
-    font-size: 0.82rem; font-weight: bold; display: flex; align-items: center; transition: all 0.2s;
+    color: var(--primary-text-color); cursor: pointer; padding: 0 10px;
+    font-size: 0.82rem; font-weight: bold; display: flex; align-items: center; justify-content: center;
+    height: 34px; box-sizing: border-box; transition: all 0.2s;
   }
   .add-trigger-btn:hover, .io-btn:hover {
     background: var(--card-background-color); border-color: var(--accent-color); color: var(--accent-color);
@@ -53,7 +54,16 @@ export const cardStyles = `
   .qty-display { font-weight: bold; font-size: 0.9rem; }
   .btn-delete { color: var(--error-color, #db4437) !important; }
 
-  .edit-icon-btn { position: absolute; top: 6px; right: 6px; background: transparent; border: none; color: var(--secondary-text-color); cursor: pointer; padding: 2px; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; z-index: 2; }
+  .card-top-right-actions {
+    position: absolute; top: 6px; right: 6px; display: flex; align-items: center; gap: 4px; z-index: 2;
+  }
+
+  .auto-add-icon {
+    display: flex; align-items: center; justify-content: center; color: var(--secondary-text-color); cursor: help; width: 20px; height: 20px;
+  }
+  .auto-add-icon ha-icon { --mdc-icon-size: 16px; }
+
+  .edit-icon-btn { background: transparent; border: none; color: var(--secondary-text-color); cursor: pointer; padding: 2px; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; }
   .edit-icon-btn ha-icon { --mdc-icon-size: 16px; }
 
   .item-edit-form, .item-add-popup {
