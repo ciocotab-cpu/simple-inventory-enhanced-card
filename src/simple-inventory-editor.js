@@ -303,11 +303,11 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_sort: lang.ed_lbl_show_sort, 
       show_ico_total: lang.ed_lbl_ico_total, 
       show_ico_expired: lang.ed_lbl_ico_expired, 
-      show_ico_10d: (lang.ed_lbl_ico_10d, days10d), 
-      show_ico_30d: (lang.ed_lbl_ico_30d, days30d), 
-      show_ico_qty0: (lang.ed_lbl_ico_qty0), 
-      show_ico_qty1: (lang.ed_lbl_ico_qty1, qty1Val), 
-      show_ico_qty3: (lang.ed_lbl_ico_qty3, qty3Val),
+      show_ico_10d: (lang.ed_lbl_ico_10d || "Scadenze entro {days}gg").replace("{days}", days10d), 
+      show_ico_30d: (lang.ed_lbl_ico_30d || "Scadenze entro {days}gg").replace("{days}", days30d), 
+      show_ico_qty0: (lang.ed_lbl_ico_qty0 || "Quantità rimasta = 0"), 
+      show_ico_qty1: (lang.ed_lbl_ico_qty1 || "Quantità rimasta = {num}").replace("{num}", qty1Val), 
+      show_ico_qty3: (lang.ed_lbl_ico_qty3 || "Quantità rimasta = {num}").replace("{num}", qty3Val),
       debug_mode: "Modalità Debug Log (console.log)"
     };
     this._computeLabel = (schemaItem) => labels[schemaItem.name] || schemaItem.name;
