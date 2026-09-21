@@ -71,7 +71,8 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
     categoryHtml = `<span style="font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; text-align: right;">${item.category}</span>`;
   }
 
-  const expiryHtml = expiryText ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap; font-weight: 600;">${expiryText}</div>` : '';
+  // Rimossa la proprietà font-weight: 600 dal contenitore della scadenza
+  const expiryHtml = expiryText ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
 
@@ -92,11 +93,32 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
 
   const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
+  // Gestione icona To-Do (cart-plus)
+  let autoAddHtml = "";
+  if (item.auto_add_id_to_description_enabled) {
+    let todoName = item.todo_list || "";
+    if (todoName) {
+      const match = todoListsArray.find(t => t.entity_id === todoName);
+      if (match) todoName = match.name;
+    }
+    const minQty = item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : "";
+    const tooltipText = (lang.auto_add_tooltip || "{todo} quando {min_qty} oggetti rimanenti")
+      .replace("{todo}", todoName)
+      .replace("{min_qty}", minQty);
+
+    autoAddHtml = `<span class="auto-add-icon" title="${tooltipText}"><ha-icon icon="mdi:cart-plus"></ha-icon></span>`;
+  }
+
   return `
     <div class="item-card" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};">
-      ${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
+      ${!isEditing ? `
+        <div class="card-top-right-actions">
+          ${autoAddHtml}
+          <button class="edit-icon-btn" data-id="${item.id}"><ha-icon icon="mdi:cog-outline"></ha-icon></button>
+        </div>
+      ` : ''}
       <div style="display: flex; flex-direction: column; min-width: 0; width: 100%;">
-        <div class="item-name" style="padding-right: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayName}</div>
+        <div class="item-name" style="padding-right: 44px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayName}</div>
         <div style="display: flex; align-items: center; width: 100%; margin-top: 4px; overflow: hidden;">${expiryHtml}${categoryHtml}</div>
       </div>
       ${!isEditing ? `<div class="item-actions"><button class="btn-dec" data-name="${item.name}">-</button>${centerDisplay}<button class="btn-inc" data-name="${item.name}">+</button></div>` : ''}

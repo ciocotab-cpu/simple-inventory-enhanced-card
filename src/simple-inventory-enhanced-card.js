@@ -17,7 +17,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
 
   static getStubConfig() {
     return {
-      title: "", columns: 2, default_sort: "alpha", show_summary: true,
+      title: "", columns: 2, summary_columns: 0, default_sort: "alpha", show_summary: true,
       show_items: true, show_add_form: true, show_search: true, show_sort: true,
       show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true,
       show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true,
@@ -63,6 +63,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     this.config = {
       title: baseConfig.title ? baseConfig.title : "",
       columns: baseConfig.columns !== undefined ? baseConfig.columns : 2,
+      summary_columns: baseConfig.summary_columns !== undefined ? parseInt(baseConfig.summary_columns) : 0,
       default_sort: baseConfig.default_sort || "alpha",
       show_summary: baseConfig.show_summary !== undefined ? baseConfig.show_summary : true,
       show_items: baseConfig.show_items !== undefined ? baseConfig.show_items : true,
@@ -174,8 +175,8 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
             
             <div class="header-buttons">
               <button id="add-trigger-btn" class="add-trigger-btn"><ha-icon icon="mdi:plus"></ha-icon></button>
-              <button id="export-btn" class="io-btn" title="Export"><ha-icon icon="mdi:database-export-outline"></ha-icon></button>
-              <button id="import-btn" class="io-btn" title="Import"><ha-icon icon="mdi:database-import-outline"></ha-icon></button>
+              <button id="export-btn" class="io-btn"><ha-icon icon="mdi:database-export-outline"></ha-icon></button>
+              <button id="import-btn" class="io-btn"><ha-icon icon="mdi:database-import-outline"></ha-icon></button>
             </div>
           </div>
           <div id="summary-area" class="summary-box"></div>
