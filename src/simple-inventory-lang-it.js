@@ -10,7 +10,7 @@ export const langIt = {
     scadenza_data: "Scad: {date}",
     senza_nome: "Senza Nome",
     senza_categoria: "Senza Categoria",
-    auto_add_tooltip: "{todo} quando {min_qty} oggetti rimanenti",
+    auto_add_tooltip: "{todo} quando restano {min_qty} oggetti",
     
     // Sigle contatori superiori
     ico_expired_lbl: "Scad",
