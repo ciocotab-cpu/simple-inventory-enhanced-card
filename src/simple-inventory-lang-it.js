@@ -10,7 +10,7 @@ export const langIt = {
     scadenza_data: "Scad: {date}",
     senza_nome: "Senza Nome",
     senza_categoria: "Senza Categoria",
-    auto_add_tooltip: "{todo} quando {min_qty} oggetti rimanenti",
+    auto_add_tooltip: "{todo} quando restano {min_qty} oggetti",
     
     // Sigle contatori superiori
     ico_expired_lbl: "Scad",
@@ -26,9 +26,15 @@ export const langIt = {
     sort_threshold_avail: "Sotto Soglia (Solo Disponibili)",
     sort_expiry: "In Scadenza (Solo Disponibili)",
     sort_expiring_soon_desc: "In Scadenza a Breve",
-    sort_only_expired: "Solo Scaduti",
-    sort_only_empty: "Solo Esauriti",
     sort_cat_label: "Categoria: {cat}",
+
+    // Nuovi Ordinamenti Allerte Scadenze e Quantità (Dinamici)
+    sort_alert_exp_expired: "Scaduti (0 giorni)",
+    sort_alert_exp_10d: "In Scadenza (entro {days} giorni)",
+    sort_alert_exp_30d: "In Scadenza (entro {days} giorni)",
+    sort_alert_qty_0: "Esauriti (Q.tà {num})",
+    sort_alert_qty_1: "Critici (Q.tà {num})",
+    sort_alert_qty_3: "Minimi (Q.tà {num})",
 
     // Editor Lovelace
     ed_panel_base: "⚙️ Configurazione Base e Visibilità",

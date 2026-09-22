@@ -64,6 +64,19 @@ export function renderCardContent(cardInstance) {
   // 3. DROPDOWN ORDINAMENTO
   const selectSort = cardInstance.shadowRoot.getElementById("sort-select");
   if (selectSort && cardInstance.config.show_sort) {
+    const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
+    const days30d = cardInstance.config.days_30d !== undefined ? cardInstance.config.days_30d : 30;
+    const qty0Val = cardInstance.config.qty_0 !== undefined ? cardInstance.config.qty_0 : 0;
+    const qty1Val = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
+    const qty3Val = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
+
+    const optAlertExpExpired = (lang.sort_alert_exp_expired || "Scaduti (0 giorni)");
+    const optAlertExp10d = (lang.sort_alert_exp_10d || "In Scadenza (entro {days} giorni)").replace("{days}", days10d);
+    const optAlertExp30d = (lang.sort_alert_exp_30d || "In Scadenza (entro {days} giorni)").replace("{days}", days30d);
+    const optAlertQty0 = (lang.sort_alert_qty_0 || "Esauriti (Q.tà {num})").replace("{num}", qty0Val);
+    const optAlertQty1 = (lang.sort_alert_qty_1 || "Critici (Q.tà {num})").replace("{num}", qty1Val);
+    const optAlertQty3 = (lang.sort_alert_qty_3 || "Minimi (Q.tà {num})").replace("{num}", qty3Val);
+
     let sortOptionsHtml = `
       <option value="alpha" ${cardInstance.currentSort === 'alpha' ? 'selected' : ''}>${lang.sort_alpha}</option>
       <option value="alpha_avail" ${cardInstance.currentSort === 'alpha_avail' ? 'selected' : ''}>${lang.sort_alpha_avail}</option>
@@ -73,8 +86,12 @@ export function renderCardContent(cardInstance) {
       <option value="threshold_avail" ${cardInstance.currentSort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
       <option value="expiry" ${cardInstance.currentSort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
       <option value="expiring_soon_desc" ${cardInstance.currentSort === 'expiring_soon_desc' ? 'selected' : ''}>${lang.sort_expiring_soon_desc}</option>
-      <option value="only_expired" ${cardInstance.currentSort === 'only_expired' ? 'selected' : ''}>${lang.sort_only_expired}</option>
-      <option value="only_empty" ${cardInstance.currentSort === 'only_empty' ? 'selected' : ''}>${lang.sort_only_empty}</option>
+      <option value="alert_exp_expired" ${cardInstance.currentSort === 'alert_exp_expired' ? 'selected' : ''}>${optAlertExpExpired}</option>
+      <option value="alert_exp_10d" ${cardInstance.currentSort === 'alert_exp_10d' ? 'selected' : ''}>${optAlertExp10d}</option>
+      <option value="alert_exp_30d" ${cardInstance.currentSort === 'alert_exp_30d' ? 'selected' : ''}>${optAlertExp30d}</option>
+      <option value="alert_qty_0" ${cardInstance.currentSort === 'alert_qty_0' ? 'selected' : ''}>${optAlertQty0}</option>
+      <option value="alert_qty_1" ${cardInstance.currentSort === 'alert_qty_1' ? 'selected' : ''}>${optAlertQty1}</option>
+      <option value="alert_qty_3" ${cardInstance.currentSort === 'alert_qty_3' ? 'selected' : ''}>${optAlertQty3}</option>
     `;
     dynamicCategories.forEach(cat => {
       const optionValue = `cat_${cat}`;

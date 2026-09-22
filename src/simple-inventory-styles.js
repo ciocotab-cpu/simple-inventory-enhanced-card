@@ -59,7 +59,7 @@ export const cardStyles = `
   }
 
   .auto-add-icon {
-    display: flex; align-items: center; justify-content: center; color: var(--secondary-text-color); cursor: help; width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center; color: var(--secondary-text-color); cursor: pointer; width: 20px; height: 20px;
   }
   .auto-add-icon ha-icon { --mdc-icon-size: 16px; }
 

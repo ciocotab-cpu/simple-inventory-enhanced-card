@@ -33,7 +33,20 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this._initialized = true; 
     this.attachShadow({ mode: 'open' });
     const lang = getTranslation(this._hass);
-    
+
+    const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
+    const days30d = this._config.days_30d !== undefined ? this._config.days_30d : 30;
+    const qty0Val = this._config.qty_0 !== undefined ? this._config.qty_0 : 0;
+    const qty1Val = this._config.qty_1 !== undefined ? this._config.qty_1 : 1;
+    const qty3Val = this._config.qty_3 !== undefined ? this._config.qty_3 : 3;
+
+    const optAlertExpExpired = (lang.sort_alert_exp_expired || "Scaduti (0 giorni)");
+    const optAlertExp10d = (lang.sort_alert_exp_10d || "In Scadenza (entro {days} giorni)").replace("{days}", days10d);
+    const optAlertExp30d = (lang.sort_alert_exp_30d || "In Scadenza (entro {days} giorni)").replace("{days}", days30d);
+    const optAlertQty0 = (lang.sort_alert_qty_0 || "Esauriti (Q.tà {num})").replace("{num}", qty0Val);
+    const optAlertQty1 = (lang.sort_alert_qty_1 || "Critici (Q.tà {num})").replace("{num}", qty1Val);
+    const optAlertQty3 = (lang.sort_alert_qty_3 || "Minimi (Q.tà {num})").replace("{num}", qty3Val);
+
     this.shadowRoot.innerHTML = `
       <style>
         .editor-container { display: flex; flex-direction: column; gap: 12px; font-family: var(--paper-font-body1_-_font-family, sans-serif); color: var(--primary-text-color); }
@@ -130,8 +143,12 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
                 <option value="threshold_avail" ${this._config && this._config.default_sort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
                 <option value="expiry" ${this._config && this._config.default_sort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
                 <option value="expiring_soon_desc" ${this._config && this._config.default_sort === 'expiring_soon_desc' ? 'selected' : ''}>${lang.sort_expiring_soon_desc}</option>
-                <option value="only_expired" ${this._config && this._config.default_sort === 'only_expired' ? 'selected' : ''}>${lang.sort_only_expired}</option>
-                <option value="only_empty" ${this._config && this._config.default_sort === 'only_empty' ? 'selected' : ''}>${lang.sort_only_empty}</option>
+                <option value="alert_exp_expired" ${this._config && this._config.default_sort === 'alert_exp_expired' ? 'selected' : ''}>${optAlertExpExpired}</option>
+                <option value="alert_exp_10d" ${this._config && this._config.default_sort === 'alert_exp_10d' ? 'selected' : ''}>${optAlertExp10d}</option>
+                <option value="alert_exp_30d" ${this._config && this._config.default_sort === 'alert_exp_30d' ? 'selected' : ''}>${optAlertExp30d}</option>
+                <option value="alert_qty_0" ${this._config && this._config.default_sort === 'alert_qty_0' ? 'selected' : ''}>${optAlertQty0}</option>
+                <option value="alert_qty_1" ${this._config && this._config.default_sort === 'alert_qty_1' ? 'selected' : ''}>${optAlertQty1}</option>
+                <option value="alert_qty_3" ${this._config && this._config.default_sort === 'alert_qty_3' ? 'selected' : ''}>${optAlertQty3}</option>
               </select>
             </div>
           </div>
