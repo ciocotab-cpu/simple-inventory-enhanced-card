@@ -34,19 +34,6 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     const lang = getTranslation(this._hass);
 
-    const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
-    const days30d = this._config.days_30d !== undefined ? this._config.days_30d : 30;
-    const qty0Val = this._config.qty_0 !== undefined ? this._config.qty_0 : 0;
-    const qty1Val = this._config.qty_1 !== undefined ? this._config.qty_1 : 1;
-    const qty3Val = this._config.qty_3 !== undefined ? this._config.qty_3 : 3;
-
-    const optAlertExpExpired = (lang.sort_alert_exp_expired || "Scaduti (0 giorni)");
-    const optAlertExp10d = (lang.sort_alert_exp_10d || "In Scadenza (entro {days} giorni)").replace("{days}", days10d);
-    const optAlertExp30d = (lang.sort_alert_exp_30d || "In Scadenza (entro {days} giorni)").replace("{days}", days30d);
-    const optAlertQty0 = (lang.sort_alert_qty_0 || "Esauriti (Q.tà {num})").replace("{num}", qty0Val);
-    const optAlertQty1 = (lang.sort_alert_qty_1 || "Critici (Q.tà {num})").replace("{num}", qty1Val);
-    const optAlertQty3 = (lang.sort_alert_qty_3 || "Minimi (Q.tà {num})").replace("{num}", qty3Val);
-
     this.shadowRoot.innerHTML = `
       <style>
         .editor-container { display: flex; flex-direction: column; gap: 12px; font-family: var(--paper-font-body1_-_font-family, sans-serif); color: var(--primary-text-color); }
@@ -134,23 +121,27 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
             <ha-form id="form-base-t5"></ha-form>
             <div class="select-option">
               <span class="select-label">${lang.ed_sort_label}</span>
-              <select id="default_sort" class="custom-dropdown">
-                <option value="alpha" ${this._config && this._config.default_sort === 'alpha' ? 'selected' : ''}>${lang.sort_alpha}</option>
-                <option value="alpha_avail" ${this._config && this._config.default_sort === 'alpha_avail' ? 'selected' : ''}>${lang.sort_alpha_avail}</option>
-                <option value="alpha_desc" ${this._config && this._config.default_sort === 'alpha_desc' ? 'selected' : ''}>${lang.sort_alpha_desc}</option>
-                <option value="alpha_desc_avail" ${this._config && this._config.default_sort === 'alpha_desc_avail' ? 'selected' : ''}>${lang.sort_alpha_desc_avail}</option>
-                <option value="threshold" ${this._config && this._config.default_sort === 'threshold' ? 'selected' : ''}>${lang.sort_threshold}</option>
-                <option value="threshold_avail" ${this._config && this._config.default_sort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
-                <option value="expiry" ${this._config && this._config.default_sort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
-                <option value="expiring_soon_desc" ${this._config && this._config.default_sort === 'expiring_soon_desc' ? 'selected' : ''}>${lang.sort_expiring_soon_desc}</option>
-                <option value="alert_exp_expired" ${this._config && this._config.default_sort === 'alert_exp_expired' ? 'selected' : ''}>${optAlertExpExpired}</option>
-                <option value="alert_exp_10d" ${this._config && this._config.default_sort === 'alert_exp_10d' ? 'selected' : ''}>${optAlertExp10d}</option>
-                <option value="alert_exp_30d" ${this._config && this._config.default_sort === 'alert_exp_30d' ? 'selected' : ''}>${optAlertExp30d}</option>
-                <option value="alert_qty_0" ${this._config && this._config.default_sort === 'alert_qty_0' ? 'selected' : ''}>${optAlertQty0}</option>
-                <option value="alert_qty_1" ${this._config && this._config.default_sort === 'alert_qty_1' ? 'selected' : ''}>${optAlertQty1}</option>
-                <option value="alert_qty_3" ${this._config && this._config.default_sort === 'alert_qty_3' ? 'selected' : ''}>${optAlertQty3}</option>
-              </select>
+              <select id="default_sort" class="custom-dropdown"></select>
             </div>
+          </div>
+        </ha-expansion-panel>
+
+        <ha-expansion-panel>
+          <div slot="header" class="panel-header">${lang.ed_panel_sort_options || "🔀 Visualizza Ordinamenti"}</div>
+          <div class="form-row">
+            <div class="coppia-row">
+              <ha-form id="form-sort-t1"></ha-form>
+              <ha-form id="form-sort-t2"></ha-form>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-sort-t3"></ha-form>
+              <ha-form id="form-sort-t4"></ha-form>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-sort-t5"></ha-form>
+              <ha-form id="form-sort-t6"></ha-form>
+            </div>
+            <ha-form id="form-sort-t7"></ha-form>
           </div>
         </ha-expansion-panel>
 
@@ -196,6 +187,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       </div>
     `;
     this.renderForms(lang); 
+    this.updateDefaultSortOptions(lang);
     this.setupSortListener(); 
     this._attachColorListeners();
     this._setupShiftListener();
@@ -294,14 +286,76 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         el.addEventListener("change", (e) => {
           this._config = { ...this._config, [id]: parseInt(e.target.value, 10) || 0 }; 
           this.fireConfigChanged();
-          this.renderForms(getTranslation(this._hass));
+          const currentLang = getTranslation(this._hass);
+          this.renderForms(currentLang);
+          this.updateDefaultSortOptions(currentLang);
         });
       }
     });
   }
 
+  updateDefaultSortOptions(lang) {
+    const selectSort = this.shadowRoot.getElementById("default_sort");
+    if (!selectSort) return;
+
+    const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
+    const days30d = this._config.days_30d !== undefined ? this._config.days_30d : 30;
+    const qty0Val = this._config.qty_0 !== undefined ? this._config.qty_0 : 0;
+    const qty1Val = this._config.qty_1 !== undefined ? this._config.qty_1 : 1;
+    const qty3Val = this._config.qty_3 !== undefined ? this._config.qty_3 : 3;
+
+    const optAlertExpExpired = (lang.sort_alert_exp_expired || "Scaduti (0 giorni)");
+    const optAlertExp10d = (lang.sort_alert_exp_10d || "In Scadenza (entro {days} giorni)").replace("{days}", days10d);
+    const optAlertExp30d = (lang.sort_alert_exp_30d || "In Scadenza (entro {days} giorni)").replace("{days}", days30d);
+    const optAlertQty0 = (lang.sort_alert_qty_0 || "Esauriti (Q.tà {num})").replace("{num}", qty0Val);
+    const optAlertQty1 = (lang.sort_alert_qty_1 || "Critici (Q.tà {num})").replace("{num}", qty1Val);
+    const optAlertQty3 = (lang.sort_alert_qty_3 || "Minimi (Q.tà {num})").replace("{num}", qty3Val);
+
+    const showAlpha = this._config.show_sort_alpha !== undefined ? this._config.show_sort_alpha : true;
+    const showThreshold = this._config.show_sort_threshold !== undefined ? this._config.show_sort_threshold : true;
+    const showExpiry = this._config.show_sort_expiry !== undefined ? this._config.show_sort_expiry : true;
+    const showAlertExp = this._config.show_sort_alert_exp !== undefined ? this._config.show_sort_alert_exp : true;
+    const showAlertQty = this._config.show_sort_alert_qty !== undefined ? this._config.show_sort_alert_qty : true;
+
+    let optionsHtml = "";
+    if (showAlpha) {
+      optionsHtml += `<option value="alpha">${lang.sort_alpha}</option>`;
+      optionsHtml += `<option value="alpha_avail">${lang.sort_alpha_avail}</option>`;
+      optionsHtml += `<option value="alpha_desc">${lang.sort_alpha_desc}</option>`;
+      optionsHtml += `<option value="alpha_desc_avail">${lang.sort_alpha_desc_avail}</option>`;
+    }
+    if (showThreshold) {
+      optionsHtml += `<option value="threshold">${lang.sort_threshold}</option>`;
+      optionsHtml += `<option value="threshold_avail">${lang.sort_threshold_avail}</option>`;
+    }
+    if (showExpiry) {
+      optionsHtml += `<option value="expiry">${lang.sort_expiry}</option>`;
+      optionsHtml += `<option value="expiring_soon_desc">${lang.sort_expiring_soon_desc}</option>`;
+    }
+    if (showAlertExp) {
+      optionsHtml += `<option value="alert_exp_expired">${optAlertExpExpired}</option>`;
+      optionsHtml += `<option value="alert_exp_10d">${optAlertExp10d}</option>`;
+      optionsHtml += `<option value="alert_exp_30d">${optAlertExp30d}</option>`;
+    }
+    if (showAlertQty) {
+      optionsHtml += `<option value="alert_qty_0">${optAlertQty0}</option>`;
+      optionsHtml += `<option value="alert_qty_1">${optAlertQty1}</option>`;
+      optionsHtml += `<option value="alert_qty_3">${optAlertQty3}</option>`;
+    }
+
+    selectSort.innerHTML = optionsHtml;
+    selectSort.value = this._config.default_sort || "alpha";
+  }
+
   renderForms(lang) {
-    const defaultData = { title: "", columns: 2, summary_columns: 4, default_sort: "alpha", show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, debug_mode: false, ...this._config };
+    const defaultData = { 
+      title: "", columns: 2, summary_columns: 4, default_sort: "alpha", 
+      show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, 
+      show_sort_alpha: true, show_sort_threshold: true, show_sort_expiry: true, 
+      show_sort_category: true, show_sort_location: true, show_sort_alert_exp: true, show_sort_alert_qty: true,
+      show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, 
+      show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, debug_mode: false, ...this._config 
+    };
     
     const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
     const days30d = this._config.days_30d !== undefined ? this._config.days_30d : 30;
@@ -318,6 +372,13 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_add_form: lang.add_trigger_label, 
       show_search: lang.ed_lbl_show_search, 
       show_sort: lang.ed_lbl_show_sort, 
+      show_sort_alpha: lang.ed_lbl_sort_alpha || "Alfabetico",
+      show_sort_threshold: lang.ed_lbl_sort_threshold || "Sotto Soglia",
+      show_sort_expiry: lang.ed_lbl_sort_expiry || "In Scadenza",
+      show_sort_category: lang.ed_lbl_sort_category || "Categoria",
+      show_sort_location: lang.ed_lbl_sort_location || "Posizione",
+      show_sort_alert_exp: lang.ed_lbl_sort_alert_exp || "Allerta Scadenze",
+      show_sort_alert_qty: lang.ed_lbl_sort_alert_qty || "Allerta Quantità",
       show_ico_total: lang.ed_lbl_ico_total, 
       show_ico_expired: lang.ed_lbl_ico_expired, 
       show_ico_10d: (lang.ed_lbl_ico_10d || "Scadenze entro {days}gg").replace("{days}", days10d), 
@@ -340,6 +401,14 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.setupForm("form-base-t3", [{ name: "show_add_form", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-base-t4", [{ name: "show_search", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-base-t5", [{ name: "show_sort", selector: { boolean: {} } }], defaultData);
+
+    this.setupForm("form-sort-t1", [{ name: "show_sort_alpha", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sort-t2", [{ name: "show_sort_threshold", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sort-t3", [{ name: "show_sort_expiry", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sort-t4", [{ name: "show_sort_category", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sort-t5", [{ name: "show_sort_location", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sort-t6", [{ name: "show_sort_alert_exp", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-sort-t7", [{ name: "show_sort_alert_qty", selector: { boolean: {} } }], defaultData);
 
     this.setupForm("form-sum-cols", [{ name: "summary_columns", selector: { number: { min: 0, max: 7, mode: "box" } } }], defaultData);
     this.setupForm("form-sum-t1", [{ name: "show_ico_total", selector: { boolean: {} } }], defaultData);
@@ -369,6 +438,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       e.stopPropagation(); 
       this._config = { ...this._config, ...e.detail.value }; 
       this.fireConfigChanged(); 
+      if (formId.startsWith("form-sort-")) {
+        this.updateDefaultSortOptions(getTranslation(this._hass));
+      }
     }); 
   }
 
@@ -394,10 +466,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       form.data = { ...form.data, ...currentData }; 
     }); 
     
-    const selectSort = shadow.getElementById("default_sort"); 
-    if (selectSort) { 
-      selectSort.value = this._config.default_sort || "alpha"; 
-    } 
+    this.updateDefaultSortOptions(getTranslation(this._hass));
     
     ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
       const el = shadow.getElementById(`${id}_input`); 

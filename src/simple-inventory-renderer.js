@@ -82,32 +82,65 @@ export function renderCardContent(cardInstance) {
     const optAlertQty1 = (lang.sort_alert_qty_1 || "Critici (Q.tà {num})").replace("{num}", qty1Val);
     const optAlertQty3 = (lang.sort_alert_qty_3 || "Minimi (Q.tà {num})").replace("{num}", qty3Val);
 
-    let sortOptionsHtml = `
-      <option value="alpha" ${cardInstance.currentSort === 'alpha' ? 'selected' : ''}>${lang.sort_alpha}</option>
-      <option value="alpha_avail" ${cardInstance.currentSort === 'alpha_avail' ? 'selected' : ''}>${lang.sort_alpha_avail}</option>
-      <option value="alpha_desc" ${cardInstance.currentSort === 'alpha_desc' ? 'selected' : ''}>${lang.sort_alpha_desc}</option>
-      <option value="alpha_desc_avail" ${cardInstance.currentSort === 'alpha_desc_avail' ? 'selected' : ''}>${lang.sort_alpha_desc_avail}</option>
-      <option value="threshold" ${cardInstance.currentSort === 'threshold' ? 'selected' : ''}>${lang.sort_threshold}</option>
-      <option value="threshold_avail" ${cardInstance.currentSort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
-      <option value="expiry" ${cardInstance.currentSort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
-      <option value="expiring_soon_desc" ${cardInstance.currentSort === 'expiring_soon_desc' ? 'selected' : ''}>${lang.sort_expiring_soon_desc}</option>
-      <option value="alert_exp_expired" ${cardInstance.currentSort === 'alert_exp_expired' ? 'selected' : ''}>${optAlertExpExpired}</option>
-      <option value="alert_exp_10d" ${cardInstance.currentSort === 'alert_exp_10d' ? 'selected' : ''}>${optAlertExp10d}</option>
-      <option value="alert_exp_30d" ${cardInstance.currentSort === 'alert_exp_30d' ? 'selected' : ''}>${optAlertExp30d}</option>
-      <option value="alert_qty_0" ${cardInstance.currentSort === 'alert_qty_0' ? 'selected' : ''}>${optAlertQty0}</option>
-      <option value="alert_qty_1" ${cardInstance.currentSort === 'alert_qty_1' ? 'selected' : ''}>${optAlertQty1}</option>
-      <option value="alert_qty_3" ${cardInstance.currentSort === 'alert_qty_3' ? 'selected' : ''}>${optAlertQty3}</option>
-    `;
-    dynamicCategories.forEach(cat => {
-      const optionValue = `cat_${cat}`;
-      const labelText = lang.sort_cat_label.replace("{cat}", cat);
-      sortOptionsHtml += `<option value="${optionValue}" ${cardInstance.currentSort === optionValue ? 'selected' : ''}>${labelText}</option>`;
-    });
-    dynamicLocations.forEach(loc => {
-      const optionValue = `loc_${loc}`;
-      const labelText = (lang.sort_loc_label || "Posizione: {loc}").replace("{loc}", loc);
-      sortOptionsHtml += `<option value="${optionValue}" ${cardInstance.currentSort === optionValue ? 'selected' : ''}>${labelText}</option>`;
-    });
+    const showAlpha = cardInstance.config.show_sort_alpha !== undefined ? cardInstance.config.show_sort_alpha : true;
+    const showThreshold = cardInstance.config.show_sort_threshold !== undefined ? cardInstance.config.show_sort_threshold : true;
+    const showExpiry = cardInstance.config.show_sort_expiry !== undefined ? cardInstance.config.show_sort_expiry : true;
+    const showCategory = cardInstance.config.show_sort_category !== undefined ? cardInstance.config.show_sort_category : true;
+    const showLocation = cardInstance.config.show_sort_location !== undefined ? cardInstance.config.show_sort_location : true;
+    const showAlertExp = cardInstance.config.show_sort_alert_exp !== undefined ? cardInstance.config.show_sort_alert_exp : true;
+    const showAlertQty = cardInstance.config.show_sort_alert_qty !== undefined ? cardInstance.config.show_sort_alert_qty : true;
+
+    let sortOptionsHtml = "";
+
+    if (showAlpha) {
+      sortOptionsHtml += `
+        <option value="alpha" ${cardInstance.currentSort === 'alpha' ? 'selected' : ''}>${lang.sort_alpha}</option>
+        <option value="alpha_avail" ${cardInstance.currentSort === 'alpha_avail' ? 'selected' : ''}>${lang.sort_alpha_avail}</option>
+        <option value="alpha_desc" ${cardInstance.currentSort === 'alpha_desc' ? 'selected' : ''}>${lang.sort_alpha_desc}</option>
+        <option value="alpha_desc_avail" ${cardInstance.currentSort === 'alpha_desc_avail' ? 'selected' : ''}>${lang.sort_alpha_desc_avail}</option>
+      `;
+    }
+    if (showThreshold) {
+      sortOptionsHtml += `
+        <option value="threshold" ${cardInstance.currentSort === 'threshold' ? 'selected' : ''}>${lang.sort_threshold}</option>
+        <option value="threshold_avail" ${cardInstance.currentSort === 'threshold_avail' ? 'selected' : ''}>${lang.sort_threshold_avail}</option>
+      `;
+    }
+    if (showExpiry) {
+      sortOptionsHtml += `
+        <option value="expiry" ${cardInstance.currentSort === 'expiry' ? 'selected' : ''}>${lang.sort_expiry}</option>
+        <option value="expiring_soon_desc" ${cardInstance.currentSort === 'expiring_soon_desc' ? 'selected' : ''}>${lang.sort_expiring_soon_desc}</option>
+      `;
+    }
+    if (showAlertExp) {
+      sortOptionsHtml += `
+        <option value="alert_exp_expired" ${cardInstance.currentSort === 'alert_exp_expired' ? 'selected' : ''}>${optAlertExpExpired}</option>
+        <option value="alert_exp_10d" ${cardInstance.currentSort === 'alert_exp_10d' ? 'selected' : ''}>${optAlertExp10d}</option>
+        <option value="alert_exp_30d" ${cardInstance.currentSort === 'alert_exp_30d' ? 'selected' : ''}>${optAlertExp30d}</option>
+      `;
+    }
+    if (showAlertQty) {
+      sortOptionsHtml += `
+        <option value="alert_qty_0" ${cardInstance.currentSort === 'alert_qty_0' ? 'selected' : ''}>${optAlertQty0}</option>
+        <option value="alert_qty_1" ${cardInstance.currentSort === 'alert_qty_1' ? 'selected' : ''}>${optAlertQty1}</option>
+        <option value="alert_qty_3" ${cardInstance.currentSort === 'alert_qty_3' ? 'selected' : ''}>${optAlertQty3}</option>
+      `;
+    }
+    if (showCategory) {
+      dynamicCategories.forEach(cat => {
+        const optionValue = `cat_${cat}`;
+        const labelText = lang.sort_cat_label.replace("{cat}", cat);
+        sortOptionsHtml += `<option value="${optionValue}" ${cardInstance.currentSort === optionValue ? 'selected' : ''}>${labelText}</option>`;
+      });
+    }
+    if (showLocation) {
+      dynamicLocations.forEach(loc => {
+        const optionValue = `loc_${loc}`;
+        const labelText = (lang.sort_loc_label || "Posizione: {loc}").replace("{loc}", loc);
+        sortOptionsHtml += `<option value="${optionValue}" ${cardInstance.currentSort === optionValue ? 'selected' : ''}>${labelText}</option>`;
+      });
+    }
+
     selectSort.innerHTML = sortOptionsHtml;
     if (!selectSort._hasListener) {
       selectSort.addEventListener("change", (e) => { cardInstance.currentSort = e.target.value; cardInstance.updateCard(); });

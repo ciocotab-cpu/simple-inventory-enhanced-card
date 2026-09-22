@@ -19,27 +19,35 @@ export const langIt = {
     ico_qty_lbl: "Q.tà {num}",
 
     // Opzioni Dropdown Ordinamento
-    sort_alpha: "Nome A-Z (Tutti)",
-    sort_alpha_avail: "Nome A-Z (Solo Disponibili)",
-    sort_alpha_desc: "Nome Z-A (Tutti)",
-    sort_alpha_desc_avail: "Nome Z-A (Solo Disponibili)",
-    sort_threshold: "Sotto Soglia (Tutti)",
-    sort_threshold_avail: "Sotto Soglia (Solo Disponibili)",
-    sort_expiry: "In Scadenza (Solo Disponibili)",
-    sort_expiring_soon_desc: "In Scadenza a Breve",
-    sort_cat_label: "Categoria: {cat}",
-    sort_loc_label: "Posizione: {loc}",
-
-    // Nuovi Ordinamenti Allerte Scadenze e Quantità (Dinamici)
-    sort_alert_exp_expired: "Scaduti (0 giorni)",
-    sort_alert_exp_10d: "In Scadenza (entro {days} giorni)",
-    sort_alert_exp_30d: "In Scadenza (entro {days} giorni)",
-    sort_alert_qty_0: "Esauriti (Q.tà {num})",
-    sort_alert_qty_1: "Critici (Q.tà {num})",
-    sort_alert_qty_3: "Minimi (Q.tà {num})",
+    sort_alpha: "🔤 Nome A-Z (Tutti)",
+    sort_alpha_avail: "🔤 Nome A-Z (Solo Disponibili)",
+    sort_alpha_desc: "🔤 Nome Z-A (Tutti)",
+    sort_alpha_desc_avail: "🔤 Nome Z-A (Solo Disponibili)",
+    sort_threshold: "⚠️ Sotto Soglia (Tutti)",
+    sort_threshold_avail: "⚠️ Sotto Soglia (Solo Disponibili)",
+    sort_expiry: "⌛ In Scadenza (Solo Disponibili)",
+    sort_expiring_soon_desc: "⌛ In Scadenza a Breve",
+    sort_cat_label: "🏳️ Categoria: {cat}",
+    sort_loc_label: "📌 Posizione: {loc}",
+    sort_alert_exp_expired: "📅 Scaduti (0 giorni)",
+    sort_alert_exp_10d: "📅 In Scadenza (entro {days} giorni)",
+    sort_alert_exp_30d: "📅 In Scadenza (entro {days} giorni)",
+    sort_alert_qty_0: "📦 Esauriti (Q.tà {num})",
+    sort_alert_qty_1: "📦 Critici (Q.tà {num})",
+    sort_alert_qty_3: "📦 Minimi (Q.tà {num})",
+    
+    // Toggle visibilità ordinamenti
+    ed_lbl_sort_alpha: "🔤 Alfabetico",
+    ed_lbl_sort_threshold: "⚠️ Sotto Soglia",
+    ed_lbl_sort_expiry: "⌛ In Scadenza",
+    ed_lbl_sort_category: "🏳️ Categoria",
+    ed_lbl_sort_location: "📌 Posizione",
+    ed_lbl_sort_alert_exp: "📅 Allerta Scadenze",
+    ed_lbl_sort_alert_qty: "📦 Allerta Quantità",
 
     // Editor Lovelace
     ed_panel_base: "⚙️ Configurazione Base",
+    ed_panel_sort_options: "🔀 Visualizza Ordinamenti",
     ed_panel_summary: "📊 Icone di Riepilogo",
     ed_panel_expiry: "📅 Allerta Scadenze",
     ed_panel_qty: "📦 Allerta Scorte",
@@ -50,7 +58,7 @@ export const langIt = {
     ed_sort_label: "Criterio di ordinamento predefinito",
     ed_lbl_days: "Giorni",
     ed_lbl_qty: "Quantità",
-    
+
     // Toggle visibilità base
     ed_lbl_show_summary: "Sezione Icone di Riepilogo",
     ed_lbl_show_items: "Elenco dei prodotti",
@@ -59,12 +67,12 @@ export const langIt = {
 
     // Icone Riepilogo Toggle
     ed_lbl_ico_total: "Oggetti totali",
-    ed_lbl_ico_expired: "Prodotti scaduti",
-    ed_lbl_ico_10d: "Scadenze entro {days}gg",
-    ed_lbl_ico_30d: "Scadenze entro {days}gg",
-    ed_lbl_ico_qty0: "Quantità rimasta = 0",
-    ed_lbl_ico_qty1: "Quantità rimasta = {num}",
-    ed_lbl_ico_qty3: "Quantità rimasta = {num}",
+    ed_lbl_ico_expired: "⌛ Prodotti scaduti",
+    ed_lbl_ico_10d: "⌛ Scadenze entro {days}gg",
+    ed_lbl_ico_30d: "⌛ Scadenze entro {days}gg",
+    ed_lbl_ico_qty0: "⚠️Quantità rimasta = 0",
+    ed_lbl_ico_qty1: "⚠️ Quantità rimasta = {num}",
+    ed_lbl_ico_qty3: "⚠️ Quantità rimasta = {num}",
     
     // Gestione etichette Colori scaduti
     color_expired: "Scaduto",
