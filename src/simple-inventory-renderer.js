@@ -50,16 +50,21 @@ export function renderCardContent(cardInstance) {
   }
 
   const dynamicCategories = [];
+  const dynamicLocations = [];
   if (cardInstance.inventoryItems && Array.isArray(cardInstance.inventoryItems)) {
     cardInstance.inventoryItems.forEach(item => {
       const q = item.quantity !== undefined ? item.quantity : 0;
       if (q > 0) {
         const catName = item.category && item.category.trim() !== "" ? item.category.trim() : lang.senza_categoria;
         if (!dynamicCategories.includes(catName)) { dynamicCategories.push(catName); }
+
+        const locName = item.location && item.location.trim() !== "" ? item.location.trim() : (lang.senza_posizione || "Senza Posizione");
+        if (!dynamicLocations.includes(locName)) { dynamicLocations.push(locName); }
       }
     });
   }
   dynamicCategories.sort((a, b) => a.localeCompare(b));
+  dynamicLocations.sort((a, b) => a.localeCompare(b));
 
   // 3. DROPDOWN ORDINAMENTO
   const selectSort = cardInstance.shadowRoot.getElementById("sort-select");
@@ -96,6 +101,11 @@ export function renderCardContent(cardInstance) {
     dynamicCategories.forEach(cat => {
       const optionValue = `cat_${cat}`;
       const labelText = lang.sort_cat_label.replace("{cat}", cat);
+      sortOptionsHtml += `<option value="${optionValue}" ${cardInstance.currentSort === optionValue ? 'selected' : ''}>${labelText}</option>`;
+    });
+    dynamicLocations.forEach(loc => {
+      const optionValue = `loc_${loc}`;
+      const labelText = (lang.sort_loc_label || "Posizione: {loc}").replace("{loc}", loc);
       sortOptionsHtml += `<option value="${optionValue}" ${cardInstance.currentSort === optionValue ? 'selected' : ''}>${labelText}</option>`;
     });
     selectSort.innerHTML = sortOptionsHtml;
