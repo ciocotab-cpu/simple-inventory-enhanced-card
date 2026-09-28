@@ -68,7 +68,7 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
 
   let categoryHtml = "";
   if (item.category && item.category.trim() !== "") {
-    categoryHtml = `<span style="font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; text-align: right;">${item.category}</span>`;
+    categoryHtml = `<span style="font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; text-align: right;">${item.category}, ${item.location}</span>`;
   }
 
   // Rimossa la proprietà font-weight: 600 dal contenitore della scadenza
