@@ -1,35 +1,34 @@
 import { getAddPopupHtml } from './simple-inventory-templates.js';
 
-export async function startCameraScanner(cardInstance, lang) {
-  if (typeof Html5Qrcode === "undefined") {
-    try {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "/hacsfiles/simple-inventory-card/html5-qrcode.min.js";
-        script.type = "text/javascript";
-        script.async = true;
-        
-        script.onload = () => {
-          if (typeof Html5Qrcode !== "undefined") resolve();
-          else reject(new Error("Oggetto non istanziato"));
-        };
-        script.onerror = () => {
-          const fallbackScript = document.createElement("script");
-          fallbackScript.src = "/local/simple-inventory-card/html5-qrcode.min.js";
-          fallbackScript.type = "text/javascript";
-          fallbackScript.async = true;
-          fallbackScript.onload = () => resolve();
-          fallbackScript.onerror = () => reject(new Error("File non trovato"));
-          document.head.appendChild(fallbackScript);
-        };
-        document.head.appendChild(script);
-      });
-    } catch (e) {
-      alert("Impossibile caricare lo scanner locale.");
+// Funzione helper per caricare lo script evitando i blocchi di DOM
+function loadHtml5QrcodeScript() {
+  return new Promise((resolve, reject) => {
+    if (typeof Html5Qrcode !== "undefined") {
+      resolve();
       return;
     }
+    const script = document.createElement("script");
+    // Carica da unpkg o dal percorso locale di HA
+    script.src = "https://unpkg.com/html5-qrcode";
+    script.type = "text/javascript";
+    
+    script.onload = () => resolve();
+    script.onerror = (err) => reject(err);
+    
+    document.head.appendChild(script);
+  });
+}
+
+export async function startCameraScanner(cardInstance, lang) {
+  try {
+    await loadHtml5QrcodeScript();
+  } catch (e) {
+    console.error("Errore nel caricamento del file locale:", e);
+    alert("Impossibile caricare lo script dello scanner.");
+    return;
   }
 
+  // Creazione overlay
   const overlay = document.createElement("div");
   overlay.id = "scanner-fullscreen-overlay";
   overlay.style = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif; color:white;";
@@ -43,13 +42,7 @@ export async function startCameraScanner(cardInstance, lang) {
   `;
   document.body.appendChild(overlay);
 
-  const html5Qrcode = new Html5Qrcode("camera-preview-region", {
-    formatsToSupport: [ 
-      Html5QrcodeSupportedFormats.EAN_13, 
-      Html5QrcodeSupportedFormats.EAN_8, 
-      Html5QrcodeSupportedFormats.CODE_128 
-    ]
-  });
+  const html5Qrcode = new Html5Qrcode("camera-preview-region");
 
   const closeScanner = () => { 
     html5Qrcode.stop().catch(() => {}).then(() => { 
@@ -73,26 +66,39 @@ export async function startCameraScanner(cardInstance, lang) {
       if (navigator.vibrate) navigator.vibrate(100);
       barcodeText = barcodeText.trim();
       
-      await html5Qrcode.stop();
-      html5Qrcode.clear();
+      // Chiusura pulita fotocamera senza interrompere lo script in caso di eccezione
+      try {
+        await html5Qrcode.stop();
+      } catch (err) {
+        console.warn("Stop scanner non completato:", err);
+      }
+      
+      try {
+        html5Qrcode.clear();
+      } catch (err) {}
+      
       overlay.remove();
 
-      const existingProduct = cardInstance.inventoryItems.find(i => {
+      // Controllo se il prodotto esiste già
+      const items = cardInstance.inventoryItems || [];
+      const existingProduct = items.find(i => {
         const b = i.barcode || i.barcodes || i.barcode_id || "";
-        return b.trim() === barcodeText;
+        return String(b).trim() === barcodeText;
       });
 
       if (existingProduct) {
         cardInstance._editingItemId = existingProduct.id;
-        cardInstance.updateCard();
+        if (typeof cardInstance.updateCard === "function") cardInstance.updateCard();
+        else if (typeof cardInstance.requestUpdate === "function") cardInstance.requestUpdate();
         return;
       }
 
+      // Prodotto non presente: salvataggio cache e chiamata OpenFoodFacts
       cardInstance._scannedBarcodeCache = barcodeText;
       cardInstance._scannedDataCache = { name: "", category: "", unit: "" };
 
       try {
-        const response = await fetch(`https://openfoodfacts.org{barcodeText}.json`);
+        const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcodeText}.json`);
         if (response.ok) {
           const resData = await response.json();
           if (resData && resData.product) {
@@ -100,7 +106,7 @@ export async function startCameraScanner(cardInstance, lang) {
             cardInstance._scannedDataCache.name = p.product_name_it || p.product_name || "";
             
             if (p.categories_tags && p.categories_tags.length > 0) {
-              const rawCat = p.categories_tags[0]; // Isola la stringa della categoria principale
+              const rawCat = p.categories_tags[0];
               let cleanCat = rawCat.includes(":") ? rawCat.split(":")[1] : rawCat;
               cardInstance._scannedDataCache.category = cleanCat.charAt(0).toUpperCase() + cleanCat.slice(1).replace(/-/g, " ");
             }
@@ -119,14 +125,22 @@ export async function startCameraScanner(cardInstance, lang) {
             }
           }
         }
-      } catch (err) { console.warn("OpenFoodFacts offline."); }
+      } catch (err) { 
+        console.warn("OpenFoodFacts offline."); 
+      }
 
+      // Impostazione per mostrare il popup e re-render grafico
       cardInstance._showAddPopup = true;
-      cardInstance.updateCard();
+      if (typeof cardInstance.updateCard === "function") {
+        cardInstance.updateCard();
+      } else if (typeof cardInstance.requestUpdate === "function") {
+        cardInstance.requestUpdate();
+      }
     },
     () => {}
-  ).catch(() => { 
-    alert("Impossibile accedere alla fotocamera."); 
+  ).catch((err) => { 
+    console.error(err);
+    alert("Impossibile accedere alla fotocamera. Verifica che la pagina sia in HTTPS e di aver dato i permessi."); 
     overlay.remove(); 
   });
 }

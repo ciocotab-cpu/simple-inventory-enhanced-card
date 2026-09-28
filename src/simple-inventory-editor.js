@@ -43,6 +43,40 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         .select-option { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
         .select-label { font-size: 0.85rem; color: var(--secondary-text-color); font-weight: 500; }
         
+        .io-buttons-row {
+          display: flex;
+          gap: 10px;
+          margin-top: -4px;
+          margin-bottom: 4px;
+        }
+
+        .editor-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          flex: 1;
+          height: 38px;
+          padding: 0 12px;
+          border-radius: 4px;
+          border: 1px solid var(--divider-color);
+          background: var(--card-background-color, var(--primary-background-color));
+          color: var(--primary-text-color);
+          font-size: 0.9rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .editor-btn:hover {
+          background: var(--secondary-background-color);
+          border-color: var(--primary-color);
+        }
+
+        .editor-btn ha-icon {
+          --mdc-icon-size: 18px;
+        }
+
         .coppia-row {
           display: flex !important; flex-direction: row !important; gap: 12px !important; width: 100% !important; align-items: flex-end !important;
         }
@@ -106,6 +140,18 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
           <div slot="header" class="panel-header">${lang.ed_panel_base}</div>
           <div class="form-row">
             <ha-form id="form-base-ent"></ha-form>
+            
+            <div class="io-buttons-row">
+              <button id="export-btn" class="editor-btn">
+                <ha-icon icon="mdi:database-export-outline"></ha-icon>
+                <span>${lang.export_btn || "Esporta Backup"}</span>
+              </button>
+              <button id="import-btn" class="editor-btn">
+                <ha-icon icon="mdi:database-import-outline"></ha-icon>
+                <span>${lang.import_btn || "Importa Backup"}</span>
+              </button>
+            </div>
+
             <div class="coppia-row">
               <ha-form id="form-base-title"></ha-form>
               <ha-form id="form-base-cols"></ha-form>
@@ -191,6 +237,105 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.setupSortListener(); 
     this._attachColorListeners();
     this._setupShiftListener();
+    this._setupImportExportListeners();
+  }
+
+  _setupImportExportListeners() {
+    const shadow = this.shadowRoot;
+    const exportBtn = shadow.getElementById("export-btn");
+    const importBtn = shadow.getElementById("import-btn");
+
+    if (exportBtn) {
+      exportBtn.addEventListener("click", async () => {
+        const lang = getTranslation(this._hass);
+        if (!this._config || !this._config.entity || !this._hass) {
+          alert(lang.io_err_no_entity || "Seleziona prima un'entità sensore inventario valida.");
+          return;
+        }
+        const stateObj = this._hass.states[this._config.entity];
+        if (!stateObj || !stateObj.attributes || !stateObj.attributes.inventory_id) {
+          alert(lang.io_err_invalid_sensor || "Sensore inventario non valido o attributo inventory_id mancante.");
+          return;
+        }
+        const inventoryId = stateObj.attributes.inventory_id;
+        try {
+          const result = await this._hass.connection.sendMessagePromise({
+            type: "simple_inventory/list_items", inventory_id: inventoryId
+          });
+          const items = (result && result.items) ? result.items : [];
+          if (items.length === 0) {
+            alert(lang.io_err_empty_export || "Nessun articolo trovato da esportare per questo inventario.");
+            return;
+          }
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
+          const downloadAnchor = document.createElement('a');
+          downloadAnchor.setAttribute("href", dataStr);
+          downloadAnchor.setAttribute("download", `${this._config.entity}_backup.json`);
+          document.body.appendChild(downloadAnchor);
+          downloadAnchor.click();
+          downloadAnchor.remove();
+        } catch (err) {
+          alert((lang.io_err_export_failed || "Errore durante il recupero dei dati: {err}").replace("{err}", err.message));
+        }
+      });
+    }
+
+    if (importBtn) {
+      importBtn.addEventListener("click", () => {
+        const lang = getTranslation(this._hass);
+        if (!this._config || !this._config.entity || !this._hass) {
+          alert(lang.io_err_no_entity || "Seleziona prima un'entità sensore inventario valida.");
+          return;
+        }
+        const stateObj = this._hass.states[this._config.entity];
+        if (!stateObj || !stateObj.attributes || !stateObj.attributes.inventory_id) {
+          alert(lang.io_err_invalid_sensor || "Sensore inventario non valido o attributo inventory_id mancante.");
+          return;
+        }
+        const inventoryId = stateObj.attributes.inventory_id;
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = async (evt) => {
+            try {
+              const importedItems = JSON.parse(evt.target.result);
+              if (!Array.isArray(importedItems)) {
+                throw new Error(lang.io_err_invalid_json || "File non valido. Deve contenere un array JSON.");
+              }
+
+              const confirmMsg = (lang.io_confirm_import || "Vuoi procedere al caricamento di {count} prodotti in questo inventario?").replace("{count}", importedItems.length);
+              if (!confirm(confirmMsg)) return;
+
+              for (const item of importedItems) {
+                if (!item.name) continue;
+                const serviceData = {
+                  inventory_id: inventoryId,
+                  name: item.name,
+                  quantity: parseFloat(item.quantity) || 0,
+                  expiry_date: item.expiry_date || "",
+                  unit: item.unit || "",
+                  category: item.category || "",
+                  location: item.location || "",
+                  description: item.description || "",
+                  barcodes: item.barcodes || item.barcode_id || item.barcode || ""
+                };
+                await this._hass.callService("simple_inventory", "add_item", serviceData);
+              }
+              alert(lang.io_import_success || "Importazione completata con successo!");
+            } catch (err) {
+              alert((lang.io_err_import_failed || "Errore di importazione: {err}").replace("{err}", err.message));
+            }
+          };
+          reader.readAsText(file);
+        };
+        fileInput.click();
+      });
+    }
   }
 
   _setupShiftListener() {
@@ -386,7 +531,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_ico_qty0: (lang.ed_lbl_ico_qty0 || "Quantità rimasta = 0"), 
       show_ico_qty1: (lang.ed_lbl_ico_qty1 || "Quantità rimasta = {num}").replace("{num}", qty1Val), 
       show_ico_qty3: (lang.ed_lbl_ico_qty3 || "Quantità rimasta = {num}").replace("{num}", qty3Val),
-      debug_mode: "Modalità Debug Log (console.log)"
+      debug_mode: lang.ed_lbl_debug_mode || "Modalità Debug Log (console.log)"
     };
     this._computeLabel = (schemaItem) => labels[schemaItem.name] || schemaItem.name;
     

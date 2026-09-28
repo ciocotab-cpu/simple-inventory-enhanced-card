@@ -93,8 +93,6 @@ export const langIt = {
     field_qty: "Quantità",
     btn_cancel: "Annulla",
     btn_add: "Aggiungi",
-    btn_export_tooltip: "Esporta Prodotti",
-    btn_import_tooltip: "Importa Prodotti",
     btn_save: "Salva Modifiche",
     add_trigger_label: "Tasto Aggiungi",
     error_empty_name: "Il nome del prodotto non può essere vuoto.",
@@ -127,5 +125,16 @@ export const langIt = {
     lbl_todo_placeholder: "Seleziona Lista",
     lbl_todo_placement: "Posizione Quantità",
     opt_placement_name: "Nel nome",
-    opt_placement_desc: "Nella descrizione"
+    opt_placement_desc: "Nella descrizione",
+    export_btn: "Esporta Backup",
+    import_btn: "Importa Backup",
+    io_err_no_entity: "Seleziona prima un'entità sensore inventario valida.",
+    io_err_invalid_sensor: "Sensore inventario non valido o attributo inventory_id mancante.",
+    io_err_empty_export: "Nessun articolo trovato da esportare per questo inventario.",
+    io_err_export_failed: "Errore durante il recupero dei dati: {err}",
+    io_err_invalid_json: "File non valido. Deve contenere un array JSON.",
+    io_confirm_import: "Vuoi procedere al caricamento di {count} prodotti in questo inventario?",
+    io_import_success: "Importazione completata con successo!",
+    io_err_import_failed: "Errore di importazione: {err}",
+    ed_lbl_debug_mode: "Modalità Debug Log (console.log)"
 };

@@ -184,8 +184,6 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
             
             <div class="header-buttons">
               <button id="add-trigger-btn" class="add-trigger-btn"><ha-icon icon="mdi:plus"></ha-icon></button>
-              <button id="export-btn" class="io-btn"><ha-icon icon="mdi:database-export-outline"></ha-icon></button>
-              <button id="import-btn" class="io-btn"><ha-icon icon="mdi:database-import-outline"></ha-icon></button>
             </div>
           </div>
           <div id="summary-area" class="summary-box"></div>
@@ -207,61 +205,6 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     this.shadowRoot.getElementById("add-trigger-btn").addEventListener("click", () => {
       this.log("[CARD] Cliccato pulsante Aggiungi (+)");
       this._showAddPopup = true; this.updateCard();
-    });
-
-    this.shadowRoot.getElementById("export-btn").addEventListener("click", () => {
-      this.log("[CARD] Cliccato Export");
-      if (!this.inventoryItems || this.inventoryItems.length === 0) return;
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.inventoryItems, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `${this.config.entity || 'inventario'}_backup.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    });
-
-    this.shadowRoot.getElementById("import-btn").addEventListener("click", () => {
-      this.log("[CARD] Cliccato Import");
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file'; fileInput.accept = '.json';
-      fileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async (evt) => {
-          try {
-            const importedItems = JSON.parse(evt.target.result);
-            if (!Array.isArray(importedItems)) throw new Error("File non valido. Deve contenere un array JSON.");
-            
-            const stateObj = this._hass.states[this.config.entity];
-            const inventoryId = stateObj.attributes.inventory_id;
-            if (!inventoryId) return;
-
-            if (!confirm(`Vuoi procedere al caricamento di ${importedItems.length} prodotti in questo inventario?`)) return;
-
-            for (const item of importedItems) {
-              if (!item.name) continue;
-              const serviceData = {
-                inventory_id: inventoryId,
-                name: item.name,
-                quantity: parseFloat(item.quantity) || 0,
-                expiry_date: item.expiry_date || "",
-                unit: item.unit || "",
-                category: item.category || "",
-                location: item.location || "",
-                description: item.description || "",
-                barcodes: item.barcodes || item.barcode_id || item.barcode || ""
-              };
-              await this._hass.callService("simple_inventory", "add_item", serviceData);
-            }
-            alert("Importazione completata con successo!");
-            this._initialFetched = false; this.fetchInventoryItems();
-          } catch (err) { alert("Errore di importazione: " + err.message); }
-        };
-        reader.readAsText(file);
-      };
-      fileInput.click();
     });
   }
 
