@@ -200,14 +200,14 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
             </div>
             <div class="coppia-row">
               <ha-form id="form-sum-t2"></ha-form>
-              <ha-form id="form-sum-t3"></ha-form>
-            </div>
-            <div class="coppia-row">
-              <ha-form id="form-sum-t4"></ha-form>
               <ha-form id="form-sum-t5"></ha-form>
             </div>
             <div class="coppia-row">
+              <ha-form id="form-sum-t3"></ha-form>
               <ha-form id="form-sum-t6"></ha-form>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-sum-t4"></ha-form>
               <ha-form id="form-sum-t7"></ha-form>
             </div>
           </div>
