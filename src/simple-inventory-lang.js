@@ -13,8 +13,8 @@ export const languages = {
 };
 
 export function getTranslation(hass) {
-  // const haLang = hass && hass.language ? hass.language.split("-") : "it";
-   const haLang = "en"; // <-- Forza l'INGLESE
+   const haLang = hass && hass.language ? hass.language.split("-") : "it";
+  // const haLang = "en"; // <-- Forza l'INGLESE
   // const haLang = "fr"; // <-- Forza il FRANCESE
   // const haLang = "de"; // <-- Forza il TEDESCO
   
