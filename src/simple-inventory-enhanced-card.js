@@ -3,7 +3,6 @@ import { cardStyles } from './simple-inventory-styles.js';
 import { renderCardContent } from './simple-inventory-renderer.js';
 import { version } from '../package.json';
 
-
 console.info(
   `%c SIMPLE-INVENTORY-ENHANCED-CARD %c v${version} `,
   'color: white; background: coral; font-weight: bold;',
@@ -31,20 +30,24 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     };
   }
 
+  isDebugEnabled() {
+    return Boolean(this.config && (this.config.debug_mode === true || this.config.debug_mode === "true"));
+  }
+
   log(...args) {
-    if (this.config && this.config.debug_mode) {
+    if (this.isDebugEnabled()) {
       console.log(...args);
     }
   }
 
   warn(...args) {
-    if (this.config && this.config.debug_mode) {
+    if (this.isDebugEnabled()) {
       console.warn(...args);
     }
   }
 
   error(...args) {
-    if (this.config && this.config.debug_mode) {
+    if (this.isDebugEnabled()) {
       console.error(...args);
     }
   }
@@ -62,6 +65,10 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
 
   setConfig(config) {
     const baseConfig = config || {};
+    const isDebugMode = baseConfig.debug_mode !== undefined 
+      ? (baseConfig.debug_mode === true || baseConfig.debug_mode === "true") 
+      : false;
+
     this.config = {
       title: baseConfig.title ? baseConfig.title : "",
       columns: baseConfig.columns !== undefined ? baseConfig.columns : 2,
@@ -104,11 +111,13 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       alpha_qty1: baseConfig.alpha_qty1 !== undefined ? baseConfig.alpha_qty1 : 100,
       alpha_qty3: baseConfig.alpha_qty3 !== undefined ? baseConfig.alpha_qty3 : 100,
       entity: baseConfig.entity || "",
-      debug_mode: baseConfig.debug_mode !== undefined ? baseConfig.debug_mode : false
+      debug_mode: isDebugMode
     };
 
-    this.log("%c[CARD] setConfig() invocato", "color: #00bcd4", config);
-    
+    if (this.isDebugEnabled()) {
+      console.log("%c[CARD] Modalità Debug ABILITATA tramite setConfig()", "color: #00ff00; font-weight: bold;", this.config);
+    }
+
     this.inventoryItems = this.inventoryItems || [];
     this.searchQuery = this.searchQuery || "";
     this._summaryExpanded = this._summaryExpanded !== undefined ? this._summaryExpanded : true;

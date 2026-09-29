@@ -2,15 +2,20 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange?style=for-the-badge&logo=homeassistant)](https://gitlab.com)
 [![license_badge](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=mit)](https://opensource.org/licenses/MIT)
+<a href="https://www.buymeacoffee.com/ciocotab" target="_blank" rel="noreferrer noopener"><img src="https://img.shields.io/badge/Donate-Buy%20me%20a%20beer-yellow?style=for-the-badge&amp;logo=buy-me-a-coffee" alt="Buy me a beer"></a>
+<a href="https://www.paypal.com/donate/?business=MRVBV9PLT9ZPL&amp;no_recurring=0&amp;item_name=Hi%2C+I%27m+Clooos+the+creator+of+Bubble+Card.+Thank+you+for+supporting+me+and+my+passion.+You+are+awesome%21+%F0%9F%8D%BB&amp;currency_code=EUR" target="_blank" rel="noreferrer noopener"><img src="https://img.shields.io/badge/Donate-PayPal-blue?logo=paypal&amp;style=for-the-badge" alt="PayPal"></a>
 
 🌐 **Select Language:**  
 *   [English Version 🇬🇧](#-english-version)
 *   [Versione Italiana 🇮🇹](#-versione-italiana)
 
 ![Card](./img/Visual.png)
+![Setting3](./img/AddItem.png)
 ![Setting1](./img/Setting1.png)
 ![Setting2](./img/Setting2.png)
 ![Setting3](./img/Setting3.png)
+![Setting3](./img/Setting4.png)
+![Setting3](./img/Setting5.png)
 ---
 
 # 🇬🇧 English Version
@@ -202,7 +207,7 @@ Grazie alla predisposizione del repository, l'installazione e la gestione degli 
 Tutte le preferenze della card possono essere gestite ed estese comodamente tramite l'**Editor Visuale Interattivo** integrato in Lovelace, senza la necessità di scrivere codice YAML a mano:
 
 * **📐 Griglia e Colonne Dinamiche:** È possibile personalizzare il numero di colonne per adattare la visualizzazione della griglia dei prodotti a qualsiasi tipo di schermo (PC, Tablet o Smartphone).
-* **📥 Import & Export:** La card integra funzioni avanzate per esportare l'intero database della dispensa in formato testuale o importare stock massivi di prodotti in pochissimi secondi.
+* **📥 Import & Export:** La card integra funzioni per esportare l'intero database della dispensa in formato testuale o importare stock massivi di prodotti in pochissimi secondi.
 * **🔌 Disattivazione Selettiva dei Componenti:** Attraverso i comodi interruttori (toggle) grafici dell'editor, puoi nascondere o mostrare singolarmente le varie aree della card per ripulire l'interfaccia:
     * Sezione Icone di Riepilogo (Contatori totali, prodotti scaduti, in esaurimento, ecc.).
     * Barra di ricerca (Filtro istantaneo e inserimento rapido tramite scanner barcode).
@@ -214,7 +219,7 @@ Tutte le preferenze della card possono essere gestite ed estese comodamente tram
 
 ## 🛠️ Tecnologie Utilizzate
 
-1. **Backend Core:** Simple Inventory Python Integration (componente personalizzato per Home Assistant).
+1. **Backend Core:** [**Simple Inventory**](https://github.com/blaineventurine/simple_inventory) (componente personalizzato per Home Assistant presente su HACS).
 2. **Motore di Scansione:** Html5-QRCode v 2.3.8 (libreria JavaScript locale integrata *on-demand* per la decodifica dei formati EAN-13, EAN-8 e Code-128).
 3. **Database Informazioni:** Open Food Facts API v3 (servizio open-source per l'estrazione delle schede tecniche dei prodotti).
 
@@ -245,8 +250,9 @@ Assicurati che l'applicazione ufficiale di Home Assistant (o Google Chrome su mo
 Le prossime versioni della card si concentreranno sull'ottimizzazione delle performance, su nuove scorciatoie interattive e su una migliore disposizione degli elementi:
 
 * 📦 **Pubblicazione ufficiale su HACS:** Registrare la card come archivio ufficiale nel catalogo pubblico di HACS per consentire l'installazione automatica senza inserire l'URL.
-* 🔗 **Scorciatoia Liste To-Do:** Introdurre la possibilità di cliccare direttamente sull'icona del riepilogo per aprire istantaneamente la relativa lista di Home Assistant in un popup.
-* 📐 **Restyling Interfaccia Import/Export:** Riposizionare i tasti di Import ed Export in una zona più strategica, discreta e visivamente integrata nel layout della card.
+* 📐 **Layout Multipli:** Più configurazioni della disposizione dei testi per la scheda oggetto. Possibilità di decidere cosa visualizzare.
+* 📐 **Puntamento Icone di Riepilogo:** Al click su un'icona di riepilogo, viene visualizzata la lista corrispondente.
+* 📐 **Testi di FailOver:** Traduzione in inglese dei testi failover (ora in italiano).
 
 ---
 
@@ -256,19 +262,47 @@ Anche se è consigliabile configurarla graficamente tramite l'interfaccia visiva
 
 ```yaml
 type: custom:simple-inventory-enhanced-card
-entity: sensor.simple_inventory_dispensa # La tua entità generata dal backend Python
+title: 'Personal'
 columns: 2
-show_search: true
-show_sort: true
+default_sort: expiry
 show_summary: true
 show_items: true
 show_add_form: true
-color_expired: "#db4437"
-alpha_expired: 20
-color_10d: "#e6a23c"
-alpha_10d: 15
-color_qty0: "#db4437"
-alpha_qty0: 30
+show_search: true
+show_sort: true
+show_ico_total: true
+show_ico_expired: true
+show_ico_10d: true
+show_ico_30d: true
+show_ico_qty0: true
+show_ico_qty1: true
+show_ico_qty3: true
+color_expired: '#db4437'
+color_10d: '#e8dece'
+color_30d: '#543dff'
+color_qty0: '#db4437'
+color_qty1: '#def434'
+color_qty3: '#1e00ff'
+alpha_expired: 50
+alpha_10d: 50
+alpha_30d: 50
+alpha_qty0: 50
+alpha_qty1: 50
+alpha_qty3: 50
+entity: sensor.personal_inventory
+threshold_1_days: 1000
+threshold_2_days: 10000
+days_10d: 11
+summary_columns: 4
+debug_mode: false
+show_sort_alpha: true
+show_sort_threshold: true
+show_sort_expiry: true
+show_sort_category: true
+show_sort_location: true
+show_sort_alert_exp: true
+show_sort_alert_qty: true
+
 ```
 
 ---

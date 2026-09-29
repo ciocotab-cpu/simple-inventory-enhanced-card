@@ -6,7 +6,24 @@ import { filterAndSortItems } from './simple-inventory-filters.js';
 import { renderSingleItemCard } from './simple-inventory-cards.js';
 
 export function renderCardContent(cardInstance) {
-  if (!cardInstance || !cardInstance.config) return;
+  // Stessa logica di verfifica del flag debug presente nel file principale
+  const isDebugEnabled = () => {
+    return Boolean(cardInstance && cardInstance.isDebugEnabled && cardInstance.isDebugEnabled());
+  };
+
+  const log = (...args) => {
+    if (isDebugEnabled()) console.log(...args);
+  };
+  
+  const warn = (...args) => {
+    if (isDebugEnabled()) console.warn(...args);
+  };
+
+  log("[simple-inventory-renderer] Inizio rendering della scheda:", cardInstance);
+  if (!cardInstance || !cardInstance.config) {
+    warn("[simple-inventory-renderer] Istanza o configurazione mancante.");
+    return;
+  }
   const lang = getTranslation(cardInstance._hass);
   
   // 1. GESTIONE TITOLO ROBUSTA
@@ -25,6 +42,7 @@ export function renderCardContent(cardInstance) {
     }
     
     titleEl.textContent = computedTitle;
+    log("[simple-inventory-renderer] Titolo impostato:", computedTitle);
   }
 
   // AGGIORNAMENTO TRADUZIONE TOOLTIP TASTI EXPORT/IMPORT
@@ -40,10 +58,12 @@ export function renderCardContent(cardInstance) {
 
   // 2. RENDERING MESSAGGIO INVENTARIO VUOTO / SENZA ENTITÀ SULLA GRIGLIA
   if (!cardInstance.config.entity) {
+    warn("[simple-inventory-renderer] Nessuna entità configurata.");
     if (cardInstance.content) {
       cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang ? lang.select_entity_error : 'Seleziona un\'entità nelle impostazioni'}</div>`;
     }
   } else if (!cardInstance.inventoryItems || cardInstance.inventoryItems.length === 0) {
+    log("[simple-inventory-renderer] Nessun elemento trovato nell'inventario.");
     if (cardInstance.content) {
       cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang ? lang.loading_items : 'Nessun articolo trovato'}</div>`;
     }
@@ -143,7 +163,11 @@ export function renderCardContent(cardInstance) {
 
     selectSort.innerHTML = sortOptionsHtml;
     if (!selectSort._hasListener) {
-      selectSort.addEventListener("change", (e) => { cardInstance.currentSort = e.target.value; cardInstance.updateCard(); });
+      selectSort.addEventListener("change", (e) => { 
+        log("[simple-inventory-renderer] Cambio ordinamento a:", e.target.value);
+        cardInstance.currentSort = e.target.value; 
+        cardInstance.updateCard(); 
+      });
       selectSort._hasListener = true;
     }
   }
@@ -167,16 +191,20 @@ export function renderCardContent(cardInstance) {
       searchBar.addEventListener("keydown", async (e) => {
         if (e.key === "Enter") {
           const rawCode = searchBar.value.trim();
+          log("[simple-inventory-renderer] Tasto Invio premuto nella barra di ricerca. Codice inserito:", rawCode);
           if (!rawCode || !cardInstance.inventoryItems) return;
           const exactMatch = cardInstance.inventoryItems.find(i => {
             const b = i.barcodes || i.barcode_id || i.barcode || "";
             return b.trim() === rawCode;
           });
           if (exactMatch) {
+            log("[simple-inventory-renderer] Trovato corrispondenza esatta per barcode nella ricerca:", exactMatch.name);
             e.preventDefault();
             searchBar.value = ""; 
             cardInstance.searchQuery = "";
             await cardInstance.adjustQuantity(exactMatch.name, 1);
+          } else {
+            log("[simple-inventory-renderer] Nessuna corrispondenza esatta trovata per barcode:", rawCode);
           }
         }
       });
@@ -201,7 +229,10 @@ export function renderCardContent(cardInstance) {
       scanBtn.style.border = "none";
       scanBtn.style.marginLeft = "0px";
       addTriggerBtn.parentNode.insertBefore(scanBtn, addTriggerBtn.nextSibling);
-      scanBtn.addEventListener("click", () => { startCameraScanner(cardInstance, lang); });
+      scanBtn.addEventListener("click", () => { 
+        log("[simple-inventory-renderer] Avvio dello scanner dalla testata");
+        startCameraScanner(cardInstance, lang); 
+      });
     }
   }
 
@@ -241,6 +272,16 @@ export function renderCardContent(cardInstance) {
     });
   }
 
+  log("[simple-inventory-renderer] Calcolo riepilogo eseguito:", {
+    totalItems,
+    expiredCount,
+    exp10Count,
+    exp30Count,
+    qty0Count,
+    qtyLowCount,
+    qtyWarningCount
+  });
+
   const summaryArea = cardInstance.shadowRoot.getElementById("summary-area");
   if (cardInstance.config.show_summary) {
     summaryArea.classList.add("visible");
@@ -273,6 +314,7 @@ export function renderCardContent(cardInstance) {
   // 7. GRIGLIA PRODOTTI
   if (cardInstance.inventoryItems && cardInstance.inventoryItems.length > 0) {
     const items = filterAndSortItems(cardInstance);
+    log(`[simple-inventory-renderer] Rendering di ${items.length} articoli filtrati/ordinati.`);
 
     const categoriesListArray = [];
     cardInstance.inventoryItems.forEach(i => {
@@ -283,22 +325,58 @@ export function renderCardContent(cardInstance) {
 
     cardInstance.content.innerHTML = items.map(item => renderSingleItemCard(item, cardInstance, lang, categoriesListArray)).join('');
 
-    cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance.adjustQuantity(btn.dataset.name, 1); }); });
-    cardInstance.content.querySelectorAll(".btn-dec").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance.adjustQuantity(btn.dataset.name, -1); }); });
-    cardInstance.content.querySelectorAll(".btn-delete").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); deleteItemDefinitivelyService(cardInstance, btn.dataset.name); }); });
+    cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { 
+      btn.addEventListener("click", (e) => { 
+        e.stopPropagation(); 
+        log("[simple-inventory-renderer] Pulsante '+' premuto per:", btn.dataset.name);
+        cardInstance.adjustQuantity(btn.dataset.name, 1); 
+      }); 
+    });
+
+    cardInstance.content.querySelectorAll(".btn-dec").forEach(btn => { 
+      btn.addEventListener("click", (e) => { 
+        e.stopPropagation(); 
+        log("[simple-inventory-renderer] Pulsante '-' premuto per:", btn.dataset.name);
+        cardInstance.adjustQuantity(btn.dataset.name, -1); 
+      }); 
+    });
+
+    cardInstance.content.querySelectorAll(".btn-delete").forEach(btn => { 
+      btn.addEventListener("click", (e) => { 
+        e.stopPropagation(); 
+        log("[simple-inventory-renderer] Eliminazione richiesta per:", btn.dataset.name);
+        deleteItemDefinitivelyService(cardInstance, btn.dataset.name); 
+      }); 
+    });
     
     cardInstance.content.querySelectorAll(".edit-icon-btn").forEach(btn => { 
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
+        log("[simple-inventory-renderer] Apertura modifica per ID:", btn.dataset.id);
         cardInstance._editingItemId = btn.dataset.id; 
         cardInstance.updateCard(); 
       }); 
     });
     
-    cardInstance.content.querySelectorAll(".btn-cancel-edit").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); cardInstance._editingItemId = null; cardInstance.updateCard(); }); });
-    cardInstance.content.querySelectorAll(".btn-save-edit").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); handleSaveEditService(cardInstance, btn.dataset.id, btn.dataset.oldname); }); });
+    cardInstance.content.querySelectorAll(".btn-cancel-edit").forEach(btn => { 
+      btn.addEventListener("click", (e) => { 
+        e.stopPropagation(); 
+        log("[simple-inventory-renderer] Annullamento modifica in corso");
+        cardInstance._editingItemId = null; 
+        cardInstance.updateCard(); 
+      }); 
+    });
+
+    cardInstance.content.querySelectorAll(".btn-save-edit").forEach(btn => { 
+      btn.addEventListener("click", (e) => { 
+        e.stopPropagation(); 
+        log("[simple-inventory-renderer] Salvataggio modifica per ID:", btn.dataset.id);
+        handleSaveEditService(cardInstance, btn.dataset.id, btn.dataset.oldname); 
+      }); 
+    });
 
     if (cardInstance._editingItemId) {
+      log("[simple-inventory-renderer] Configurazione listener per form di modifica attivo (ID):", cardInstance._editingItemId);
       const shadow = cardInstance.shadowRoot;
       const editQtyInput = shadow.getElementById("edit_qty");
       const editIncBtn = shadow.getElementById("edit-qty-inc");
@@ -327,6 +405,7 @@ export function renderCardContent(cardInstance) {
     if (!cardInstance._showAddPopup) {
       addPopupContainer.innerHTML = "";
     } else {
+      log("[simple-inventory-renderer] Rendering popup aggiunta nuovo prodotto");
       const todoListsArray = [];
       if (cardInstance._hass && cardInstance._hass.states) {
         Object.keys(cardInstance._hass.states).forEach(entityId => {
@@ -354,6 +433,7 @@ export function renderCardContent(cardInstance) {
       const shadow = cardInstance.shadowRoot;
       
       if (cardInstance._scannedBarcodeCache) {
+        log("[simple-inventory-renderer] Applicazione dati da cache scanner:", cardInstance._scannedBarcodeCache);
         const bInput = shadow.getElementById("new_barcode"); if (bInput) bInput.value = cardInstance._scannedBarcodeCache;
         if (cardInstance._scannedDataCache) {
           const nInput = shadow.getElementById("new-name"); if (nInput && cardInstance._scannedDataCache.name) nInput.value = cardInstance._scannedDataCache.name;
@@ -389,9 +469,21 @@ export function renderCardContent(cardInstance) {
       }
 
       const addButtons = addPopupContainer.querySelectorAll(".btn-save-add, .btn-add, #btn-add-save");
-      addButtons.forEach(btn => { btn.addEventListener("click", () => handleAddItemService(cardInstance)); });
+      addButtons.forEach(btn => { 
+        btn.addEventListener("click", () => {
+          log("[simple-inventory-renderer] Salvataggio nuovo articolo avviato");
+          handleAddItemService(cardInstance); 
+        }); 
+      });
+      
       const cancelButtons = addPopupContainer.querySelectorAll(".btn-cancel-add, .btn-cancel, #btn-add-cancel");
-      cancelButtons.forEach(btn => { btn.addEventListener("click", () => { cardInstance._showAddPopup = false; cardInstance.updateCard(); }); });
+      cancelButtons.forEach(btn => { 
+        btn.addEventListener("click", () => { 
+          log("[simple-inventory-renderer] Annullamento popup aggiunta articolo");
+          cardInstance._showAddPopup = false; 
+          cardInstance.updateCard(); 
+        }); 
+      });
     }
   }
 }
