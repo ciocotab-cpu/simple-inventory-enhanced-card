@@ -55,10 +55,10 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
   if (currentQty === qty0Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty0, cardInstance.config.alpha_qty0);
     customBorder = getRgbaColor(cardInstance.config.color_qty0, 50);
-  } else if (currentQty === qty1Val) {
+  } else if (currentQty > qty0Val && currentQty < qty3Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty1, cardInstance.config.alpha_qty1);
     customBorder = getRgbaColor(cardInstance.config.color_qty1, 50);
-  } else if (currentQty === qty3Val) {
+  } else if (currentQty >= qty3Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty3, cardInstance.config.alpha_qty3);
     customBorder = getRgbaColor(cardInstance.config.color_qty3, 50);
   }
@@ -68,7 +68,13 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
 
   let categoryHtml = "";
   if (item.category && item.category.trim() !== "") {
-    categoryHtml = `<span style="font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; text-align: right;">${item.category}, ${item.location}</span>`;
+    if (item.location && item.location.trim() !== "") {
+      categoryHtml = `<span style="font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; text-align: right;">${item.category}, ${item.location}</span>`;
+    } else {
+      categoryHtml = `<span style="font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; text-align: right;">${item.category}</span>`;
+    }
+  } else if (item.location && item.location.trim() !== "") {  
+    categoryHtml = `<span style="font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; text-align: right;">${item.location}</span>`;
   }
 
   // Rimossa la proprietà font-weight: 600 dal contenitore della scadenza
