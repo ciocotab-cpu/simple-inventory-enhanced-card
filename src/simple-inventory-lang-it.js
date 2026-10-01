@@ -139,7 +139,7 @@ export const langIt = {
     io_err_import_failed: "Errore di importazione: {err}",
     ed_lbl_debug_mode: "Modalità Debug Log (console.log)",
     ed_layout_label: "Stile Layout Scheda",
-    ed_panel_item_card: "👷 Scheda Oggetto",
+    ed_panel_item_card: "👷 Scheda Prodotto",
     ed_lbl_show_item_name: "Mostra Nome",
     ed_lbl_show_item_unit: "Mostra Confezione",
     ed_lbl_show_item_expiry: "Mostra Scadenza",
