@@ -6,7 +6,6 @@ import { filterAndSortItems } from './simple-inventory-filters.js';
 import { renderSingleItemCard } from './simple-inventory-cards.js';
 
 export function renderCardContent(cardInstance) {
-  // Stessa logica di verfifica del flag debug presente nel file principale
   const isDebugEnabled = () => {
     return Boolean(cardInstance && cardInstance.isDebugEnabled && cardInstance.isDebugEnabled());
   };
@@ -194,7 +193,7 @@ export function renderCardContent(cardInstance) {
           log("[simple-inventory-renderer] Tasto Invio premuto nella barra di ricerca. Codice inserito:", rawCode);
           if (!rawCode || !cardInstance.inventoryItems) return;
           const exactMatch = cardInstance.inventoryItems.find(i => {
-            const b = i.barcodes || i.barcode_id || i.barcode || "";
+            const b = i.barcode || i.barcode_id || i.barcode || "";
             return b.trim() === rawCode;
           });
           if (exactMatch) {
@@ -404,7 +403,8 @@ export function renderCardContent(cardInstance) {
   if (addPopupContainer) {
     if (!cardInstance._showAddPopup) {
       addPopupContainer.innerHTML = "";
-    } else {
+    } else if (!addPopupContainer.querySelector(".add-popup-content")) {
+      // Evitiamo di sovrascrivere l'HTML del popup se è già stato renderizzato e aperto
       log("[simple-inventory-renderer] Rendering popup aggiunta nuovo prodotto");
       const todoListsArray = [];
       if (cardInstance._hass && cardInstance._hass.states) {
@@ -446,7 +446,7 @@ export function renderCardContent(cardInstance) {
             // Ricerca 1: Match Esatto Case-Insensitive
             let matchedOption = options.find(o => o.value.trim().toLowerCase() === scannedCatLower);
 
-            // Ricerca 2: Match Parziale (es. "Alimentari" se scansionato "Alimentari freschi" o viceversa)
+            // Ricerca 2: Match Parziale
             if (!matchedOption) {
               matchedOption = options.find(o => {
                 const valLower = o.value.trim().toLowerCase();
@@ -458,12 +458,10 @@ export function renderCardContent(cardInstance) {
             const cCust = shadow.getElementById("new_cat_custom");
 
             if (matchedOption) {
-              // Se trovata nell'elenco, selezionala
               cSelect.value = matchedOption.value;
               cSelect.className = "";
               if (cCont) cCont.style.display = "none";
             } else {
-              // Se non trovata nell'elenco, seleziona "Nuova Categoria" e compila il campo
               cSelect.value = "__NEW_CAT__";
               cSelect.className = "";
               if (cCont && cCust) {

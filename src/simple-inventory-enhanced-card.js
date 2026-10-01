@@ -54,12 +54,30 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
   }
 
   set hass(hass) {
+    const oldHass = this._hass;
     this._hass = hass;
-    this.log("%c[CARD] set hass() invocato", "color: #00bcd4", { entity: this.config?.entity, hassState: !!hass });
-    if (!this.content) { this.initCard(); }
-    if (this.config && this.config.entity && !this._initialFetched) { 
+
+    if (!this.content) { 
+      this.initCard(); 
+    }
+
+    const entityId = this.config?.entity;
+    const oldState = oldHass && entityId ? oldHass.states[entityId] : null;
+    const newState = hass && entityId ? hass.states[entityId] : null;
+
+    // Se stiamo modificando o aggiungendo un elemento, evitiamo re-render distruttivi provenienti da set hass
+    if (this._showAddPopup || this._editingItemId) {
+      return;
+    }
+
+    // Verifica se lo stato effettivo dell'entità configurata è cambiato
+    const stateChanged = !oldState || !newState || oldState.state !== newState.state || oldState.last_updated !== newState.last_updated;
+
+    this.log("%c[CARD] set hass() invocato", "color: #00bcd4", { entity: entityId, hassState: !!hass, stateChanged });
+
+    if (entityId && !this._initialFetched) { 
       this.fetchInventoryItems(); 
-    } else {
+    } else if (stateChanged) {
       this.updateCard();
     }
   }
@@ -132,10 +150,18 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     this._editingItemId = this._editingItemId || null;
 
     if (!this._hasSetDefaultSort || this._oldDefaultSort !== this.config.default_sort) {
-      this.currentSort = this.config.default_sort; this._oldDefaultSort = this.config.default_sort; this._hasSetDefaultSort = true;
+      this.currentSort = this.config.default_sort; 
+      this._oldDefaultSort = this.config.default_sort; 
+      this._hasSetDefaultSort = true;
     }
-    if (this._oldEntity !== this.config.entity) { this._oldEntity = this.config.entity; this._initialFetched = false; }
-    if (this.content) { this.applyGridStyles(); this.updateCard(); }
+    if (this._oldEntity !== this.config.entity) { 
+      this._oldEntity = this.config.entity; 
+      this._initialFetched = false; 
+    }
+    if (this.content) { 
+      this.applyGridStyles(); 
+      this.updateCard(); 
+    }
   }
 
   async fetchInventoryItems() {
@@ -216,11 +242,13 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     this.applyGridStyles();
     
     this.shadowRoot.getElementById("search-input").addEventListener("input", (e) => {
-      this.searchQuery = e.target.value.toLowerCase(); this.updateCard();
+      this.searchQuery = e.target.value.toLowerCase(); 
+      this.updateCard();
     });
     this.shadowRoot.getElementById("add-trigger-btn").addEventListener("click", () => {
       this.log("[CARD] Cliccato pulsante Aggiungi (+)");
-      this._showAddPopup = true; this.updateCard();
+      this._showAddPopup = true; 
+      this.updateCard();
     });
   }
 
@@ -229,7 +257,18 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     renderCardContent(this); 
   }
 
-  async adjustQuantity(itemName, diff) { if (!this.config || !this.config.entity) return; const stateObj = this._hass.states[this.config.entity]; const inventoryId = stateObj.attributes.inventory_id; if (!inventoryId) return; const serviceName = diff > 0 ? "increment_item" : "decrement_item"; await this._hass.callService("simple_inventory", serviceName, { inventory_id: inventoryId, name: itemName, amount: Math.abs(diff) }); this._initialFetched = false; this.fetchInventoryItems(); }
+  async adjustQuantity(itemName, diff) { 
+    if (!this.config || !this.config.entity) return; 
+    const stateObj = this._hass.states[this.config.entity]; 
+    if (!stateObj || !stateObj.attributes) return;
+    const inventoryId = stateObj.attributes.inventory_id; 
+    if (!inventoryId) return; 
+    const serviceName = diff > 0 ? "increment_item" : "decrement_item"; 
+    await this._hass.callService("simple_inventory", serviceName, { inventory_id: inventoryId, name: itemName, amount: Math.abs(diff) }); 
+    this._initialFetched = false; 
+    this.fetchInventoryItems(); 
+  }
+
   getCardSize() { return 3; }
 }
 

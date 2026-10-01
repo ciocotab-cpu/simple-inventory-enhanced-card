@@ -1,5 +1,5 @@
 export function getEditFormHtml(item, lang, dataObj = {}) {
-  const currentBarcode = item.barcode || item.barcodes || item.barcode_id || "";
+  const currentBarcode = item.barcode || item.barcode || item.barcode_id || "";
 
   const categoriesList = Array.isArray(dataObj) ? dataObj : (dataObj.categories || []);
   const todoLists = dataObj.todoLists || [];

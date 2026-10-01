@@ -6,7 +6,7 @@ export function filterAndSortItems(cardInstance) {
   
   if (cardInstance.searchQuery) { 
     items = items.filter(i => {
-      const itemBarcode = i.barcodes || i.barcode_id || i.barcode || "";
+      const itemBarcode = i.barcode || i.barcode_id || i.barcode || "";
       const barcodeStr = typeof itemBarcode === "object" ? JSON.stringify(itemBarcode) : String(itemBarcode);
       return (i.name && i.name.toLowerCase().includes(cardInstance.searchQuery)) ||
              (barcodeStr && barcodeStr.toLowerCase().includes(cardInstance.searchQuery));

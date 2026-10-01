@@ -261,7 +261,7 @@ export async function startCameraScanner(cardInstance, lang) {
 
       const items = cardInstance.inventoryItems || [];
       const existingProduct = items.find(i => {
-        const b = i.barcode || i.barcodes || i.barcode_id || "";
+        const b = i.barcode || i.barcode || i.barcode_id || "";
         return String(b).trim() === barcodeText;
       });
 
