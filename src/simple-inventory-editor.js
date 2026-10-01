@@ -136,7 +136,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
           <ha-form id="form-debug-toggle"></ha-form>
         </div>
 
-        <ha-expansion-panel expanded>
+        <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_base}</div>
           <div class="form-row">
             <ha-form id="form-base-ent"></ha-form>
@@ -230,11 +230,36 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
             ${this._createColorBlock("color_qty3", "alpha_qty3", "Colore Minimo", "#ff9800", "qty_3", 3, false, "Quantità")}
           </div>
         </ha-expansion-panel>
+
+        <ha-expansion-panel>
+          <div slot="header" class="panel-header">${lang.ed_panel_item_card || "👷 Scheda Oggetto"}</div>
+          <div class="form-row">
+            <div class="select-option">
+              <span class="select-label">${lang.ed_layout_label || "Stile Layout Scheda"}</span>
+              <select id="card_layout" class="custom-dropdown">
+                <option value="layout1">Default</option>
+                <option value="layout2">Default Reversed</option>
+                <option value="layout3">Compact</option>
+                <option value="layout4">Compact Reversed</option>
+              </select>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-item-name"></ha-form>
+              <ha-form id="form-item-unit"></ha-form>
+            </div>
+            <div class="coppia-row">
+              <ha-form id="form-item-expiry"></ha-form>
+              <ha-form id="form-item-category"></ha-form>
+            </div>
+            <ha-form id="form-item-location"></ha-form>
+          </div>
+        </ha-expansion-panel>
       </div>
     `;
     this.renderForms(lang); 
     this.updateDefaultSortOptions(lang);
     this.setupSortListener(); 
+    this.setupLayoutListener();
     this._attachColorListeners();
     this._setupShiftListener();
     this._setupImportExportListeners();
@@ -461,6 +486,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     const showExpiry = this._config.show_sort_expiry !== undefined ? this._config.show_sort_expiry : true;
     const showAlertExp = this._config.show_sort_alert_exp !== undefined ? this._config.show_sort_alert_exp : true;
     const showAlertQty = this._config.show_sort_alert_qty !== undefined ? this._config.show_sort_alert_qty : true;
+    //const cardLayout = this._config && this._config.card_layout ? this._config.card_layout : 'layout1';
+    const cardLayout = this.shadowRoot.getElementById("card_layout");
+    if (!cardLayout) return;
 
     let optionsHtml = "";
     if (showAlpha) {
@@ -490,16 +518,19 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
 
     selectSort.innerHTML = optionsHtml;
     selectSort.value = this._config.default_sort || "alpha";
+    cardLayout.value = this._config.card_layout || 'layout1';
   }
 
   renderForms(lang) {
     const defaultData = { 
-      title: "", columns: 2, summary_columns: 4, default_sort: "alpha", 
+      title: "", columns: 2, summary_columns: 4, default_sort: "alpha", card_layout: "layout1",
       show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, 
       show_sort_alpha: true, show_sort_threshold: true, show_sort_expiry: true, 
       show_sort_category: true, show_sort_location: true, show_sort_alert_exp: true, show_sort_alert_qty: true,
       show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, 
-      show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true, debug_mode: false, ...this._config 
+      show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true,
+      show_item_name: true, show_item_unit: true, show_item_expiry: true, show_item_category: true, show_item_location: true,
+      debug_mode: false, ...this._config 
     };
     
     const days10d = this._config.days_10d !== undefined ? this._config.days_10d : 10;
@@ -531,6 +562,11 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_ico_qty0: (lang.ed_lbl_ico_qty0 || "Quantità rimasta = 0"), 
       show_ico_qty1: (lang.ed_lbl_ico_qty1 || "Quantità rimasta = {num}").replace("{num}", qty1Val), 
       show_ico_qty3: (lang.ed_lbl_ico_qty3 || "Quantità rimasta = {num}").replace("{num}", qty3Val),
+      show_item_name: lang.ed_lbl_show_item_name || "Mostra Nome",
+      show_item_unit: lang.ed_lbl_show_item_unit || "Mostra Confezione",
+      show_item_expiry: lang.ed_lbl_show_item_expiry || "Mostra Scadenza",
+      show_item_category: lang.ed_lbl_show_item_category || "Mostra Categoria",
+      show_item_location: lang.ed_lbl_show_item_location || "Mostra Posizione",
       debug_mode: lang.ed_lbl_debug_mode || "Modalità Debug Log (console.log)"
     };
     this._computeLabel = (schemaItem) => labels[schemaItem.name] || schemaItem.name;
@@ -563,6 +599,12 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.setupForm("form-sum-t5", [{ name: "show_ico_qty0", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-sum-t6", [{ name: "show_ico_qty1", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-sum-t7", [{ name: "show_ico_qty3", selector: { boolean: {} } }], defaultData);
+
+    this.setupForm("form-item-name", [{ name: "show_item_name", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-item-unit", [{ name: "show_item_unit", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-item-expiry", [{ name: "show_item_expiry", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-item-category", [{ name: "show_item_category", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-item-location", [{ name: "show_item_location", selector: { boolean: {} } }], defaultData);
     
     this.shadowRoot.querySelectorAll("ha-form").forEach(form => { form.hass = this._hass; });
 
@@ -598,6 +640,15 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     }); 
   }
 
+  setupLayoutListener() {
+    const selectLayout = this.shadowRoot.getElementById("card_layout");
+    if (!selectLayout) return;
+    selectLayout.addEventListener("change", () => {
+      this._config = { ...this._config, card_layout: selectLayout.value };
+      this.fireConfigChanged();
+    });
+  }
+
   fireConfigChanged() { 
     this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._config }, bubbles: true, composed: true })); 
   }
@@ -612,6 +663,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     }); 
     
     this.updateDefaultSortOptions(getTranslation(this._hass));
+
+    const selectLayout = shadow.getElementById("card_layout");
+    if (selectLayout) selectLayout.value = this._config.card_layout || "layout1";
     
     ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
       const el = shadow.getElementById(`${id}_input`); 

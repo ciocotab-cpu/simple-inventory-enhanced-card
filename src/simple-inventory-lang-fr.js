@@ -136,5 +136,12 @@ export const langFr = {
     io_confirm_import: "Voulez-vous procéder au chargement de {count} produits dans cet inventaire ?",
     io_import_success: "Importation terminée avec succès !",
     io_err_import_failed: "Erreur d'importation : {err}",
-    ed_lbl_debug_mode: "Mode Debug Log (console.log)"
+    ed_lbl_debug_mode: "Mode Debug Log (console.log)",
+    ed_layout_label: "Style de mise en page de la carte",
+    ed_panel_item_card: "👷 Carte de l'article",
+    ed_lbl_show_item_name: "Afficher le nom",
+    ed_lbl_show_item_unit: "Afficher le conditionnement",
+    ed_lbl_show_item_expiry: "Afficher la date de péremption",
+    ed_lbl_show_item_category: "Afficher la catégorie",
+    ed_lbl_show_item_location: "Afficher l'emplacement"
 };

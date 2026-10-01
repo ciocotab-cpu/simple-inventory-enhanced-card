@@ -68,11 +68,11 @@ export const langEn = {
     // Summary Icons Toggles
     ed_lbl_ico_total: "Total items",
     ed_lbl_ico_expired: "⌛ Expired products",
-    ed_lbl_ico_10d: "⌛ Expiring within {days} days",
-    ed_lbl_ico_30d: "⌛ Expiring within {days} days",
-    ed_lbl_ico_qty0: "⚠️ Quantity remaining = 0",
-    ed_lbl_ico_qty1: "⚠️ Quantity remaining = {num}",
-    ed_lbl_ico_qty3: "⚠️ Quantity remaining = {num}",
+    ed_lbl_ico_10d: "⌛ Exp. within {days} days",
+    ed_lbl_ico_30d: "⌛ Exp. within {days} days",
+    ed_lbl_ico_qty0: "⚠️ Q.ty remaining = 0",
+    ed_lbl_ico_qty1: "⚠️ Q.ty remaining = {num}",
+    ed_lbl_ico_qty3: "⚠️ Q.ty remaining = {num}",
     
     // Expired Colors labels
     color_expired: "Expired",
@@ -136,5 +136,12 @@ export const langEn = {
     io_confirm_import: "Do you want to proceed with uploading {count} products into this inventory?",
     io_import_success: "Import completed successfully!",
     io_err_import_failed: "Import error: {err}",
-    ed_lbl_debug_mode: "Debug Log Mode (console.log)"
+    ed_lbl_debug_mode: "Debug Log Mode (console.log)",
+    ed_layout_label: "Item Card Layout Style",
+    ed_panel_item_card: "👷 Item Card",
+    ed_lbl_show_item_name: "Show Name",
+    ed_lbl_show_item_unit: "Show Unit/Pack",
+    ed_lbl_show_item_expiry: "Show Expiry",
+    ed_lbl_show_item_category: "Show Category",
+    ed_lbl_show_item_location: "Show Location"
 };

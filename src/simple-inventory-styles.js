@@ -85,4 +85,20 @@ export const cardStyles = `
   .edit-form-actions button { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; border: none; height: 36px; }
   .btn-save-edit { background: var(--accent-color); color: white; }
   .btn-cancel-edit { background: var(--secondary-background-color); color: var(--primary-text-color); border: 1px solid var(--divider-color) !important; }
-`;
+
+  /* Stile base per il Layout 3 */
+  .item-card.layout-3 {display: flex; flex-direction: column; gap: 6px; padding: 8px 12px; border-radius: 8px; box-sizing: border-box; width: 100%;}
+  .item-card.layout-3 .item-name {font-weight: bold; font-size: 0.95rem;}
+  .item-card.layout-3 .item-actions {display: flex; align-items: center; gap: 4px;}
+  .item-card.layout-3 ha-icon {--mdc-icon-size: 20px;}
+  .item-card.layout-3 .edit-icon-btn,
+  .item-card.layout-3 .btn-delete {background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center;}
+
+  /* Stile base per il Layout 4 */
+  .item-card.layout-4 {display: flex; flex-direction: column; gap: 6px; padding: 8px 12px; border-radius: 8px; box-sizing: border-box; width: 100%;}
+  .item-card.layout-4 .item-name {font-weight: bold; font-size: 0.95rem;}
+  .item-card.layout-4 .item-actions {display: flex; align-items: center; gap: 4px;}
+  .item-card.layout-4 ha-icon {--mdc-icon-size: 20px;}
+  .item-card.layout-4 .edit-icon-btn,
+  .item-card.layout-4 .btn-delete {background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center;}
+  `;

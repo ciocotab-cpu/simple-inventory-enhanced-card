@@ -136,5 +136,12 @@ export const langDe = {
     io_confirm_import: "Möchtest du {count} Produkte in dieses Inventar hochladen?",
     io_import_success: "Import erfolgreich abgeschlossen!",
     io_err_import_failed: "Importfehler: {err}",
-    ed_lbl_debug_mode: "Debug-Protokollmodus (console.log)"
+    ed_lbl_debug_mode: "Debug-Protokollmodus (console.log)",
+    ed_layout_label: "Layout-Stil der Karte",
+    ed_panel_item_card: "👷 Artikelkarte",
+    ed_lbl_show_item_name: "Name anzeigen",
+    ed_lbl_show_item_unit: "Verpackungseinheit anzeigen",
+    ed_lbl_show_item_expiry: "Ablaufdatum anzeigen",
+    ed_lbl_show_item_category: "Kategorie anzeigen",
+    ed_lbl_show_item_location: "Standort anzeigen"
 };

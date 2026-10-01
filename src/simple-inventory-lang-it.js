@@ -101,6 +101,7 @@ export const langIt = {
     error_edit_fail: "Impossibile salvare le modifiche.\\nErrore Backend: ",
     error_delete_fail: "Impossibile eliminare l'articolo.\\nErrore Backend: ",
     error_validation_msg: "Verifica il formato dei dati o la presenza di codici duplicati.",
+    error_barcode: "Nessun Prodotto trovato con questo codice a barre ",
     lbl_expiry: "Data di Scadenza",
     lbl_exp_alert: "Giorni di Preavviso",
     lbl_unit: "Confezione",
@@ -136,5 +137,12 @@ export const langIt = {
     io_confirm_import: "Vuoi procedere al caricamento di {count} prodotti in questo inventario?",
     io_import_success: "Importazione completata con successo!",
     io_err_import_failed: "Errore di importazione: {err}",
-    ed_lbl_debug_mode: "Modalità Debug Log (console.log)"
+    ed_lbl_debug_mode: "Modalità Debug Log (console.log)",
+    ed_layout_label: "Stile Layout Scheda",
+    ed_panel_item_card: "👷 Scheda Oggetto",
+    ed_lbl_show_item_name: "Mostra Nome",
+    ed_lbl_show_item_unit: "Mostra Confezione",
+    ed_lbl_show_item_expiry: "Mostra Scadenza",
+    ed_lbl_show_item_category: "Mostra Categoria",
+    ed_lbl_show_item_location: "Mostra Posizione"
 };

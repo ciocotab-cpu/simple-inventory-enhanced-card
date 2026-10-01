@@ -16,12 +16,13 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
 
   static getStubConfig() {
     return {
-      title: "", columns: 2, summary_columns: 0, default_sort: "alpha", show_summary: true,
+      title: "", card_layout: "layout1", columns: 2, summary_columns: 0, default_sort: "alpha", show_summary: true,
       show_items: true, show_add_form: true, show_search: true, show_sort: true,
       show_sort_alpha: true, show_sort_threshold: true, show_sort_expiry: true,
       show_sort_category: true, show_sort_location: true, show_sort_alert_exp: true, show_sort_alert_qty: true,
       show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true,
       show_ico_qty0: true, show_ico_qty1: true, show_ico_qty3: true,
+      show_item_name: true, show_item_unit: true, show_item_expiry: true, show_item_category: true, show_item_location: true,
       days_10d: 10, days_30d: 30, qty_0: 0, qty_1: 1, qty_3: 3,
       color_expired: "#db4437", color_10d: "#e6a23c", color_30d: "#ffeb3b",
       color_qty0: "#db4437", color_qty1: "#f44336", color_qty3: "#ff9800",
@@ -71,6 +72,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
 
     this.config = {
       title: baseConfig.title ? baseConfig.title : "",
+      card_layout: baseConfig.card_layout || "layout1",
       columns: baseConfig.columns !== undefined ? baseConfig.columns : 2,
       summary_columns: baseConfig.summary_columns !== undefined ? parseInt(baseConfig.summary_columns) : 0,
       default_sort: baseConfig.default_sort || "alpha",
@@ -93,6 +95,11 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       show_ico_qty0: baseConfig.show_ico_qty0 !== undefined ? baseConfig.show_ico_qty0 : true,
       show_ico_qty1: baseConfig.show_ico_qty1 !== undefined ? baseConfig.show_ico_qty1 : true,
       show_ico_qty3: baseConfig.show_ico_qty3 !== undefined ? baseConfig.show_ico_qty3 : true,
+      show_item_name: baseConfig.show_item_name !== undefined ? baseConfig.show_item_name : true,
+      show_item_unit: baseConfig.show_item_unit !== undefined ? baseConfig.show_item_unit : true,
+      show_item_expiry: baseConfig.show_item_expiry !== undefined ? baseConfig.show_item_expiry : true,
+      show_item_category: baseConfig.show_item_category !== undefined ? baseConfig.show_item_category : true,
+      show_item_location: baseConfig.show_item_location !== undefined ? baseConfig.show_item_location : true,
       days_10d: baseConfig.days_10d !== undefined ? baseConfig.days_10d : 10,
       days_30d: baseConfig.days_30d !== undefined ? baseConfig.days_30d : 30,
       qty_0: baseConfig.qty_0 !== undefined ? baseConfig.qty_0 : 0,

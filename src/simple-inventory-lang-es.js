@@ -136,5 +136,12 @@ export const langEs = {
     io_confirm_import: "¿Quieres proceder con la carga de {count} productos en este inventario?",
     io_import_success: "¡Importación completada con éxito!",
     io_err_import_failed: "Error de importación: {err}",
-    ed_lbl_debug_mode: "Modo de Depuración (console.log)"
+    ed_lbl_debug_mode: "Modo de Depuración (console.log)",
+    ed_layout_label: "Estilo de diseño de la tarjeta del artículo",
+    ed_panel_item_card: "👷 Tarjeta del artículo",
+    ed_lbl_show_item_name: "Mostrar nombre",
+    ed_lbl_show_item_unit: "Mostrar unidad/paquete",
+    ed_lbl_show_item_expiry: "Mostrar fecha de caducidad",
+    ed_lbl_show_item_category: "Mostrar categoría",
+    ed_lbl_show_item_location: "Mostrar ubicación"
 };
