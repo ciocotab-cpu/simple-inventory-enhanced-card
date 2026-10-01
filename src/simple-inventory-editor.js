@@ -347,7 +347,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
                   category: item.category || "",
                   location: item.location || "",
                   description: item.description || "",
-                  barcodes: item.barcodes || item.barcode_id || item.barcode || ""
+                  barcode: item.barcode || item.barcode_id || item.barcode || ""
                 };
                 await this._hass.callService("simple_inventory", "add_item", serviceData);
               }
@@ -486,7 +486,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     const showExpiry = this._config.show_sort_expiry !== undefined ? this._config.show_sort_expiry : true;
     const showAlertExp = this._config.show_sort_alert_exp !== undefined ? this._config.show_sort_alert_exp : true;
     const showAlertQty = this._config.show_sort_alert_qty !== undefined ? this._config.show_sort_alert_qty : true;
-    //const cardLayout = this._config && this._config.card_layout ? this._config.card_layout : 'layout1';
+    
     const cardLayout = this.shadowRoot.getElementById("card_layout");
     if (!cardLayout) return;
 

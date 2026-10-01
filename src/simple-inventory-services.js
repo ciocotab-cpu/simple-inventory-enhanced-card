@@ -39,7 +39,6 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
 
   const isAutoAddChecked = autoAddCheckbox ? autoAddCheckbox.checked : false;
 
-  // Controllo validazione lista To-Do obbligatoria se l'aggiunta automatica è attiva
   if (isAutoAddChecked) {
     const selectedTodo = todoEl ? todoEl.value.trim() : "";
     if (!selectedTodo) {
@@ -134,7 +133,6 @@ export async function handleAddItemService(cardInstance) {
 
   const isAutoAddChecked = autoAddCheckbox ? autoAddCheckbox.checked : false;
 
-  // Controllo validazione lista To-Do obbligatoria se l'aggiunta automatica è attiva
   if (isAutoAddChecked) {
     const selectedTodo = todoEl ? todoEl.value.trim() : "";
     if (!selectedTodo) {
@@ -155,23 +153,22 @@ export async function handleAddItemService(cardInstance) {
   const serviceData = {
     inventory_id: inventoryId,
     name: name,
-    desired_quantity: qtyEl ? parseFloat(qtyEl.value) || 0 : 0,
-    auto_add_id_to_description_enabled: isAutoAddChecked
+    quantity: qtyEl ? parseFloat(qtyEl.value) || 0 : 0,
+    auto_add_id_to_description_enabled: isAutoAddChecked,
+    expiry_date: expiryEl ? expiryEl.value.trim() : "",
+    expiry_alert_days: expAlertEl ? parseInt(expAlertEl.value) || 0 : 0,
+    unit: unitEl ? unitEl.value.trim() : "",
+    category: finalCategory,
+    location: locEl ? locEl.value.trim() : "",
+    aliases: aliasesEl ? aliasesEl.value.trim() : "",
+    description: descEl ? descEl.value.trim() : "",
+    barcode: barcodeEl ? barcodeEl.value.trim() : ""
   };
 
-  if (finalCategory !== "") serviceData.category = finalCategory;
-  if (expiryEl && expiryEl.value.trim() !== "") serviceData.expiry_date = expiryEl.value.trim();
-  if (expAlertEl && expAlertEl.value.trim() !== "") serviceData.expiry_alert_days = parseInt(expAlertEl.value) || 0;
-  if (unitEl && unitEl.value.trim() !== "") serviceData.unit = unitEl.value.trim();
-  if (locEl && locEl.value.trim() !== "") serviceData.location = locEl.value.trim();
-  if (aliasesEl && aliasesEl.value.trim() !== "") serviceData.aliases = aliasesEl.value.trim();
-  if (descEl && descEl.value.trim() !== "") serviceData.description = descEl.value.trim();
-  if (barcodeEl && barcodeEl.value.trim() !== "") serviceData.barcode = barcodeEl.value.trim();
-  
   if (isAutoAddChecked) {
-    if (todoEl && todoEl.value !== "") serviceData.todo_list = todoEl.value;
-    if (todoPlaceEl && todoPlaceEl.value) serviceData.todo_quantity_placement = todoPlaceEl.value;
-    if (minQtyEl && minQtyEl.value.trim() !== "") serviceData.auto_add_to_list_quantity = parseInt(minQtyEl.value) || 2;
+    if (todoEl) serviceData.todo_list = todoEl.value.trim();
+    if (todoPlaceEl) serviceData.todo_quantity_placement = todoPlaceEl.value;
+    if (minQtyEl) serviceData.auto_add_to_list_quantity = parseInt(minQtyEl.value) || 2;
   }
 
   if (priceEl && priceEl.value.trim() !== "") {
@@ -182,36 +179,35 @@ export async function handleAddItemService(cardInstance) {
   try {
     await cardInstance._hass.callService("simple_inventory", "add_item", serviceData);
     cardInstance._showAddPopup = false;
-    cardInstance.updateCard();
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
   } catch (err) {
-    console.error("Errore durante l'aggiunta del prodotto:", err);
-    alert((lang.error_add_fail || "Impossibile aggiungere l'articolo.\nErrore Backend: ") + err.message);
+    console.error("Errore durante la creazione del nuovo prodotto:", err);
+    alert((lang.error_add_fail || "Impossibile aggiungere il prodotto.\nErrore Backend: ") + err.message);
   }
 }
 
 export async function deleteItemDefinitivelyService(cardInstance, itemName) {
   const lang = getTranslation(cardInstance._hass);
-  if (!cardInstance.config || !cardInstance.config.entity) return;
+  if (!confirm((lang.confirm_delete || "Sei sicuro di voler eliminare definitivamente '{item}'?").replace("{item}", itemName))) {
+    return;
+  }
+
   const stateObj = cardInstance._hass.states[cardInstance.config.entity];
   if (!stateObj || !stateObj.attributes) return;
+
   const inventoryId = stateObj.attributes.inventory_id;
   if (!inventoryId) return;
 
-  const confirmMsg = (lang.confirm_delete || "Vuoi eliminare definitivamente '{itemName}' dall'inventario?").replace("{itemName}", itemName);
-  if (!confirm(confirmMsg)) return;
-
   try {
-    await cardInstance._hass.callService("simple_inventory", "remove_item", {
+    await cardInstance._hass.callService("simple_inventory", "delete_item", {
       inventory_id: inventoryId,
       name: itemName
     });
-    cardInstance._editingItemId = null;
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
   } catch (err) {
-    console.error("Errore durante l'eliminazione del prodotto:", err);
-    alert((lang.error_delete_fail || "Impossibile eliminare l'articolo.\nErrore Backend: ") + err.message);
+    console.error("Errore durante l'eliminazione dell'articolo:", err);
+    alert((lang.error_delete_fail || "Impossibile eliminare l'articolo: ") + err.message);
   }
 }

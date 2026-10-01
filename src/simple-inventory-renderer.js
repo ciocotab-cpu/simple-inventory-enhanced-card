@@ -6,7 +6,6 @@ import { filterAndSortItems } from './simple-inventory-filters.js';
 import { renderSingleItemCard } from './simple-inventory-cards.js';
 
 export function renderCardContent(cardInstance) {
-  // Stessa logica di verfifica del flag debug presente nel file principale
   const isDebugEnabled = () => {
     return Boolean(cardInstance && cardInstance.isDebugEnabled && cardInstance.isDebugEnabled());
   };
@@ -194,7 +193,7 @@ export function renderCardContent(cardInstance) {
           log("[simple-inventory-renderer] Tasto Invio premuto nella barra di ricerca. Codice inserito:", rawCode);
           if (!rawCode || !cardInstance.inventoryItems) return;
           const exactMatch = cardInstance.inventoryItems.find(i => {
-            const b = i.barcodes || i.barcode_id || i.barcode || "";
+            const b = i.barcode || i.barcode_id || i.barcode || "";
             return b.trim() === rawCode;
           });
           if (exactMatch) {
@@ -404,7 +403,8 @@ export function renderCardContent(cardInstance) {
   if (addPopupContainer) {
     if (!cardInstance._showAddPopup) {
       addPopupContainer.innerHTML = "";
-    } else {
+    } else if (!addPopupContainer.querySelector(".add-popup-content")) {
+      // Evitiamo di sovrascrivere l'HTML del popup se è già stato renderizzato e aperto
       log("[simple-inventory-renderer] Rendering popup aggiunta nuovo prodotto");
       const todoListsArray = [];
       if (cardInstance._hass && cardInstance._hass.states) {
@@ -439,9 +439,36 @@ export function renderCardContent(cardInstance) {
           const nInput = shadow.getElementById("new-name"); if (nInput && cardInstance._scannedDataCache.name) nInput.value = cardInstance._scannedDataCache.name;
           const cSelect = shadow.getElementById("new_cat_select");
           if (cSelect && cardInstance._scannedDataCache.category) {
-            let exists = Array.from(cSelect.options).some(o => o.value === cardInstance._scannedDataCache.category);
-            if (exists) { cSelect.value = cardInstance._scannedDataCache.category; cSelect.className = ""; }
-            else { cSelect.value = "__NEW_CAT__"; cSelect.className = ""; const cCont = shadow.getElementById("new_cat_custom_container"); const cCust = shadow.getElementById("new_cat_custom"); if (cCont && cCust) { cCont.style.display = "block"; cCust.value = cardInstance._scannedDataCache.category; } }
+            const scannedCat = cardInstance._scannedDataCache.category.trim();
+            const scannedCatLower = scannedCat.toLowerCase();
+            const options = Array.from(cSelect.options).filter(o => o.value !== "" && o.value !== "__NEW_CAT__");
+
+            // Ricerca 1: Match Esatto Case-Insensitive
+            let matchedOption = options.find(o => o.value.trim().toLowerCase() === scannedCatLower);
+
+            // Ricerca 2: Match Parziale
+            if (!matchedOption) {
+              matchedOption = options.find(o => {
+                const valLower = o.value.trim().toLowerCase();
+                return scannedCatLower.includes(valLower) || valLower.includes(scannedCatLower);
+              });
+            }
+
+            const cCont = shadow.getElementById("new_cat_custom_container");
+            const cCust = shadow.getElementById("new_cat_custom");
+
+            if (matchedOption) {
+              cSelect.value = matchedOption.value;
+              cSelect.className = "";
+              if (cCont) cCont.style.display = "none";
+            } else {
+              cSelect.value = "__NEW_CAT__";
+              cSelect.className = "";
+              if (cCont && cCust) {
+                cCont.style.display = "block";
+                cCust.value = scannedCat;
+              }
+            }
           }
           const uInput = shadow.getElementById("new_unit"); if (uInput && cardInstance._scannedDataCache.unit) uInput.value = cardInstance._scannedDataCache.unit;
         }
