@@ -439,9 +439,38 @@ export function renderCardContent(cardInstance) {
           const nInput = shadow.getElementById("new-name"); if (nInput && cardInstance._scannedDataCache.name) nInput.value = cardInstance._scannedDataCache.name;
           const cSelect = shadow.getElementById("new_cat_select");
           if (cSelect && cardInstance._scannedDataCache.category) {
-            let exists = Array.from(cSelect.options).some(o => o.value === cardInstance._scannedDataCache.category);
-            if (exists) { cSelect.value = cardInstance._scannedDataCache.category; cSelect.className = ""; }
-            else { cSelect.value = "__NEW_CAT__"; cSelect.className = ""; const cCont = shadow.getElementById("new_cat_custom_container"); const cCust = shadow.getElementById("new_cat_custom"); if (cCont && cCust) { cCont.style.display = "block"; cCust.value = cardInstance._scannedDataCache.category; } }
+            const scannedCat = cardInstance._scannedDataCache.category.trim();
+            const scannedCatLower = scannedCat.toLowerCase();
+            const options = Array.from(cSelect.options).filter(o => o.value !== "" && o.value !== "__NEW_CAT__");
+
+            // Ricerca 1: Match Esatto Case-Insensitive
+            let matchedOption = options.find(o => o.value.trim().toLowerCase() === scannedCatLower);
+
+            // Ricerca 2: Match Parziale (es. "Alimentari" se scansionato "Alimentari freschi" o viceversa)
+            if (!matchedOption) {
+              matchedOption = options.find(o => {
+                const valLower = o.value.trim().toLowerCase();
+                return scannedCatLower.includes(valLower) || valLower.includes(scannedCatLower);
+              });
+            }
+
+            const cCont = shadow.getElementById("new_cat_custom_container");
+            const cCust = shadow.getElementById("new_cat_custom");
+
+            if (matchedOption) {
+              // Se trovata nell'elenco, selezionala
+              cSelect.value = matchedOption.value;
+              cSelect.className = "";
+              if (cCont) cCont.style.display = "none";
+            } else {
+              // Se non trovata nell'elenco, seleziona "Nuova Categoria" e compila il campo
+              cSelect.value = "__NEW_CAT__";
+              cSelect.className = "";
+              if (cCont && cCust) {
+                cCont.style.display = "block";
+                cCust.value = scannedCat;
+              }
+            }
           }
           const uInput = shadow.getElementById("new_unit"); if (uInput && cardInstance._scannedDataCache.unit) uInput.value = cardInstance._scannedDataCache.unit;
         }

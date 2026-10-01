@@ -642,11 +642,11 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
 
       <!-- RIGA 2: Icone (destra) | Categoria e Posizione (sinistra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; min-height: 24px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: left; overflow: hidden; justify-content: flex-start; flex: 1;">
           ${categoryHtml}
         </div>
         
-        <div style="display: flex; align-items: center; overflow: hidden; justify-content: flex-end; flex: 1;">
+        <div style="display: flex; align-items: center; gap: 8px;">
           ${calendarHtml}
           ${autoAddHtml}
           ${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
