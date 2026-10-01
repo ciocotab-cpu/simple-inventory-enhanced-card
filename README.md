@@ -10,12 +10,14 @@
 *   [Versione Italiana 🇮🇹](#-versione-italiana)
 
 ![Card](./img/Visual.png)
-![Setting3](./img/AddItem.png)
+![AddItem](./img/AddItem.png)
+![Layouts](./img/Layouts.png)
 ![Setting1](./img/Setting1.png)
 ![Setting2](./img/Setting2.png)
 ![Setting3](./img/Setting3.png)
-![Setting3](./img/Setting4.png)
-![Setting3](./img/Setting5.png)
+![Setting4](./img/Setting4.png)
+![Setting5](./img/Setting5.png)
+![Setting6](./img/Setting6.png)
 ---
 
 # 🇬🇧 English Version
