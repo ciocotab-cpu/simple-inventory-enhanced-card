@@ -4,7 +4,7 @@ export const langIt = {
     loading_items: "Caricamento o nessun articolo trovato...",
     no_counter_active: "Nessun contatore attivo",
     search_placeholder: "Cerca prodotto...",
-    confirm_delete: "Vuoi eliminare definitivamente '{itemName}' dall'inventario?",
+    confirm_delete: "Vuoi eliminare definitivamente '{item}' dall'inventario?",
     scaduto_oggi: "Scaduto oggi",
     scaduto_da_giorni: "Scaduto da {days} giorni",
     scadenza_data: "Scad: {date}",
