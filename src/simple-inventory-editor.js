@@ -241,6 +241,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
                 <option value="layout2">Default Reversed</option>
                 <option value="layout3">Compact</option>
                 <option value="layout4">Compact Reversed</option>
+                <option value="layout5">Mobile</option>
               </select>
             </div>
             <div class="coppia-row">
