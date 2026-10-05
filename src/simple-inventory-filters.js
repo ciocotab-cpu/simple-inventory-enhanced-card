@@ -122,7 +122,7 @@ export function filterAndSortItems(cardInstance) {
     const targetLocation = sortCriteria.replace("loc_", "");
     items = items.filter(item => {
       if ((item.quantity || 0) <= 0) return false;
-      const itemLoc = item.location && item.location.trim() !== "" ? item.location.trim() : (lang.senza_posizione || "Senza Posizione");
+      const itemLoc = item.location && item.location.trim() !== "" ? item.location.trim() : (lang.senza_posizione || "No Location");
       return itemLoc === targetLocation;
     });
     items.sort((a, b) => new Date(a.expiry_date || '9999-12-31') - new Date(b.expiry_date || '9999-12-31'));

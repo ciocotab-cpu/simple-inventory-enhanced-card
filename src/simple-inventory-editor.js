@@ -144,11 +144,11 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
             <div class="io-buttons-row">
               <button id="export-btn" class="editor-btn">
                 <ha-icon icon="mdi:database-export-outline"></ha-icon>
-                <span>${lang.export_btn || "Esporta Backup"}</span>
+                <span>${lang.export_btn || "Export Backup"}</span>
               </button>
               <button id="import-btn" class="editor-btn">
                 <ha-icon icon="mdi:database-import-outline"></ha-icon>
-                <span>${lang.import_btn || "Importa Backup"}</span>
+                <span>${lang.import_btn || "Import Backup"}</span>
               </button>
             </div>
 
@@ -173,7 +173,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         </ha-expansion-panel>
 
         <ha-expansion-panel>
-          <div slot="header" class="panel-header">${lang.ed_panel_sort_options || "🔀 Visualizza Ordinamenti"}</div>
+          <div slot="header" class="panel-header">${lang.ed_panel_sort_options || "🔀 Display Sorting Options"}</div>
           <div class="form-row">
             <div class="coppia-row">
               <ha-form id="form-sort-t1"></ha-form>
@@ -216,26 +216,26 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_expiry}</div>
           <div class="form-row">
-            ${this._createColorBlock("color_expired", "alpha_expired", "Colore Scaduto", "#db4437", "disabled_days_0", 0, true, "Giorni")}
-            ${this._createColorBlock("color_10d", "alpha_10d", "Colore Allerta", "#e6a23c", "days_10d", 10, false, "Giorni")}
-            ${this._createColorBlock("color_30d", "alpha_30d", "Colore Avviso", "#ffeb3b", "days_30d", 30, false, "Giorni")}
+            ${this._createColorBlock("color_expired", "alpha_expired", "Expired", "#db4437", "disabled_days_0", 0, true, "Days")}
+            ${this._createColorBlock("color_10d", "alpha_10d", "Alert", "#e6a23c", "days_10d", 10, false, "Days")}
+            ${this._createColorBlock("color_30d", "alpha_30d", "Warning", "#ffeb3b", "days_30d", 30, false, "Days")}
           </div>
         </ha-expansion-panel>
 
         <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_qty}</div>
           <div class="form-row">
-            ${this._createColorBlock("color_qty0", "alpha_qty0", "Colore Esaurito", "#db4437", "disabled_qty_0", 0, true, "Quantità")}
-            ${this._createColorBlock("color_qty1", "alpha_qty1", "Colore Critico", "#f44336", "qty_1", 1, false, "Quantità")}
-            ${this._createColorBlock("color_qty3", "alpha_qty3", "Colore Minimo", "#ff9800", "qty_3", 3, false, "Quantità")}
+            ${this._createColorBlock("color_qty0", "alpha_qty0", "Out of Stock (Qty 0)", "#db4437", "disabled_qty_0", 0, true, "Quantity")}
+            ${this._createColorBlock("color_qty1", "alpha_qty1", "Critical", "#f44336", "qty_1", 1, false, "Quantity")}
+            ${this._createColorBlock("color_qty3", "alpha_qty3", "Low", "#ff9800", "qty_3", 3, false, "Quantity")}
           </div>
         </ha-expansion-panel>
 
         <ha-expansion-panel>
-          <div slot="header" class="panel-header">${lang.ed_panel_item_card || "👷 Scheda Oggetto"}</div>
+          <div slot="header" class="panel-header">${lang.ed_panel_item_card || "👷 Item Product"}</div>
           <div class="form-row">
             <div class="select-option">
-              <span class="select-label">${lang.ed_layout_label || "Stile Layout Scheda"}</span>
+              <span class="select-label">${lang.ed_layout_label || "Item Product Layout Style"}</span>
               <select id="card_layout" class="custom-dropdown">
                 <option value="layout1">Default</option>
                 <option value="layout2">Default Reversed</option>
@@ -274,12 +274,12 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       exportBtn.addEventListener("click", async () => {
         const lang = getTranslation(this._hass);
         if (!this._config || !this._config.entity || !this._hass) {
-          alert(lang.io_err_no_entity || "Seleziona prima un'entità sensore inventario valida.");
+          alert(lang.io_err_no_entity || "Please select a valid inventory sensor entity first.");
           return;
         }
         const stateObj = this._hass.states[this._config.entity];
         if (!stateObj || !stateObj.attributes || !stateObj.attributes.inventory_id) {
-          alert(lang.io_err_invalid_sensor || "Sensore inventario non valido o attributo inventory_id mancante.");
+          alert(lang.io_err_invalid_sensor || "Invalid inventory sensor or missing inventory_id attribute.");
           return;
         }
         const inventoryId = stateObj.attributes.inventory_id;
@@ -289,7 +289,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
           });
           const items = (result && result.items) ? result.items : [];
           if (items.length === 0) {
-            alert(lang.io_err_empty_export || "Nessun articolo trovato da esportare per questo inventario.");
+            alert(lang.io_err_empty_export || "No items found to export for this inventory.");
             return;
           }
           const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
@@ -300,7 +300,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
           downloadAnchor.click();
           downloadAnchor.remove();
         } catch (err) {
-          alert((lang.io_err_export_failed || "Errore durante il recupero dei dati: {err}").replace("{err}", err.message));
+          alert((lang.io_err_export_failed || "Error fetching data: {err}").replace("{err}", err.message));
         }
       });
     }
@@ -309,12 +309,12 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       importBtn.addEventListener("click", () => {
         const lang = getTranslation(this._hass);
         if (!this._config || !this._config.entity || !this._hass) {
-          alert(lang.io_err_no_entity || "Seleziona prima un'entità sensore inventario valida.");
+          alert(lang.io_err_no_entity || "Please select a valid inventory sensor entity first.");
           return;
         }
         const stateObj = this._hass.states[this._config.entity];
         if (!stateObj || !stateObj.attributes || !stateObj.attributes.inventory_id) {
-          alert(lang.io_err_invalid_sensor || "Sensore inventario non valido o attributo inventory_id mancante.");
+          alert(lang.io_err_invalid_sensor || "Invalid inventory sensor or missing inventory_id attribute.");
           return;
         }
         const inventoryId = stateObj.attributes.inventory_id;
@@ -330,10 +330,10 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
             try {
               const importedItems = JSON.parse(evt.target.result);
               if (!Array.isArray(importedItems)) {
-                throw new Error(lang.io_err_invalid_json || "File non valido. Deve contenere un array JSON.");
+                throw new Error(lang.io_err_invalid_json || "Invalid file. Must contain a JSON array.");
               }
 
-              const confirmMsg = (lang.io_confirm_import || "Vuoi procedere al caricamento di {count} prodotti in questo inventario?").replace("{count}", importedItems.length);
+              const confirmMsg = (lang.io_confirm_import || "Do you want to proceed with uploading {count} products into this inventory?").replace("{count}", importedItems.length);
               if (!confirm(confirmMsg)) return;
 
               for (const item of importedItems) {
@@ -351,9 +351,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
                 };
                 await this._hass.callService("simple_inventory", "add_item", serviceData);
               }
-              alert(lang.io_import_success || "Importazione completata con successo!");
+              alert(lang.io_import_success || "Import completed successfully!");
             } catch (err) {
-              alert((lang.io_err_import_failed || "Errore di importazione: {err}").replace("{err}", err.message));
+              alert((lang.io_err_import_failed || "Import error: {err}").replace("{err}", err.message));
             }
           };
           reader.readAsText(file);
@@ -387,11 +387,11 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     if (this._handleKeyUp) window.removeEventListener("keyup", this._handleKeyUp);
   }
 
-  _createColorBlock(colorId, alphaId, labelKey, fallbackHex, daysId = null, fallbackDays = null, isDisabled = false, daysLabel = "Giorni") {
+  _createColorBlock(colorId, alphaId, labelKey, fallbackHex, daysId = null, fallbackDays = null, isDisabled = false, daysLabel = "Days") {
     const lang = getTranslation(this._hass);
     const labelText = lang[`ed_lbl_${colorId}`] || lang[colorId] || colorId;
-    const alphaText = lang.ed_lbl_alpha_pct || "% Trasparenza";
-    const daysText = daysLabel === "Quantità" ? (lang.ed_lbl_qty || "Quantità") : (lang.ed_lbl_days || "Giorni");
+    const alphaText = lang.ed_lbl_alpha_pct || "% Transparency";
+    const daysText = daysLabel === "Quantity" ? (lang.ed_lbl_qty || "Quantity") : (lang.ed_lbl_days || "Days");
     
     const currentHex = this._config[colorId] || fallbackHex;
     const currentAlpha = this._config[alphaId] !== undefined ? this._config[alphaId] : 100;
@@ -474,12 +474,12 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     const qty1Val = this._config.qty_1 !== undefined ? this._config.qty_1 : 1;
     const qty3Val = this._config.qty_3 !== undefined ? this._config.qty_3 : 3;
 
-    const optAlertExpExpired = (lang.sort_alert_exp_expired || "Scaduti (0 giorni)");
-    const optAlertExp10d = (lang.sort_alert_exp_10d || "In Scadenza (entro {days} giorni)").replace("{days}", days10d);
-    const optAlertExp30d = (lang.sort_alert_exp_30d || "In Scadenza (entro {days} giorni)").replace("{days}", days30d);
-    const optAlertQty0 = (lang.sort_alert_qty_0 || "Esauriti (Q.tà {num})").replace("{num}", qty0Val);
-    const optAlertQty1 = (lang.sort_alert_qty_1 || "Critici (Q.tà {num})").replace("{num}", qty1Val);
-    const optAlertQty3 = (lang.sort_alert_qty_3 || "Minimi (Q.tà {num})").replace("{num}", qty3Val);
+    const optAlertExpExpired = (lang.sort_alert_exp_expired || "📅 Expired (0 days)");
+    const optAlertExp10d = (lang.sort_alert_exp_10d || "📅 Expiring (within {days} days)").replace("{days}", days10d);
+    const optAlertExp30d = (lang.sort_alert_exp_30d || "📅 Expiring (within {days} days)").replace("{days}", days30d);
+    const optAlertQty0 = (lang.sort_alert_qty_0 || "📦 Out of stock (Qty {num})").replace("{num}", qty0Val);
+    const optAlertQty1 = (lang.sort_alert_qty_1 || "📦 Critical (Qty {num})").replace("{num}", qty1Val);
+    const optAlertQty3 = (lang.sort_alert_qty_3 || "📦 Low (Qty {num})").replace("{num}", qty3Val);
 
     const showAlpha = this._config.show_sort_alpha !== undefined ? this._config.show_sort_alpha : true;
     const showThreshold = this._config.show_sort_threshold !== undefined ? this._config.show_sort_threshold : true;
@@ -548,26 +548,26 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_add_form: lang.add_trigger_label, 
       show_search: lang.ed_lbl_show_search, 
       show_sort: lang.ed_lbl_show_sort, 
-      show_sort_alpha: lang.ed_lbl_sort_alpha || "Alfabetico",
-      show_sort_threshold: lang.ed_lbl_sort_threshold || "Sotto Soglia",
-      show_sort_expiry: lang.ed_lbl_sort_expiry || "In Scadenza",
-      show_sort_category: lang.ed_lbl_sort_category || "Categoria",
-      show_sort_location: lang.ed_lbl_sort_location || "Posizione",
-      show_sort_alert_exp: lang.ed_lbl_sort_alert_exp || "Allerta Scadenze",
-      show_sort_alert_qty: lang.ed_lbl_sort_alert_qty || "Allerta Quantità",
+      show_sort_alpha: lang.ed_lbl_sort_alpha || "🔤 Alphabetical",
+      show_sort_threshold: lang.ed_lbl_sort_threshold || "⚠️ Low Stock",
+      show_sort_expiry: lang.ed_lbl_sort_expiry || "⌛ Expiring Soon",
+      show_sort_category: lang.ed_lbl_sort_category || "🏳️ Category",
+      show_sort_location: lang.ed_lbl_sort_location || "📌 Location",
+      show_sort_alert_exp: lang.ed_lbl_sort_alert_exp || "📅 Expiry Alert",
+      show_sort_alert_qty: lang.ed_lbl_sort_alert_qty || "📦 Quantity Alert",
       show_ico_total: lang.ed_lbl_ico_total, 
       show_ico_expired: lang.ed_lbl_ico_expired, 
-      show_ico_10d: (lang.ed_lbl_ico_10d || "Scadenze entro {days}gg").replace("{days}", days10d), 
-      show_ico_30d: (lang.ed_lbl_ico_30d || "Scadenze entro {days}gg").replace("{days}", days30d), 
-      show_ico_qty0: (lang.ed_lbl_ico_qty0 || "Quantità rimasta = 0"), 
-      show_ico_qty1: (lang.ed_lbl_ico_qty1 || "Quantità rimasta = {num}").replace("{num}", qty1Val), 
-      show_ico_qty3: (lang.ed_lbl_ico_qty3 || "Quantità rimasta = {num}").replace("{num}", qty3Val),
-      show_item_name: lang.ed_lbl_show_item_name || "Mostra Nome",
-      show_item_unit: lang.ed_lbl_show_item_unit || "Mostra Confezione",
-      show_item_expiry: lang.ed_lbl_show_item_expiry || "Mostra Scadenza",
-      show_item_category: lang.ed_lbl_show_item_category || "Mostra Categoria",
-      show_item_location: lang.ed_lbl_show_item_location || "Mostra Posizione",
-      debug_mode: lang.ed_lbl_debug_mode || "Modalità Debug Log (console.log)"
+      show_ico_10d: (lang.ed_lbl_ico_10d || "⌛ Exp. within {days} days").replace("{days}", days10d), 
+      show_ico_30d: (lang.ed_lbl_ico_30d || "⌛ Exp. within {days} days").replace("{days}", days30d), 
+      show_ico_qty0: (lang.ed_lbl_ico_qty0 || "⚠️ Q.ty remaining = 0"), 
+      show_ico_qty1: (lang.ed_lbl_ico_qty1 || "⚠️ Q.ty remaining = {num}").replace("{num}", qty1Val), 
+      show_ico_qty3: (lang.ed_lbl_ico_qty3 || "⚠️ Q.ty remaining = {num}").replace("{num}", qty3Val),
+      show_item_name: lang.ed_lbl_show_item_name || "Show Name",
+      show_item_unit: lang.ed_lbl_show_item_unit || "Show Unit/Pack",
+      show_item_expiry: lang.ed_lbl_show_item_expiry || "Show Expiry",
+      show_item_category: lang.ed_lbl_show_item_category || "Show Category",
+      show_item_location: lang.ed_lbl_show_item_location || "Show Location",
+      debug_mode: lang.ed_lbl_debug_mode || "Debug Log Mode (console.log)"
     };
     this._computeLabel = (schemaItem) => labels[schemaItem.name] || schemaItem.name;
     

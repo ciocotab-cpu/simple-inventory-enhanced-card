@@ -37,7 +37,7 @@ export function renderCardContent(cardInstance) {
       
       const friendlyName = stateObj && stateObj.attributes ? stateObj.attributes.friendly_name : null;
       
-      computedTitle = friendlyName || cardInstance.config.entity || (lang && lang.select_entity_error ? lang.select_entity_error : "Seleziona Inventario");
+      computedTitle = friendlyName || cardInstance.config.entity || (lang && lang.select_entity_error ? lang.select_entity_error : "Please select an entity in the settings");
     }
     
     titleEl.textContent = computedTitle;
@@ -59,12 +59,12 @@ export function renderCardContent(cardInstance) {
   if (!cardInstance.config.entity) {
     warn("[simple-inventory-renderer] Nessuna entità configurata.");
     if (cardInstance.content) {
-      cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang ? lang.select_entity_error : 'Seleziona un\'entità nelle impostazioni'}</div>`;
+      cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang ? lang.select_entity_error : 'Please select an entity in the settings'}</div>`;
     }
   } else if (!cardInstance.inventoryItems || cardInstance.inventoryItems.length === 0) {
     log("[simple-inventory-renderer] Nessun elemento trovato nell'inventario.");
     if (cardInstance.content) {
-      cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang ? lang.loading_items : 'Nessun articolo trovato'}</div>`;
+      cardInstance.content.innerHTML = `<div style='padding: 10px; color: var(--secondary-text-color);'>${lang ? lang.loading_items : 'Loading or no items found...'}</div>`;
     }
   }
 
@@ -77,7 +77,7 @@ export function renderCardContent(cardInstance) {
         const catName = item.category && item.category.trim() !== "" ? item.category.trim() : lang.senza_categoria;
         if (!dynamicCategories.includes(catName)) { dynamicCategories.push(catName); }
 
-        const locName = item.location && item.location.trim() !== "" ? item.location.trim() : (lang.senza_posizione || "Senza Posizione");
+        const locName = item.location && item.location.trim() !== "" ? item.location.trim() : (lang.senza_posizione || "No Location");
         if (!dynamicLocations.includes(locName)) { dynamicLocations.push(locName); }
       }
     });
@@ -94,12 +94,12 @@ export function renderCardContent(cardInstance) {
     const qty1Val = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
     const qty3Val = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
 
-    const optAlertExpExpired = (lang.sort_alert_exp_expired || "Scaduti (0 giorni)");
-    const optAlertExp10d = (lang.sort_alert_exp_10d || "In Scadenza (entro {days} giorni)").replace("{days}", days10d);
-    const optAlertExp30d = (lang.sort_alert_exp_30d || "In Scadenza (entro {days} giorni)").replace("{days}", days30d);
-    const optAlertQty0 = (lang.sort_alert_qty_0 || "Esauriti (Q.tà {num})").replace("{num}", qty0Val);
-    const optAlertQty1 = (lang.sort_alert_qty_1 || "Critici (Q.tà {num})").replace("{num}", qty1Val);
-    const optAlertQty3 = (lang.sort_alert_qty_3 || "Minimi (Q.tà {num})").replace("{num}", qty3Val);
+    const optAlertExpExpired = (lang.sort_alert_exp_expired || "📅 Expired (0 days)");
+    const optAlertExp10d = (lang.sort_alert_exp_10d || "📅 Expiring (within {days} days)").replace("{days}", days10d);
+    const optAlertExp30d = (lang.sort_alert_exp_30d || "📅 Expiring (within {days} days)").replace("{days}", days30d);
+    const optAlertQty0 = (lang.sort_alert_qty_0 || "📦 Out of stock (Qty {num})").replace("{num}", qty0Val);
+    const optAlertQty1 = (lang.sort_alert_qty_1 || "📦 Critical (Qty {num})").replace("{num}", qty1Val);
+    const optAlertQty3 = (lang.sort_alert_qty_3 || "📦 Low (Qty {num})").replace("{num}", qty3Val);
 
     const showAlpha = cardInstance.config.show_sort_alpha !== undefined ? cardInstance.config.show_sort_alpha : true;
     const showThreshold = cardInstance.config.show_sort_threshold !== undefined ? cardInstance.config.show_sort_threshold : true;
@@ -155,7 +155,7 @@ export function renderCardContent(cardInstance) {
     if (showLocation) {
       dynamicLocations.forEach(loc => {
         const optionValue = `loc_${loc}`;
-        const labelText = (lang.sort_loc_label || "Posizione: {loc}").replace("{loc}", loc);
+        const labelText = (lang.sort_loc_label || "📌 Location: {loc}").replace("{loc}", loc);
         sortOptionsHtml += `<option value="${optionValue}" ${cardInstance.currentSort === optionValue ? 'selected' : ''}>${labelText}</option>`;
       });
     }

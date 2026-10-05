@@ -142,7 +142,7 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
       if (match) todoName = match.name;
     }
     const minQty = item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : "";
-    const tooltipText = (lang.auto_add_tooltip || "{todo} quando {min_qty} oggetti rimanenti")
+    const tooltipText = (lang.auto_add_tooltip || "{todo} when {min_qty} items remain")
       .replace("{todo}", todoName)
       .replace("{min_qty}", minQty);
 
@@ -290,7 +290,7 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
       if (match) todoName = match.name;
     }
     const minQty = item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : "";
-    const tooltipText = (lang.auto_add_tooltip || "{todo} quando {min_qty} oggetti rimanenti")
+    const tooltipText = (lang.auto_add_tooltip || "{todo} when {min_qty} items remain")
       .replace("{todo}", todoName)
       .replace("{min_qty}", minQty);
 
@@ -441,7 +441,7 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
       if (match) todoName = match.name;
     }
     const minQty = item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : "";
-    const tooltipText = (lang.auto_add_tooltip || "{todo} quando {min_qty} oggetti rimanenti")
+    const tooltipText = (lang.auto_add_tooltip || "{todo} when {min_qty} items remain")
       .replace("{todo}", todoName)
       .replace("{min_qty}", minQty);
 
@@ -612,7 +612,7 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
       if (match) todoName = match.name;
     }
     const minQty = item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : "";
-    const tooltipText = (lang.auto_add_tooltip || "{todo} quando {min_qty} oggetti rimanenti")
+    const tooltipText = (lang.auto_add_tooltip || "{todo} when {min_qty} items remain")
       .replace("{todo}", todoName)
       .replace("{min_qty}", minQty);
 

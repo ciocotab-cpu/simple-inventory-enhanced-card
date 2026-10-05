@@ -33,7 +33,7 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
   const newName = nameEl.value.trim();
 
   if (!newName) {
-    alert(lang.error_empty_name || "Il nome del prodotto non può essere vuoto.");
+    alert(lang.error_empty_name || "Product name cannot be empty.");
     return;
   }
 
@@ -42,7 +42,7 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
   if (isAutoAddChecked) {
     const selectedTodo = todoEl ? todoEl.value.trim() : "";
     if (!selectedTodo) {
-      alert(lang.error_select_todo || "Seleziona una lista To-Do valida per l'aggiunta automatica.");
+      alert(lang.error_select_todo || "Select a valid To-Do list for automatic addition.");
       return;
     }
   }
@@ -90,7 +90,7 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
     cardInstance.fetchInventoryItems();
   } catch (err) {
     console.error("Errore durante l'aggiornamento del prodotto:", err);
-    alert((lang.error_edit_fail || "Impossibile salvare le modifiche.\nErrore Backend: ") + err.message);
+    alert((lang.error_edit_fail || "Failed to save changes.\\nBackend Error: ") + err.message);
   }
 }
 
@@ -127,7 +127,7 @@ export async function handleAddItemService(cardInstance) {
   const baseName = nameEl.value.trim();
 
   if (!baseName) {
-    alert(lang.error_empty_name || "Il nome del prodotto non può essere vuoto.");
+    alert(lang.error_empty_name || "Product name cannot be empty.");
     return;
   }
 
@@ -136,7 +136,7 @@ export async function handleAddItemService(cardInstance) {
   if (isAutoAddChecked) {
     const selectedTodo = todoEl ? todoEl.value.trim() : "";
     if (!selectedTodo) {
-      alert(lang.error_select_todo || "Seleziona una lista To-Do valida per l'aggiunta automatica.");
+      alert(lang.error_select_todo || "Select a valid To-Do list for automatic addition.");
       return;
     }
   }
@@ -210,7 +210,7 @@ export async function handleAddItemService(cardInstance) {
       cardInstance.fetchInventoryItems();
     } catch (err) {
       console.error("Errore durante l'incremento della quantità del prodotto:", err);
-      alert((lang.error_add_fail || "Impossibile aggiornare il prodotto.\nErrore Backend: ") + err.message);
+      alert((lang.error_add_fail || "Failed to add item.\\nBackend Error: ") + err.message);
     }
     return;
   }
@@ -264,13 +264,13 @@ export async function handleAddItemService(cardInstance) {
     cardInstance.fetchInventoryItems();
   } catch (err) {
     console.error("Errore durante la creazione del nuovo prodotto:", err);
-    alert((lang.error_add_fail || "Impossibile aggiungere il prodotto.\nErrore Backend: ") + err.message);
+    alert((lang.error_add_fail || "Failed to add item.\\nBackend Error: ") + err.message);
   }
 }
 
 export async function deleteItemDefinitivelyService(cardInstance, itemName) {
   const lang = getTranslation(cardInstance._hass);
-  if (!confirm((lang.confirm_delete || "Sei sicuro di voler eliminare definitivamente '{item}'?").replace("{item}", itemName))) {
+  if (!confirm((lang.confirm_delete || "Are you sure you want to permanently delete '{itemName}' from the inventory?").replace("{item}", itemName))) {
     return;
   }
 
@@ -289,6 +289,6 @@ export async function deleteItemDefinitivelyService(cardInstance, itemName) {
     cardInstance.fetchInventoryItems();
   } catch (err) {
     console.error("Errore durante l'eliminazione dell'articolo:", err);
-    alert((lang.error_delete_fail || "Impossibile eliminare l'articolo: ") + err.message);
+    alert((lang.error_delete_fail || "Failed to delete item.\\nBackend Error: ") + err.message);
   }
 }
