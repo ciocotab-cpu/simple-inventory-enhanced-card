@@ -193,7 +193,7 @@ export function renderCardContent(cardInstance) {
           log("[simple-inventory-renderer] Tasto Invio premuto nella barra di ricerca. Codice inserito:", rawCode);
           if (!rawCode || !cardInstance.inventoryItems) return;
           const exactMatch = cardInstance.inventoryItems.find(i => {
-            const b = i.barcode || i.barcode_id || i.barcode || "";
+            const b = i.barcode || i.barcode_id || "";
             return b.trim() === rawCode;
           });
           if (exactMatch) {
@@ -377,6 +377,22 @@ export function renderCardContent(cardInstance) {
     if (cardInstance._editingItemId) {
       log("[simple-inventory-renderer] Configurazione listener per form di modifica attivo (ID):", cardInstance._editingItemId);
       const shadow = cardInstance.shadowRoot;
+
+      // LISTENER PER ICONA SCANNER SU CAMPO EDIT_BARCODE
+      const editScanBtn = shadow.querySelector('.input-scan-btn[data-target="edit_barcode"]');
+      if (editScanBtn && !editScanBtn._hasScanListener) {
+        editScanBtn.addEventListener("click", () => {
+          log("[simple-inventory-renderer] Avvio dello scanner dal campo edit_barcode");
+          startCameraScanner(cardInstance, lang, (scannedCode) => {
+            const barcodeInput = shadow.getElementById("edit_barcode");
+            if (barcodeInput) {
+              barcodeInput.value = scannedCode;
+            }
+          });
+        });
+        editScanBtn._hasScanListener = true;
+      }
+
       const editQtyInput = shadow.getElementById("edit_qty");
       const editIncBtn = shadow.getElementById("edit-qty-inc");
       const editDecBtn = shadow.getElementById("edit-qty-dec");
@@ -442,6 +458,21 @@ export function renderCardContent(cardInstance) {
 
       addPopupContainer.innerHTML = getAddPopupHtml(lang, categoriesListArray, { todoLists: todoListsArray });
       const shadow = cardInstance.shadowRoot;
+
+      // LISTENER PER ICONA SCANNER SU CAMPO NEW_BARCODE
+      const newScanBtn = shadow.querySelector('.input-scan-btn[data-target="new_barcode"]');
+      if (newScanBtn && !newScanBtn._hasScanListener) {
+        newScanBtn.addEventListener("click", () => {
+          log("[simple-inventory-renderer] Avvio dello scanner dal campo new_barcode");
+          startCameraScanner(cardInstance, lang, (scannedCode) => {
+            const barcodeInput = shadow.getElementById("new_barcode");
+            if (barcodeInput) {
+              barcodeInput.value = scannedCode;
+            }
+          });
+        });
+        newScanBtn._hasScanListener = true;
+      }
       
       if (cardInstance._scannedBarcodeCache) {
         log("[simple-inventory-renderer] Applicazione dati da cache scanner:", cardInstance._scannedBarcodeCache);

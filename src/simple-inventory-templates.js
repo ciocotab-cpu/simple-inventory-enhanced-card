@@ -1,5 +1,5 @@
 export function getEditFormHtml(item, lang, dataObj = {}) {
-  const currentBarcode = item.barcode || item.barcode || item.barcode_id || "";
+  const currentBarcode = item.barcode || item.barcode_id || "";
 
   const categoriesList = Array.isArray(dataObj) ? dataObj : (dataObj.categories || []);
   const todoLists = dataObj.todoLists || [];
@@ -56,7 +56,15 @@ export function getEditFormHtml(item, lang, dataObj = {}) {
         <div style="display: flex; gap: 12px; width: 100%;">
           <div class="edit-field" style="flex: 1;"><label>${lang.lbl_loc}</label><input type="text" id="edit_loc" value="${item.location || ''}" placeholder="${lang.lbl_loc_placeholder}"></div>
           <div class="edit-field" style="flex: 1;"><label>${lang.lbl_price}</label><input type="number" step="0.01" id="edit_price" value="${item.price !== undefined ? item.price : ''}" placeholder="${lang.lbl_price_placeholder}"></div>
-          <div class="edit-field" style="flex: 1;"><label>${lang.lbl_barcode}</label><input type="text" id="edit_barcode" value="${currentBarcode}"></div>
+          <div class="edit-field" style="flex: 1;">
+            <label>${lang.lbl_barcode}</label>
+            <div style="position: relative; display: flex; align-items: center; width: 100%;">
+              <input type="text" id="edit_barcode" value="${currentBarcode}" style="width: 100%; padding-right: 36px; box-sizing: border-box;">
+              <button type="button" class="input-scan-btn" data-target="edit_barcode" title="${lang.scan_barcode || 'Scan barcode'}" style="position: absolute; right: 4px; background: transparent; border: none; cursor: pointer; color: var(--primary-text-color); display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0;">
+                <ha-icon icon="mdi:barcode-scan" style="--mdc-icon-size: 20px;"></ha-icon>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- RIGA 6: Lista To-Do automatica -->
@@ -153,7 +161,15 @@ export function getAddPopupHtml(lang, categoriesList = [], dataObj = {}) {
         <div style="display: flex; gap: 12px; width: 100%;">
           <div class="edit-field" style="flex: 1;"><label>${lang.lbl_loc}</label><input type="text" id="new_loc" placeholder="${lang.lbl_loc_placeholder}"></div>
           <div class="edit-field" style="flex: 1;"><label>${lang.lbl_price}</label><input type="number" step="0.01" id="new_price" placeholder="${lang.lbl_price_placeholder}"></div>
-          <div class="edit-field" style="flex: 1;"><label>${lang.lbl_barcode}</label><input type="text" id="new_barcode"></div>
+          <div class="edit-field" style="flex: 1;">
+            <label>${lang.lbl_barcode}</label>
+            <div style="position: relative; display: flex; align-items: center; width: 100%;">
+              <input type="text" id="new_barcode" style="width: 100%; padding-right: 36px; box-sizing: border-box;">
+              <button type="button" class="input-scan-btn" data-target="new_barcode" title="${lang.scan_barcode || 'Scan barcode'}" style="position: absolute; right: 4px; background: transparent; border: none; cursor: pointer; color: var(--primary-text-color); display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0;">
+                <ha-icon icon="mdi:barcode-scan" style="--mdc-icon-size: 20px;"></ha-icon>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- RIGA 6: Lista To-Do automatica -->

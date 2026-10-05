@@ -180,7 +180,7 @@ async function fetchProductData(barcodeText, primaryLangCode) {
   return result; // Nessun dato trovato
 }
 
-export async function startCameraScanner(cardInstance, lang) {
+export async function startCameraScanner(cardInstance, lang, onScanCallback) {
   try {
     await loadHtml5QrcodeScript();
   } catch (e) {
@@ -259,9 +259,15 @@ export async function startCameraScanner(cardInstance, lang) {
       
       overlay.remove();
 
+      // Se è stata passata una callback specifica per un campo di input (es. edit_barcode o new_barcode)
+      if (typeof onScanCallback === "function") {
+        onScanCallback(barcodeText);
+        return;
+      }
+
       const items = cardInstance.inventoryItems || [];
       const existingProduct = items.find(i => {
-        const b = i.barcode || i.barcode || i.barcode_id || "";
+        const b = i.barcode || i.barcode_id || "";
         return String(b).trim() === barcodeText;
       });
 
