@@ -66,7 +66,7 @@ export function getEditFormHtml(item, lang, dataObj = {}) {
             <label for="edit_auto_add_checkbox" style="font-weight: bold; font-size: 0.85rem; cursor: pointer; color: var(--primary-text-color);">${lang.lbl_auto_add}</label>
           </div>
           
-          <div id="edit_auto_add_subrow" style="display: flex; gap: 10px; flex-wrap: wrap; opacity: ${item.auto_add_id_to_description_enabled ? '1' : '0.5'}; transition: opacity 0.2s;">
+          <div id="edit_auto_add_subrow" style="display: ${item.auto_add_id_to_description_enabled ? 'flex' : 'none'}; gap: 10px; flex-wrap: wrap; transition: opacity 0.2s;">
             <div class="edit-field" style="flex: 1; min-width: 160px;">
               <label>${lang.lbl_min_qty}</label>
               <input type="number" id="edit_min_qty" value="${item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : 2}" placeholder="${lang.lbl_min_qty_placeholder}" ${!item.auto_add_id_to_description_enabled ? 'disabled' : ''}>

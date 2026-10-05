@@ -394,7 +394,18 @@ export function renderCardContent(cardInstance) {
       const editSubRow = shadow.getElementById("edit_auto_add_subrow");
       if (editCheckbox && editSubRow) {
         const editSubInputs = editSubRow.querySelectorAll("input, select");
-        editCheckbox.addEventListener("change", (e) => { const isChecked = e.target.checked; editSubRow.style.opacity = isChecked ? "1" : "0.5"; editSubInputs.forEach(input => { if (isChecked) { input.removeAttribute("disabled"); input.disabled = false; } else { input.setAttribute("disabled", "true"); input.disabled = true; } }); });
+        
+        editCheckbox.addEventListener("change", (e) => {
+          const isChecked = e.target.checked;
+          
+          // Mostra/Nascondi il div
+          editSubRow.style.display = isChecked ? "flex" : "none";
+          
+          // Abilita/Disabilita gli input interni
+          editSubInputs.forEach(input => {
+            input.disabled = !isChecked;
+          });
+        });
       }
     }
   }
