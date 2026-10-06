@@ -202,7 +202,7 @@ export function getAddPopupHtml(lang, categoriesList = [], dataObj = {}) {
             </div>
           </div>
         </div>
-
+    
       </div>
       <div class="edit-form-actions">
         <button class="btn-cancel-add" id="btn-add-cancel">${lang.btn_cancel}</button>
