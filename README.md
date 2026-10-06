@@ -123,9 +123,7 @@ Ensure the official Home Assistant app (or Google Chrome on mobile) has hardware
 Future releases will focus on performance optimization, interactive shortcuts, and layout improvements:
 
 * 📦 **Official HACS Release:** Register the card in the default HACS store directory for automatic installation without requiring custom repository URLs.
-* 📐 **Multiple Layout Options:** Additional text layout choices for item cards.
 * 📐 **Summary Icon Filtering:** Clicking a summary icon will instantly filter the list by that status.
-* 📐 **Failover Translation:** Translate failover strings to English (currently in Italian).
 
 ---
 
@@ -284,9 +282,7 @@ Assicurati che l'applicazione ufficiale di Home Assistant (o Google Chrome su mo
 Le prossime versioni della card si concentreranno sull'ottimizzazione delle performance, su nuove scorciatoie interattive e su una migliore disposizione degli elementi:
 
 * 📦 **Pubblicazione ufficiale su HACS:** Registrare la card come archivio ufficiale nel catalogo pubblico di HACS per consentire l'installazione automatica senza inserire l'URL.
-* 📐 **Layout Multipli:** Più configurazioni della disposizione dei testi per la scheda oggetto.
 * 📐 **Puntamento Icone di Riepilogo:** Al click su un'icona di riepilogo, viene visualizzata la lista corrispondente.
-* 📐 **Testi di FailOver:** Traduzione in inglese dei testi failover (ora in italiano).
 
 ---
 
