@@ -164,7 +164,10 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
               <ha-form id="form-base-t3"></ha-form>
               <ha-form id="form-base-t4"></ha-form>
             </div>
-            <ha-form id="form-base-t5"></ha-form>
+            <div class="coppia-row">
+              <ha-form id="form-base-t5"></ha-form>
+              <ha-form id="form-base-t6"></ha-form>
+            </div>
             <div class="select-option">
               <span class="select-label">${lang.ed_sort_label}</span>
               <select id="default_sort" class="custom-dropdown"></select>
@@ -525,7 +528,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   renderForms(lang) {
     const defaultData = { 
       title: "", columns: 2, summary_columns: 4, default_sort: "alpha", card_layout: "layout1",
-      show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, 
+      show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_category: true,
       show_sort_alpha: true, show_sort_threshold: true, show_sort_expiry: true, 
       show_sort_category: true, show_sort_location: true, show_sort_alert_exp: true, show_sort_alert_qty: true,
       show_ico_total: true, show_ico_expired: true, show_ico_10d: true, show_ico_30d: true, 
@@ -549,6 +552,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
       show_add_form: lang.add_trigger_label, 
       show_search: lang.ed_lbl_show_search, 
       show_sort: lang.ed_lbl_show_sort, 
+      show_category: lang.ed_lbl_show_category,
       show_sort_alpha: lang.ed_lbl_sort_alpha || "🔤 Alphabetical",
       show_sort_threshold: lang.ed_lbl_sort_threshold || "⚠️ Low Stock",
       show_sort_expiry: lang.ed_lbl_sort_expiry || "⌛ Expiring Soon",
@@ -583,6 +587,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.setupForm("form-base-t3", [{ name: "show_add_form", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-base-t4", [{ name: "show_search", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-base-t5", [{ name: "show_sort", selector: { boolean: {} } }], defaultData);
+    this.setupForm("form-base-t6", [{ name: "show_category", selector: { boolean: {} } }], defaultData);
 
     this.setupForm("form-sort-t1", [{ name: "show_sort_alpha", selector: { boolean: {} } }], defaultData);
     this.setupForm("form-sort-t2", [{ name: "show_sort_threshold", selector: { boolean: {} } }], defaultData);

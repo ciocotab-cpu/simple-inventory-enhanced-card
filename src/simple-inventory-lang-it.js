@@ -144,5 +144,32 @@ export const langIt = {
     ed_lbl_show_item_unit: "Mostra Confezione",
     ed_lbl_show_item_expiry: "Mostra Scadenza",
     ed_lbl_show_item_category: "Mostra Categoria",
-    ed_lbl_show_item_location: "Mostra Posizione"
+    ed_lbl_show_item_location: "Mostra Posizione",
+
+    //Categorie Extra
+    ed_lbl_show_category: "Mostra Categorie Base",
+    lbl_cat_alcohol: "🍻 Alcolici",
+    lbl_cat_appetizer: "🍹 Aperitivo",
+    lbl_cat_beverage: "🥤 Bibita",
+    lbl_cat_toast: "🥂 Brindisi",
+    lbl_cat_meat: "🥩 Carne",
+    lbl_cat_chestnut: "🌰 Castagne",
+    lbl_cat_beans: "🫘 Fagioli",
+    lbl_cat_icecream: "🍦 Gelato",
+    lbl_cat_milk: "🍼 Latte",
+    lbl_cat_burger: "🍔 Hamburger",
+    lbl_cat_corn: "🌽 Mais",
+    lbl_cat_eggplant: "🍆 Melanzana",
+    lbl_cat_chicken: "🍗 Pollo",
+    lbl_cat_fries: "🍟 Patatine",
+    lbl_cat_bread: "🥖 Pane",
+    lbl_cat_fish: "🐟 Pesce",
+    lbl_cat_rice: "🌾 Riso",
+    lbl_cat_vegetables: "🥕 Verdure",
+    lbl_cat_wine: "🍷 Vino",
+    lbl_cat_peppers: "🫑 Peperoni",
+    lbl_cat_pizza: "🍕 Pizza",
+    lbl_cat_parmigiana: "🥧 Parmigiana",
+    lbl_cat_pasta: "🍝 Pasta",
+    lbl_cat_ravioli: "🥟 Ravioli"
 };
