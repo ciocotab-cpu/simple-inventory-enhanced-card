@@ -1,10 +1,15 @@
-export function getEditFormHtml(item, lang, dataObj = {}) {
+export function getEditFormHtml(item, lang, categoriesInput = [], dataObj = {}) {
   const currentBarcode = item.barcode || item.barcode_id || "";
-
-  const categoriesList = Array.isArray(dataObj) ? dataObj : (dataObj.categories || []);
   const todoLists = dataObj.todoLists || [];
   
-  let catOptions = categoriesList.map(cat => `<option value="${cat}" ${item.category === cat ? 'selected' : ''}>${cat}</option>`).join('');
+  // Gestione flessibile per recuperare l'array di categorie
+  const categoriesList = Array.isArray(categoriesInput) 
+    ? categoriesInput 
+    : (categoriesInput.categories || dataObj.categories || []);
+
+  const catOptions = categoriesList.map(cat => 
+    `<option value="${cat}" ${item.category === cat ? 'selected' : ''}>${cat}</option>`
+  ).join('');
 
   return `
     <div class="item-edit-form" style="max-width: 650px; width: 95%;">
@@ -107,9 +112,17 @@ export function getEditFormHtml(item, lang, dataObj = {}) {
   `;
 }
 
-export function getAddPopupHtml(lang, categoriesList = [], dataObj = {}) {
+export function getAddPopupHtml(lang, categoriesInput = [], dataObj = {}) {
   const todoLists = dataObj.todoLists || [];
-  let catOptions = categoriesList.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+  // Risolve la lista categorie senza ridichiarare il parametro
+  const categoriesList = Array.isArray(categoriesInput) 
+    ? categoriesInput 
+    : (categoriesInput.categories || dataObj.categories || []);
+
+  const catOptions = categoriesList.map(cat => 
+    `<option value="${cat}">${cat}</option>`
+  ).join('');
 
   return `
     <div class="item-add-popup" style="max-width: 650px; width: 95%;">

@@ -5,6 +5,51 @@ import { startCameraScanner } from './simple-inventory-scanner.js';
 import { filterAndSortItems } from './simple-inventory-filters.js';
 import { renderSingleItemCard } from './simple-inventory-cards.js';
 
+
+function attachCategorySelectKeydownListener(selectElement) {
+  if (!selectElement || selectElement._hasKeydownSearch) return;
+
+  let searchBuffer = "";
+  let bufferTimeout = null;
+
+  selectElement.addEventListener("keydown", (e) => {
+    // Intercetta solo singoli caratteri/lettere ed ignora scorciatoie di sistema (Ctrl/Alt/Meta)
+    if (!e.key || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+
+    clearTimeout(bufferTimeout);
+    searchBuffer += e.key.toLowerCase();
+
+    const options = Array.from(selectElement.options);
+    const match = options.find(opt => {
+      if (!opt.text) return false;
+
+      // 1. Rimuove tutte le emoji, simboli grafici, spazi normali e spazi speciali (Unicode)
+      const cleanText = opt.text
+        .replace(/[\p{Extended_Pictographic}\p{Emoji_Component}\p{Symbol}]/gu, "") // Rimuove emoji/simboli
+        .replace(/^[\s\uFEFF\xA0]+/g, "")                                          // Rimuove tutti gli spazi e caratteri invisibili iniziali
+        .toLowerCase();
+
+      // 2. Verifica se il testo pulito inizia con la sequenza digitata dall'utente
+      return cleanText.startsWith(searchBuffer);
+    });
+
+    if (match) {
+      if (selectElement.value !== match.value) {
+        selectElement.value = match.value;
+        // Scatena l'evento 'change' per aggiornare eventuali form o logiche collegate
+        selectElement.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+
+    // Reset del buffer di ricerca dopo 1 secondo di inattività
+    bufferTimeout = setTimeout(() => {
+      searchBuffer = "";
+    }, 1000);
+  }, true); // `true` (UseCapture) forza l'esecuzione prioritaria prima dei gestori nativi
+
+  selectElement._hasKeydownSearch = true;
+}
+
 export function renderCardContent(cardInstance) {
   const isDebugEnabled = () => {
     return Boolean(cardInstance && cardInstance.isDebugEnabled && cardInstance.isDebugEnabled());
@@ -446,12 +491,20 @@ export function renderCardContent(cardInstance) {
         editIncBtn.addEventListener("click", (e) => { e.preventDefault(); editQtyInput.value = (parseFloat(editQtyInput.value) || 0) + 1; });
         editDecBtn.addEventListener("click", (e) => { e.preventDefault(); const cur = parseFloat(editQtyInput.value) || 0; if (cur > 0) editQtyInput.value = cur - 1; });
       }
-      const editCatSelect = shadow.getElementById("edit_cat_select");
+
+      const editCatSelect = shadow.querySelector("#edit_cat_select");
       const editCatContainer = shadow.getElementById("edit_cat_custom_container");
       const editCatCustomInput = shadow.getElementById("edit_cat_custom");
       if (editCatSelect && editCatContainer && editCatCustomInput) {
         editCatSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { editCatContainer.style.display = "block"; editCatCustomInput.value = ""; editCatCustomInput.focus(); } else { editCatContainer.style.display = "none"; } });
       }
+
+      // ✅ Listener per ricerca da tastiera in Modifica Categoria
+      if (editCatSelect) {
+        editCatSelect.setAttribute("tabindex", "0");
+        attachCategorySelectKeydownListener(editCatSelect);
+      }
+
       const editCheckbox = shadow.getElementById("edit_auto_add_checkbox");
       const editSubRow = shadow.getElementById("edit_auto_add_subrow");
       if (editCheckbox && editSubRow) {
@@ -570,12 +623,20 @@ export function renderCardContent(cardInstance) {
         incBtn.addEventListener("click", () => { qtyInput.value = (parseFloat(qtyInput.value) || 0) + 1; });
         decBtn.addEventListener("click", () => { const cur = parseFloat(qtyInput.value) || 0; if (cur > 0) qtyInput.value = cur - 1; });
       }
+
       const catSelect = shadow.getElementById("new_cat_select");
       const catCustomContainer = shadow.getElementById("new_cat_custom_container");
       const catCustomInput = shadow.getElementById("new_cat_custom");
       if (catSelect && catCustomContainer && catCustomInput) {
         catSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { catCustomContainer.style.display = "block"; catCustomInput.value = ""; catCustomInput.focus(); } else { catCustomContainer.style.display = "none"; } });
       }
+
+      // ✅ Listener per ricerca da tastiera in Nuova Categoria
+      if (catSelect) {
+        catSelect.setAttribute("tabindex", "0");
+        attachCategorySelectKeydownListener(catSelect);
+      }
+
       const autoAddCheckbox = shadow.getElementById("new_auto_add_checkbox");
       const subRow = shadow.getElementById("new_auto_add_subrow");
       if (autoAddCheckbox && subRow) {

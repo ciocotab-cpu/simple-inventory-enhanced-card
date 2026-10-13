@@ -245,6 +245,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
                 <option value="layout3">Compact</option>
                 <option value="layout4">Compact Reversed</option>
                 <option value="layout5">Mobile</option>
+                <option value="layout6">UltraCompact</option>
               </select>
             </div>
             <div class="coppia-row">
