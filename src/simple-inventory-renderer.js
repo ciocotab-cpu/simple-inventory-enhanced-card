@@ -130,7 +130,44 @@ export function renderCardContent(cardInstance) {
   dynamicCategories.sort((a, b) => a.localeCompare(b));
   dynamicLocations.sort((a, b) => a.localeCompare(b));
 
-  // 3. DROPDOWN ORDINAMENTO
+  // 3. COSTRUZIONE LISTA CATEGORIE UNIFICATA (Predefinite da lingua + Dinamiche dell'inventario)
+  const categoriesListArray = [];
+  const showCategoryConfig = cardInstance.config.show_category !== undefined ? cardInstance.config.show_category : true;
+  if (showCategoryConfig) {
+    categoriesListArray.push(
+      lang.lbl_cat_alcohol, lang.lbl_cat_appetizer, lang.lbl_cat_beverage, 
+      lang.lbl_cat_toast, lang.lbl_cat_meat, lang.lbl_cat_chestnut, 
+      lang.lbl_cat_beans, lang.lbl_cat_icecream, lang.lbl_cat_milk, 
+      lang.lbl_cat_burger, lang.lbl_cat_corn, lang.lbl_cat_eggplant, 
+      lang.lbl_cat_chicken, lang.lbl_cat_fries, lang.lbl_cat_bread, 
+      lang.lbl_cat_fish, lang.lbl_cat_rice, lang.lbl_cat_vegetables, 
+      lang.lbl_cat_wine, lang.lbl_cat_peppers, lang.lbl_cat_pizza, 
+      lang.lbl_cat_parmigiana, lang.lbl_cat_pasta, lang.lbl_cat_ravioli
+    );
+  }
+
+  if (cardInstance.inventoryItems && Array.isArray(cardInstance.inventoryItems)) {
+    cardInstance.inventoryItems.forEach(i => {
+      if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
+        categoriesListArray.push(i.category.trim());
+      }
+    });
+  }
+  
+  const cleanCategoryName = (str) => {
+    if (!str) return "";
+    return str.replace(/^[\p{Extended_Pictographic}\p{Emoji_Component}\s]+/gu, "").trim();
+  };
+
+  categoriesListArray.sort((a, b) => {
+    const cleanA = cleanCategoryName(a);
+    const cleanB = cleanCategoryName(b);
+    const textA = cleanA !== "" ? cleanA : a;
+    const textB = cleanB !== "" ? cleanB : b;
+    return textA.localeCompare(textB, undefined, { sensitivity: 'base' });
+  });
+
+  // 4. DROPDOWN ORDINAMENTO
   const selectSort = cardInstance.shadowRoot.getElementById("sort-select");
   if (selectSort && cardInstance.config.show_sort) {
     const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
@@ -221,7 +258,7 @@ export function renderCardContent(cardInstance) {
     else selectSort.classList.remove("visible");
   }
 
-  // 4. BARRA DI RICERCA
+  // 5. BARRA DI RICERCA
   const searchBar = cardInstance.shadowRoot.getElementById("search-input");
   const controlsContainer = cardInstance.shadowRoot.getElementById("controls-container");
   if (searchBar && controlsContainer) {
@@ -256,7 +293,7 @@ export function renderCardContent(cardInstance) {
     }
   }
 
-  // 5. PULSANTE AGGIUNGI E SCANNER BARCODE
+  // 6. PULSANTE AGGIUNGI E SCANNER BARCODE
   const addTriggerBtn = cardInstance.shadowRoot.getElementById("add-trigger-btn");
   if (addTriggerBtn) { 
     addTriggerBtn.innerText = lang.btn_add;
@@ -287,7 +324,7 @@ export function renderCardContent(cardInstance) {
     else cardInstance.content.classList.remove("visible");
   }
 
-  // 6. CALCOLO E RENDERING RIEPILOGO (Soglie Dinamiche Scadenze e Quantità)
+  // 7. CALCOLO E RENDERING RIEPILOGO (Soglie Dinamiche Scadenze e Quantità)
   let totalItems = 0, expiredCount = 0, exp10Count = 0, exp30Count = 0, qty0Count = 0, qtyLowCount = 0, qtyWarningCount = 0;
   
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
@@ -355,64 +392,12 @@ export function renderCardContent(cardInstance) {
     summaryArea.innerHTML = htmlContent || `<div style='color:var(--secondary-text-color); font-size:0.8rem; padding:2px;'>${lang.no_counter_active}</div>`;
   } else { summaryArea.classList.remove("visible"); }
 
-  // 7. GRIGLIA PRODOTTI
+  // 8. GRIGLIA PRODOTTI
   if (cardInstance.inventoryItems && cardInstance.inventoryItems.length > 0) {
     const items = filterAndSortItems(cardInstance);
     log(`[simple-inventory-renderer] Rendering di ${items.length} articoli filtrati/ordinati.`);
 
-    const categoriesListArray = [];
-    const showCategory = cardInstance.config.show_category !== undefined ? cardInstance.config.show_category : true;
-    if (showCategory) {
-      categoriesListArray.push(lang.lbl_cat_alcohol);
-      categoriesListArray.push(lang.lbl_cat_appetizer);
-      categoriesListArray.push(lang.lbl_cat_beverage);
-      categoriesListArray.push(lang.lbl_cat_toast);
-      categoriesListArray.push(lang.lbl_cat_meat);
-      categoriesListArray.push(lang.lbl_cat_chestnut);
-      categoriesListArray.push(lang.lbl_cat_beans);
-      categoriesListArray.push(lang.lbl_cat_icecream);
-      categoriesListArray.push(lang.lbl_cat_milk);
-      categoriesListArray.push(lang.lbl_cat_burger);
-      categoriesListArray.push(lang.lbl_cat_corn);
-      categoriesListArray.push(lang.lbl_cat_eggplant);
-      categoriesListArray.push(lang.lbl_cat_chicken);
-      categoriesListArray.push(lang.lbl_cat_fries);
-      categoriesListArray.push(lang.lbl_cat_bread);
-      categoriesListArray.push(lang.lbl_cat_fish);
-      categoriesListArray.push(lang.lbl_cat_rice);
-      categoriesListArray.push(lang.lbl_cat_vegetables);
-      categoriesListArray.push(lang.lbl_cat_wine);
-      categoriesListArray.push(lang.lbl_cat_peppers);
-      categoriesListArray.push(lang.lbl_cat_pizza);
-      categoriesListArray.push(lang.lbl_cat_parmigiana);
-      categoriesListArray.push(lang.lbl_cat_pasta);
-      categoriesListArray.push(lang.lbl_cat_ravioli);
-    }
-    cardInstance.inventoryItems.forEach(i => {
-      if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
-        categoriesListArray.push(i.category.trim());
-      }
-    });
-    
-    // ✅ 1. Definizione della funzione di pulizia (rimuove emoji e spazi iniziali)
-    const cleanCategoryName = (str) => {
-      if (!str) return "";
-      // Rimuove emoji, simboli Unicode e spazi all'inizio della stringa
-      return str.replace(/^[\p{Extended_Pictographic}\p{Emoji_Component}\s]+/gu, "").trim();
-    };
-
-    // ✅ 2. Ordinamento delle categorie ignorando l'emoji iniziale
-    categoriesListArray.sort((a, b) => {
-      const cleanA = cleanCategoryName(a);
-      const cleanB = cleanCategoryName(b);
-
-      // Se dopo la pulizia una rimane vuota (es. la categoria è SOLO un'emoji), usa la stringa originale
-      const textA = cleanA !== "" ? cleanA : a;
-      const textB = cleanB !== "" ? cleanB : b;
-
-      return textA.localeCompare(textB, undefined, { sensitivity: 'base' });
-    });
-
+    // Passiamo categoriesListArray unificato a ciascuna card singola
     cardInstance.content.innerHTML = items.map(item => renderSingleItemCard(item, cardInstance, lang, categoriesListArray)).join('');
 
     cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { 
@@ -525,7 +510,7 @@ export function renderCardContent(cardInstance) {
     }
   }
 
-  // 8. POPUP PER L'INSERIMENTO DI NUOVI PRODOTTI
+  // 9. POPUP PER L'INSERIMENTO DI NUOVI PRODOTTI
   if (addPopupContainer) {
     if (!cardInstance._showAddPopup) {
       addPopupContainer.innerHTML = "";
@@ -546,15 +531,7 @@ export function renderCardContent(cardInstance) {
       }
       todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-      const categoriesListArray = [];
-      if (cardInstance.inventoryItems) {
-        cardInstance.inventoryItems.forEach(i => {
-          if (i.category && i.category.trim() !== "" && !categoriesListArray.includes(i.category.trim())) {
-            categoriesListArray.push(i.category.trim());
-          }
-        });
-      }
-
+      // Passiamo categoriesListArray unificato al popup di aggiunta
       addPopupContainer.innerHTML = getAddPopupHtml(lang, categoriesListArray, { todoLists: todoListsArray });
       const shadow = cardInstance.shadowRoot;
 
