@@ -180,7 +180,7 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
   }
 
   return `
-    <div class="item-card" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};">
+    <div class="item-card" data-item-id="${item.id}" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};">
       ${!isEditing ? `
         <div class="card-top-right-actions">
           ${autoAddHtml}
@@ -354,7 +354,7 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
   }
 
   return `
-    <div class="item-card" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};">
+    <div class="item-card" data-item-id="${item.id}" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};">
       ${!isEditing ? `
         <div class="card-top-right-actions">
           ${autoAddHtml}
@@ -537,7 +537,7 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
     : '';
 
   return `
-    <div class="item-card layout-3" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
+    <div class="item-card layout-3" data-item-id="${item.id}" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
       
       <!-- RIGA 1: Nome (sinistra) | Quantità (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px;">
@@ -735,7 +735,7 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
     : '';
 
   return `
-    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
+    <div class="item-card layout-4" data-item-id="${item.id}" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
       
       <!-- RIGA 1: Nome (sinistra) | Quantità (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px;">
@@ -941,7 +941,7 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
 
   return `
-    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px;">
+    <div class="item-card layout-4" data-item-id="${item.id}" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px;">
       
       <!-- RIGA 1: Nome (sinistra) | Quantità (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 2px;">
@@ -1149,7 +1149,7 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
 
   return `
-    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px;">
+    <div class="item-card layout-4" data-item-id="${item.id}" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px;">
       
       <!-- RIGA 1: Nome (sinistra) | Quantità (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 2px;">

@@ -173,7 +173,7 @@ test('rifiuta nome vuoto e aggiunta automatica senza lista To-Do', async t => {
   assert.equal(alerts.length, 2);
 });
 
-test('incrementa la quantità quando nome, unità e scadenza coincidono', async () => {
+test('invia la stessa identità al backend per il merge della quantità', async () => {
   const existing = { name: 'Caffè', quantity: 2, unit: 'busta', expiry_date: '2030-01-01' };
   const { card, calls } = makeServiceCard({
     items: [existing],
@@ -188,9 +188,10 @@ test('incrementa la quantità quando nome, unità e scadenza coincidono', async 
   await handleAddItemService(card);
 
   assert.equal(calls.length, 1);
-  assert.equal(calls[0][1], 'update_item');
-  assert.equal(calls[0][2].desired_quantity, 5);
-  assert.equal(calls[0][2].old_name, 'Caffè');
+  assert.equal(calls[0][1], 'add_item');
+  assert.equal(calls[0][2].name, 'Caffè');
+  assert.equal(calls[0][2].unit, 'busta');
+  assert.equal(calls[0][2].quantity, 3);
   assert.equal(card.fetchCount, 1);
 });
 
@@ -201,7 +202,7 @@ test('crea un articolo distinto se unità o scadenza differiscono', async () => 
       'new-name': { value: 'Tè' },
       'new-qty': { value: '2' },
       new_unit: { value: 'busta' },
-      new_expiry: { value: '2030-02-01' }
+      new_expiry: { value: '2030-01-01' }
     }
   });
 
@@ -209,7 +210,9 @@ test('crea un articolo distinto se unità o scadenza differiscono', async () => 
 
   assert.equal(calls.length, 1);
   assert.equal(calls[0][1], 'add_item');
-  assert.equal(calls[0][2].name, 'Tè (busta - 2030-02-01)');
+  assert.equal(calls[0][2].name, 'Tè');
+  assert.equal(calls[0][2].expiry_date, '2030-01-01');
+  assert.equal(calls[0][2].unit, 'busta');
   assert.equal(calls[0][2].quantity, 2);
 });
 
@@ -229,6 +232,7 @@ test('salva i valori del form di modifica nel servizio corretto', async () => {
 
   assert.equal(calls.length, 1);
   assert.equal(calls[0][1], 'update_item');
+  assert.equal(calls[0][2].item_id, 'item-1');
   assert.equal(calls[0][2].old_name, 'Riso');
   assert.equal(calls[0][2].name, 'Riso integrale');
   assert.equal(calls[0][2].desired_quantity, 4.5);

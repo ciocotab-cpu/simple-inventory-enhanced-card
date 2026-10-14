@@ -258,14 +258,16 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     renderCardContent(this); 
   }
 
-  async adjustQuantity(itemName, diff) { 
+  async adjustQuantity(itemName, diff, itemId) {
     if (!this.config || !this.config.entity) return; 
     const stateObj = this._hass.states[this.config.entity]; 
     if (!stateObj || !stateObj.attributes) return;
     const inventoryId = stateObj.attributes.inventory_id; 
     if (!inventoryId) return; 
     const serviceName = diff > 0 ? "increment_item" : "decrement_item"; 
-    await this._hass.callService("simple_inventory", serviceName, { inventory_id: inventoryId, name: itemName, amount: Math.abs(diff) }); 
+    const serviceData = { inventory_id: inventoryId, name: itemName, amount: Math.abs(diff) };
+    if (itemId) serviceData.item_id = itemId;
+    await this._hass.callService("simple_inventory", serviceName, serviceData);
     this._initialFetched = false; 
     this.fetchInventoryItems(); 
   }

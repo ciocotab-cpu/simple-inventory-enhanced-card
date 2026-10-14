@@ -58,6 +58,7 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
 
   const serviceData = {
     inventory_id: inventoryId,
+    item_id: itemId,
     old_name: oldName,
     name: newName,
     desired_quantity: qtyEl ? parseFloat(qtyEl.value) || 0 : 0,
@@ -154,86 +155,9 @@ export async function handleAddItemService(cardInstance) {
   const inputUnit = unitEl ? unitEl.value.trim().toLowerCase() : "";
   const inputExpiry = expiryEl ? expiryEl.value.trim() : "";
 
-  // Recupera la lista degli articoli esistenti caricati nella card
-  const existingItems = cardInstance._items || stateObj.attributes.items || [];
-
-  // Filtra tutti gli articoli con lo stesso nome base
-  const sameNameItems = existingItems.filter(item => {
-    if (!item.name) return false;
-    const itemName = item.name.trim().toLowerCase();
-    return itemName === baseName.toLowerCase() || itemName.startsWith(baseName.toLowerCase() + " (");
-  });
-
-  // CHECK DEI 3 CAMPI: Cerca un match esatto per Nome, Confezione (Unità) e Data di Scadenza
-  const exactMatch = sameNameItems.find(item => {
-    const itemUnit = item.unit ? item.unit.trim().toLowerCase() : "";
-    const itemExpiry = item.expiry_date ? item.expiry_date.trim() : "";
-    
-    return itemUnit === inputUnit && itemExpiry === inputExpiry;
-  });
-
-  // 1. CASO MATCH ESAURIENTE: Stesso Nome, Stessa Confezione e Stessa Scadenza
-  if (exactMatch) {
-    const newQuantity = (parseFloat(exactMatch.quantity) || 0) + inputQuantity;
-
-    const updateData = {
-      inventory_id: inventoryId,
-      old_name: exactMatch.name,
-      name: exactMatch.name,
-      desired_quantity: newQuantity,
-      unit: exactMatch.unit || inputUnit,
-      expiry_date: exactMatch.expiry_date || inputExpiry,
-      expiry_alert_days: expAlertEl ? parseInt(expAlertEl.value) || 0 : (exactMatch.expiry_alert_days || 0),
-      category: finalCategory || exactMatch.category || "",
-      location: locEl ? locEl.value.trim() : (exactMatch.location || ""),
-      aliases: aliasesEl ? aliasesEl.value.trim() : (exactMatch.aliases || ""),
-      description: descEl ? descEl.value.trim() : (exactMatch.description || ""),
-      barcode: barcodeEl ? barcodeEl.value.trim() : (exactMatch.barcode || ""),
-      auto_add_id_to_description_enabled: isAutoAddChecked
-    };
-
-    if (isAutoAddChecked) {
-      if (todoEl) updateData.todo_list = todoEl.value.trim();
-      if (todoPlaceEl) updateData.todo_quantity_placement = todoPlaceEl.value;
-      if (minQtyEl) updateData.auto_add_to_list_quantity = parseInt(minQtyEl.value) || 2;
-    }
-
-    if (priceEl && priceEl.value.trim() !== "") {
-      const parsedPrice = parseFloat(priceEl.value);
-      if (!isNaN(parsedPrice)) updateData.price = parsedPrice;
-    }
-
-    try {
-      await cardInstance._hass.callService("simple_inventory", "update_item", updateData);
-      cardInstance._showAddPopup = false;
-      cardInstance._initialFetched = false;
-      cardInstance.fetchInventoryItems();
-    } catch (err) {
-      console.error("Errore durante l'incremento della quantità del prodotto:", err);
-      alert((lang.error_add_fail || "Failed to add item.\\nBackend Error: ") + err.message);
-    }
-    return;
-  }
-
-  // 2. CASO DIFFERENZE: Stesso nome, ma Confezione o Scadenza diverse
-  // Per evitare che il backend Python sovrascriva l'articolo esistente, generiamo un nome univoco
-  let nameToSave = baseName;
-  if (sameNameItems.length > 0) {
-    const details = [];
-    if (inputUnit) details.push(inputUnit);
-    if (inputExpiry) details.push(inputExpiry);
-    
-    if (details.length > 0) {
-      nameToSave = `${baseName} (${details.join(" - ")})`;
-    } else {
-      nameToSave = `${baseName} (${sameNameItems.length + 1})`;
-    }
-  }
-
-  // 3. NUOVO PRODOTTO / PRODOTTO CON DETTAGLI DIVERSI: Chiama add_item
   const serviceData = {
     inventory_id: inventoryId,
-    name: nameToSave,
+    name: baseName,
     quantity: inputQuantity,
     auto_add_id_to_description_enabled: isAutoAddChecked,
     expiry_date: inputExpiry,
@@ -268,7 +192,7 @@ export async function handleAddItemService(cardInstance) {
   }
 }
 
-export async function deleteItemDefinitivelyService(cardInstance, itemName) {
+export async function deleteItemDefinitivelyService(cardInstance, itemName, itemId) {
   const lang = getTranslation(cardInstance._hass);
   if (!confirm((lang.confirm_delete || "Are you sure you want to permanently delete '{itemName}' from the inventory?").replace("{item}", itemName))) {
     return;
@@ -281,10 +205,12 @@ export async function deleteItemDefinitivelyService(cardInstance, itemName) {
   if (!inventoryId) return;
 
   try {
-    await cardInstance._hass.callService("simple_inventory", "remove_item", {
+    const serviceData = {
       inventory_id: inventoryId,
       name: itemName
-    });
+    };
+    if (itemId) serviceData.item_id = itemId;
+    await cardInstance._hass.callService("simple_inventory", "remove_item", serviceData);
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
   } catch (err) {

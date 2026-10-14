@@ -355,7 +355,7 @@ export function renderCardContent(cardInstance) {
             e.preventDefault();
             searchBar.value = ""; 
             cardInstance.searchQuery = "";
-            await cardInstance.adjustQuantity(exactMatch.name, 1);
+            await cardInstance.adjustQuantity(exactMatch.name, 1, exactMatch.id);
           } else {
             log("[simple-inventory-renderer] Nessuna corrispondenza esatta trovata per barcode:", rawCode);
           }
@@ -476,7 +476,7 @@ export function renderCardContent(cardInstance) {
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
         log("[simple-inventory-renderer] Pulsante '+' premuto per:", btn.dataset.name);
-        cardInstance.adjustQuantity(btn.dataset.name, 1); 
+        cardInstance.adjustQuantity(btn.dataset.name, 1, btn.closest(".item-card")?.dataset.itemId);
       }); 
     });
 
@@ -484,7 +484,7 @@ export function renderCardContent(cardInstance) {
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
         log("[simple-inventory-renderer] Pulsante '-' premuto per:", btn.dataset.name);
-        cardInstance.adjustQuantity(btn.dataset.name, -1); 
+        cardInstance.adjustQuantity(btn.dataset.name, -1, btn.closest(".item-card")?.dataset.itemId);
       }); 
     });
 
@@ -492,7 +492,7 @@ export function renderCardContent(cardInstance) {
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
         log("[simple-inventory-renderer] Eliminazione richiesta per:", btn.dataset.name);
-        deleteItemDefinitivelyService(cardInstance, btn.dataset.name); 
+        deleteItemDefinitivelyService(cardInstance, btn.dataset.name, btn.closest(".item-card")?.dataset.itemId);
       }); 
     });
     
