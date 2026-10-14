@@ -214,6 +214,7 @@ export function renderCardContent(cardInstance) {
       lang.lbl_cat_chicken, lang.lbl_cat_fries, lang.lbl_cat_bread, 
       lang.lbl_cat_fish, lang.lbl_cat_rice, lang.lbl_cat_vegetables, 
       lang.lbl_cat_wine, lang.lbl_cat_peppers, lang.lbl_cat_pizza, 
+      lang.lbl_cat_polpa, lang.lbl_cat_sugo,
       lang.lbl_cat_parmigiana, lang.lbl_cat_pasta, lang.lbl_cat_ravioli
     );
   }

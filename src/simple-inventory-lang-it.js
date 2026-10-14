@@ -154,7 +154,7 @@ export const langIt = {
     lbl_cat_toast: "🥂 Brindisi",
     lbl_cat_meat: "🥩 Carne",
     lbl_cat_chestnut: "🌰 Castagne",
-    lbl_cat_beans: "🫘 Fagioli",
+    lbl_cat_beans: "🫘 Legumi",
     lbl_cat_icecream: "🍦 Gelato",
     lbl_cat_milk: "🍼 Latte",
     lbl_cat_burger: "🍔 Hamburger",
@@ -169,6 +169,8 @@ export const langIt = {
     lbl_cat_wine: "🍷 Vino",
     lbl_cat_peppers: "🫑 Peperoni",
     lbl_cat_pizza: "🍕 Pizza",
+    lbl_cat_polpa: "🍅 Pomodoro (Polpa)",
+    lbl_cat_sugo: "🥫 Pomodoro (Sugo)",
     lbl_cat_parmigiana: "🥧 Parmigiana",
     lbl_cat_pasta: "🍝 Pasta",
     lbl_cat_ravioli: "🥟 Ravioli"
