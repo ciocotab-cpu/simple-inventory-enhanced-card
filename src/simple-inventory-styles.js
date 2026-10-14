@@ -34,7 +34,7 @@ export const cardStyles = `
   
   .controls { display: none; gap: 8px; align-items: center; }
   .controls.visible { display: flex; }
-  .search-bar { display: none; flex: 1; padding: 6px 10px; border-radius: 20px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); }
+  .search-bar { display: none; flex: 1 1 auto; width: 100%; min-width: 0; box-sizing: border-box; padding: 6px 10px; border-radius: 20px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); }
   .search-bar.visible { display: block; }
   .sort-select { display: none; padding: 6px; border-radius: 4px; border: 1px solid var(--divider-color); background: var(--card-background-color); color: var(--primary-text-color); }
   .sort-select.visible { display: block; }

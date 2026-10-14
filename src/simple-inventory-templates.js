@@ -5,8 +5,10 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
   // Prefissi e valori in base alla modalità (Edit o Add)
   const p = isEdit ? "edit" : "new";
   
-  const catOptions = categoriesList.map(cat => 
-    `<option value="${cat}" ${isEdit && item.category === cat ? 'selected' : ''}>${cat}</option>`
+  const catOptions = categoriesList.map(cat => {
+    const categoryLabel = cat.replace(/^[\p{Extended_Pictographic}\p{Emoji_Component}\uFE0F\u200D\s]+/u, "").trim();
+    return `<option value="${cat}" ${isEdit && item.category === cat ? 'selected' : ''}>${categoryLabel}</option>`;
+  }
   ).join('');
 
   const nameVal = isEdit ? (item.name || '') : '';
