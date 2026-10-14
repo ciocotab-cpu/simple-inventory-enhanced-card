@@ -80,6 +80,13 @@ export const cardStyles = `
   .edit-field { display: flex; flex-direction: column; gap: 4px; }
   .edit-field label { font-size: 0.78rem; color: var(--secondary-text-color); font-weight: 600; }
   .edit-field input, .edit-field select { width: 100%; padding: 6px 8px; border: 1px solid var(--divider-color); border-radius: 6px; background: var(--card-background-color); color: var(--primary-text-color); box-sizing: border-box; font-size: 0.85rem; height: 34px; }
+  .category-combobox { position: relative; }
+  .category-combobox-input { font: inherit; }
+  .category-combobox-options { display: none; position: absolute; top: calc(100% + 2px); left: 0; right: 0; max-height: 220px; overflow-y: auto; z-index: 5; padding: 4px; border: 1px solid var(--divider-color); border-radius: 6px; background: var(--card-background-color); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+  .category-combobox-options.open { display: flex; flex-direction: column; }
+  .category-combobox-option { flex: 0 0 auto; width: 100%; padding: 7px 8px; border: 0; border-radius: 4px; background: transparent; color: var(--primary-text-color); text-align: left; font: inherit; cursor: pointer; }
+  .category-combobox-option:hover, .category-combobox-option.active { background: var(--secondary-background-color); }
+  .category-combobox-value { display: none !important; }
   .edit-field.full-width { grid-column: 1 / -1; }
   .edit-form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; border-top: 1px solid var(--divider-color); padding-top: 12px; }
   .edit-form-actions button { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; border: none; height: 36px; }

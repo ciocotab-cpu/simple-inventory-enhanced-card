@@ -5,10 +5,8 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
   // Prefissi e valori in base alla modalità (Edit o Add)
   const p = isEdit ? "edit" : "new";
   
-  const catOptions = categoriesList.map(cat => {
-    const categoryLabel = cat.replace(/^[\p{Extended_Pictographic}\p{Emoji_Component}\uFE0F\u200D\s]+/u, "").trim();
-    return `<option value="${cat}" ${isEdit && item.category === cat ? 'selected' : ''}>${categoryLabel}</option>`;
-  }
+  const catOptions = categoriesList.map(cat => 
+    `<option value="${cat}" ${isEdit && item.category === cat ? 'selected' : ''}>${cat}</option>`
   ).join('');
 
   const nameVal = isEdit ? (item.name || '') : '';
@@ -44,7 +42,11 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
           <div class="edit-field" style="width: 100%;"><label>${lang.lbl_unit}</label><input type="text" id="${p}_unit" value="${unitVal}" placeholder="${lang.lbl_unit_placeholder}"></div>
           <div class="edit-field" style="width: 100%;">
             <label>${lang.lbl_cat}</label>
-            <select id="${p}_cat_select" style="width: 100%; padding: 6px 8px; border: 1px solid var(--divider-color); border-radius: 6px; background: var(--card-background-color); color: var(--primary-text-color); font-size: 0.85rem; height: 34px; outline: none; cursor: pointer; font-family: inherit; box-sizing: border-box;">
+            <div class="category-combobox">
+              <input id="${p}_cat_search" class="category-combobox-input" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${p}_cat_options" autocomplete="off" placeholder="${lang.lbl_cat_placeholder}">
+              <div id="${p}_cat_options" class="category-combobox-options" role="listbox"></div>
+            </div>
+            <select id="${p}_cat_select" class="category-combobox-value" tabindex="-1" aria-hidden="true">
               <option value="">${lang.lbl_cat_placeholder}</option>
               ${catOptions}
               <option value="__NEW_CAT__">${lang.lbl_cat_new_cat}</option>

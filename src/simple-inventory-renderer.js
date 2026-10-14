@@ -6,6 +6,122 @@ import { filterAndSortItems } from './simple-inventory-filters.js';
 import { renderSingleItemCard } from './simple-inventory-cards.js';
 
 
+function normalizeCategorySearchText(text) {
+  return text
+    .replace(/^[\p{Extended_Pictographic}\p{Emoji_Component}\uFE0F\u200D\s]+/u, "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .trim()
+    .toLocaleLowerCase();
+}
+
+function attachCategoryCombobox(selectElement) {
+  if (!selectElement || selectElement._hasCategoryCombobox) return;
+
+  const wrapper = selectElement.parentElement.querySelector(".category-combobox");
+  const input = wrapper && wrapper.querySelector(".category-combobox-input");
+  const list = wrapper && wrapper.querySelector(".category-combobox-options");
+  if (!wrapper || !input || !list) return;
+
+  let visibleOptions = [];
+  let activeIndex = -1;
+
+  const setOpen = (isOpen) => {
+    list.classList.toggle("open", isOpen);
+    input.setAttribute("aria-expanded", String(isOpen));
+    if (!isOpen) {
+      activeIndex = -1;
+      input.removeAttribute("aria-activedescendant");
+    }
+  };
+
+  const syncInput = () => {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    input.value = selectedOption ? selectedOption.text : "";
+  };
+
+  const chooseOption = (option) => {
+    if (!option) return;
+    selectElement.value = option.value;
+    syncInput();
+    setOpen(false);
+    selectElement.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+
+  const renderOptions = (query = "") => {
+    const normalizedQuery = normalizeCategorySearchText(query);
+    list.replaceChildren();
+    visibleOptions = Array.from(selectElement.options).filter(option =>
+      normalizeCategorySearchText(option.text).startsWith(normalizedQuery)
+    );
+
+    visibleOptions.forEach((option, index) => {
+      const optionButton = document.createElement("button");
+      optionButton.type = "button";
+      optionButton.className = "category-combobox-option";
+      optionButton.id = `${list.id}-option-${index}`;
+      optionButton.setAttribute("role", "option");
+      optionButton.setAttribute("aria-selected", String(option.value === selectElement.value));
+      optionButton.textContent = option.text;
+      optionButton.addEventListener("mousedown", (event) => event.preventDefault());
+      optionButton.addEventListener("click", () => chooseOption(option));
+      list.appendChild(optionButton);
+    });
+    activeIndex = -1;
+  };
+
+  const setActiveOption = (index) => {
+    if (visibleOptions.length === 0) return;
+    activeIndex = (index + visibleOptions.length) % visibleOptions.length;
+    const optionButtons = list.querySelectorAll(".category-combobox-option");
+    optionButtons.forEach((button, buttonIndex) => {
+      button.classList.toggle("active", buttonIndex === activeIndex);
+    });
+    input.setAttribute("aria-activedescendant", optionButtons[activeIndex].id);
+    optionButtons[activeIndex].scrollIntoView({ block: "nearest" });
+  };
+
+  input.addEventListener("focus", () => {
+    syncInput();
+    input.select();
+    renderOptions();
+    setOpen(true);
+  });
+  input.addEventListener("input", () => {
+    renderOptions(input.value);
+    setOpen(true);
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      if (!list.classList.contains("open")) {
+        renderOptions(input.value);
+        setOpen(true);
+      }
+      const nextIndex = activeIndex < 0
+        ? (event.key === "ArrowDown" ? 0 : visibleOptions.length - 1)
+        : activeIndex + (event.key === "ArrowDown" ? 1 : -1);
+      setActiveOption(nextIndex);
+      event.preventDefault();
+    } else if (event.key === "Enter" && list.classList.contains("open")) {
+      chooseOption(visibleOptions[activeIndex >= 0 ? activeIndex : 0]);
+      event.preventDefault();
+    } else if (event.key === "Escape" && list.classList.contains("open")) {
+      syncInput();
+      setOpen(false);
+      event.preventDefault();
+    }
+  });
+  wrapper.addEventListener("focusout", () => {
+    window.setTimeout(() => {
+      if (!wrapper.contains(document.activeElement)) setOpen(false);
+    }, 0);
+  });
+  selectElement.addEventListener("change", syncInput);
+
+  syncInput();
+  selectElement._hasCategoryCombobox = true;
+}
+
 export function renderCardContent(cardInstance) {
   const isDebugEnabled = () => {
     return Boolean(cardInstance && cardInstance.isDebugEnabled && cardInstance.isDebugEnabled());
@@ -439,6 +555,7 @@ export function renderCardContent(cardInstance) {
       if (editCatSelect && editCatContainer && editCatCustomInput) {
         editCatSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { editCatContainer.style.display = "block"; editCatCustomInput.value = ""; editCatCustomInput.focus(); } else { editCatContainer.style.display = "none"; } });
       }
+      attachCategoryCombobox(editCatSelect);
 
       const editCheckbox = shadow.getElementById("edit_auto_add_checkbox");
       const editSubRow = shadow.getElementById("edit_auto_add_subrow");
@@ -557,6 +674,7 @@ export function renderCardContent(cardInstance) {
       if (catSelect && catCustomContainer && catCustomInput) {
         catSelect.addEventListener("change", (e) => { if (e.target.value === "__NEW_CAT__") { catCustomContainer.style.display = "block"; catCustomInput.value = ""; catCustomInput.focus(); } else { catCustomContainer.style.display = "none"; } });
       }
+      attachCategoryCombobox(catSelect);
 
       const autoAddCheckbox = shadow.getElementById("new_auto_add_checkbox");
       const subRow = shadow.getElementById("new_auto_add_subrow");
