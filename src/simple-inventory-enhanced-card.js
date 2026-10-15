@@ -98,6 +98,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       show_items: baseConfig.show_items !== undefined ? baseConfig.show_items : true,
       show_add_form: baseConfig.show_add_form !== undefined ? baseConfig.show_add_form : true,
       show_search: baseConfig.show_search !== undefined ? baseConfig.show_search : true,
+      font_size_scale: baseConfig.font_size_scale || "medium",
       show_sort: baseConfig.show_sort !== undefined ? baseConfig.show_sort : true,
       show_category: baseConfig.show_category !== undefined ? baseConfig.show_category : true,
       show_sort_alpha: baseConfig.show_sort_alpha !== undefined ? baseConfig.show_sort_alpha : true,

@@ -24,12 +24,23 @@ export function renderSingleItemCard(item, cardInstance, lang, categoriesListArr
 }
 
 /**
+ * Helper per ricavare lo stile della dimensione dei caratteri
+ */
+function getFontSizeStyle(cardInstance) {
+  const scale = (cardInstance && cardInstance.config && cardInstance.config.font_size_scale) ? cardInstance.config.font_size_scale : 'medium';
+  if (scale === 'small') return 'font-size: 12px; --custom-font-size: 12px;';
+  if (scale === 'large') return 'font-size: 16px; --custom-font-size: 16px;';
+  return 'font-size: 14px; --custom-font-size: 14px;';
+}
+
+/**
  * LAYOUT 1: Codice e struttura originali senza alcuna modifica
  */
 export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
   const currentQty = item.quantity !== undefined ? item.quantity : 0;
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
   let expiryText = "", expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
+  const fontStyle = getFontSizeStyle(cardInstance);
 
   // Configurazione visibilità campi
   const showName = cardInstance.config.show_item_name !== false;
@@ -45,7 +56,7 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    return `rgba(${r},${g}, ${b},${alpha})`;
   };
 
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
@@ -112,11 +123,9 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
   let insideSpan = "";
 
   if (hasCat) {
-    // Verifica se il primo carattere è un'emoji
     const startsWithEmoji = /^\p{Extended_Pictographic}/u.test(item.category);
 
     if (startsWithEmoji) {
-      // Usiamo Array.from per non spezzare l'emoji in byte orfani
       const catChars = Array.from(item.category);
       outsideSpan = catChars.slice(0, 2).join("");
       insideSpan = catChars.slice(2).join("");
@@ -126,13 +135,11 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
   }
 
-  // Stile per lo span del testo (utilizziamo inline-block/inline in base alle esigenze)
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
 
-  // Avvolgiamo tutto in un unico blocco HTML per impedire al flex-direction: column di mandarli a capo
   const categoryHtml = (outsideSpan || insideSpan) 
     ? `<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
         ${outsideSpan ? `<span style="font-size: 0.8rem; vertical-align: middle;">${outsideSpan}</span>` : ''}
@@ -140,13 +147,10 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
       </div>` 
     : '';
 
-
-  // Scadenza condizionale
-  const expiryHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
+  const expiryHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100\%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
 
-  // Estrazione delle liste To-Do dallo stato globale per formattare la modale in modifica
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {
@@ -163,7 +167,6 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
 
   const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
-  // Gestione icona To-Do (cart-plus)
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
     let todoName = item.todo_list || "";
@@ -180,7 +183,7 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
   }
 
   return `
-    <div class="item-card" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};">
+    <div class="item-card" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};${fontStyle}">
       ${!isEditing ? `
         <div class="card-top-right-actions">
           ${autoAddHtml}
@@ -204,8 +207,8 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
   const currentQty = item.quantity !== undefined ? item.quantity : 0;
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
   let expiryText = "", expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
+  const fontStyle = getFontSizeStyle(cardInstance);
 
-  // Configurazione visibilità campi
   const showName = cardInstance.config.show_item_name !== false;
   const showUnit = cardInstance.config.show_item_unit !== false;
   const showExpiry = cardInstance.config.show_item_expiry !== false;
@@ -219,7 +222,7 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    return `rgba(${r},${g}, ${b},${alpha})`;
   };
 
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
@@ -270,15 +273,12 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
     customBorder = getRgbaColor(cardInstance.config.color_qty3, 50);
   }
 
-  // Nome e Unità di misura condizionali
   let displayName = showName ? (item.name || lang.senza_nome) : "";
   if (showUnit && item.unit) {
     displayName = displayName ? `${displayName} (${item.unit})` : `(${item.unit})`;
   }
 
-  // Categoria e Posizione condizionali (Allineate a SINISTRA)
   let catLocText = "";
-
   const hasCat = showCategory && item.category && item.category.trim() !== "";
   const hasLoc = showLocation && item.location && item.location.trim() !== "";
 
@@ -286,11 +286,8 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
   let insideSpan = "";
 
   if (hasCat) {
-    // Verifica se il primo carattere è un'emoji
     const startsWithEmoji = /^\p{Extended_Pictographic}/u.test(item.category);
-
     if (startsWithEmoji) {
-      // Usiamo Array.from per non spezzare l'emoji in byte orfani
       const catChars = Array.from(item.category);
       outsideSpan = catChars.slice(0, 2).join("");
       insideSpan = catChars.slice(2).join("");
@@ -300,13 +297,11 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
   }
 
-  // Stile per lo span del testo (utilizziamo inline-block/inline in base alle esigenze)
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
 
-  // Avvolgiamo tutto in un unico blocco HTML per impedire al flex-direction: column di mandarli a capo
   const categoryHtml = (outsideSpan || insideSpan) 
     ? `<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
         ${outsideSpan ? `<span style="font-size: 0.8rem; vertical-align: middle;">${outsideSpan}</span>` : ''}
@@ -314,13 +309,10 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
       </div>` 
     : '';
 
-
-  // Scadenza condizionale (Allineata a DESTRA con margin-left: auto se categoryHtml non è presente)
-  const expiryHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 50%; box-sizing: border-box; white-space: nowrap; text-align: right; margin-left: auto;">${expiryText}</div>` : '';
+  const expiryHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 50\%; box-sizing: border-box; white-space: nowrap; text-align: right; margin-left: auto;">${expiryText}</div>` : '';
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
 
-  // Estrazione delle liste To-Do dallo stato globale per formattare la modale in modifica
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {
@@ -337,7 +329,6 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
 
   const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
-  // Gestione icona To-Do (cart-plus)
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
     let todoName = item.todo_list || "";
@@ -354,7 +345,7 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
   }
 
   return `
-    <div class="item-card" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};">
+    <div class="item-card" style="background-color: ${customBg} !important; border: 1px solid ${customBorder};${fontStyle}">
       ${!isEditing ? `
         <div class="card-top-right-actions">
           ${autoAddHtml}
@@ -363,7 +354,6 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
       ` : ''}
       <div style="display: flex; flex-direction: column; min-width: 0; width: 100%;">
         <div class="item-name" style="padding-right: 44px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayName}</div>
-        <!-- Contenitore riga 2: justify-content: space-between distribuisce gli elementi agli opposti -->
         <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 4px; overflow: hidden; gap: 8px;">${categoryHtml}${expiryHtml}</div>
       </div>
       ${!isEditing ? `<div class="item-actions"><button class="btn-dec" data-name="${item.name}">-</button>${centerDisplay}<button class="btn-inc" data-name="${item.name}">+</button></div>` : ''}
@@ -378,8 +368,8 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
 export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
   const currentQty = item.quantity !== undefined ? item.quantity : 0;
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
+  const fontStyle = getFontSizeStyle(cardInstance);
 
-  // Configurazione visibilità campi
   const showName = cardInstance.config.show_item_name !== false;
   const showUnit = cardInstance.config.show_item_unit !== false;
   const showExpiry = cardInstance.config.show_item_expiry !== false;
@@ -393,7 +383,7 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    return `rgba(${r},${g}, ${b},${alpha})`;
   };
 
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
@@ -403,7 +393,6 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
   const qty1Val = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
   const qty3Val = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
 
-  // Gestione dinamica Scadenza: Icona, Colore e Tooltip
   let calendarIcon = "mdi:calendar-check";
   let calendarColor = "var(--secondary-text-color)";
   let expiryText = "";
@@ -439,7 +428,6 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
     }
   }
 
-  // Sfondi in base alla Quantità
   if (currentQty === qty0Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty0, cardInstance.config.alpha_qty0);
     customBorder = getRgbaColor(cardInstance.config.color_qty0, 50);
@@ -451,15 +439,12 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
     customBorder = getRgbaColor(cardInstance.config.color_qty3, 50);
   }
 
-  // Nome e Unità di misura
   let displayName = showName ? (item.name || lang.senza_nome) : "";
   if (showUnit && item.unit) {
     displayName = displayName ? `${displayName} (${item.unit})` : `(${item.unit})`;
   }
 
-  // Categoria e Posizione (Destra Riga 2)
   let catLocText = "";
-
   const hasCat = showCategory && item.category && item.category.trim() !== "";
   const hasLoc = showLocation && item.location && item.location.trim() !== "";
 
@@ -467,11 +452,8 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
   let insideSpan = "";
 
   if (hasCat) {
-    // Verifica se il primo carattere è un'emoji
     const startsWithEmoji = /^\p{Extended_Pictographic}/u.test(item.category);
-
     if (startsWithEmoji) {
-      // Usiamo Array.from per non spezzare l'emoji in byte orfani
       const catChars = Array.from(item.category);
       outsideSpan = catChars.slice(0, 2).join("");
       insideSpan = catChars.slice(2).join("");
@@ -481,13 +463,11 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
   }
 
-  // Stile per lo span del testo (utilizziamo inline-block/inline in base alle esigenze)
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
 
-  // Avvolgiamo tutto in un unico blocco HTML per impedire al flex-direction: column di mandarli a capo
   const categoryHtml = (outsideSpan || insideSpan) 
     ? `<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
         ${outsideSpan ? `<span style="font-size: 0.8rem; vertical-align: middle;">${outsideSpan}</span>` : ''}
@@ -500,7 +480,6 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
     ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` 
     : `<span class="qty-display">${currentQty}</span>`;
 
-  // Liste To-Do per Modale Modifica
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {
@@ -515,7 +494,6 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
 
   const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
-  // Gestione Icona To-Do (Carrello)
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
     let todoName = item.todo_list || "";
@@ -531,19 +509,15 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
     autoAddHtml = `<span class="auto-add-icon" title="${tooltipText}" style="display: inline-flex; align-items: center;"><ha-icon icon="mdi:cart-plus"></ha-icon></span>`;
   }
 
-  // Icona Calendario condizionale
   const calendarHtml = (showExpiry && item.expiry_date) 
     ? `<span title="${expiryText}" style="color: ${calendarColor}; display: inline-flex; align-items: center;"><ha-icon icon="${calendarIcon}"></ha-icon></span>` 
     : '';
 
   return `
-    <div class="item-card layout-3" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
+    <div class="item-card layout-3" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; ${fontStyle}">
       
-      <!-- RIGA 1: Nome (sinistra) | Quantità (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px;">
-        <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>
-        
-        ${!isEditing ? `
+        <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>${!isEditing ? `
           <div class="item-actions" style="margin: 0; display: flex; align-items: center; gap: 4px;">
             <button class="btn-dec" data-name="${item.name}">-</button>
             ${centerDisplay}
@@ -552,12 +526,10 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
         ` : ''}
       </div>
 
-      <!-- RIGA 2: Icone (sinistra) | Categoria e Posizione (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; min-height: 24px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           ${calendarHtml}
-          ${autoAddHtml}
-          ${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
+          ${autoAddHtml}${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
         </div>
         
         <div style="display: flex; align-items: center; overflow: hidden; justify-content: flex-end; flex: 1;">
@@ -571,13 +543,13 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
 }
 
 /**
- * Placeholder per Layout 4
+ * LAYOUT 4
  */
 export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
   const currentQty = item.quantity !== undefined ? item.quantity : 0;
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
+  const fontStyle = getFontSizeStyle(cardInstance);
 
-  // Configurazione visibilità campi
   const showName = cardInstance.config.show_item_name !== false;
   const showUnit = cardInstance.config.show_item_unit !== false;
   const showExpiry = cardInstance.config.show_item_expiry !== false;
@@ -591,7 +563,7 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    return `rgba(${r},${g}, ${b},${alpha})`;
   };
 
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
@@ -601,7 +573,6 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
   const qty1Val = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
   const qty3Val = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
 
-  // Gestione dinamica Scadenza: Icona, Colore e Tooltip
   let calendarIcon = "mdi:calendar-check";
   let calendarColor = "var(--secondary-text-color)";
   let expiryText = "";
@@ -637,7 +608,6 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
     }
   }
 
-  // Sfondi in base alla Quantità
   if (currentQty === qty0Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty0, cardInstance.config.alpha_qty0);
     customBorder = getRgbaColor(cardInstance.config.color_qty0, 50);
@@ -649,15 +619,12 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
     customBorder = getRgbaColor(cardInstance.config.color_qty3, 50);
   }
 
-  // Nome e Unità di misura
   let displayName = showName ? (item.name || lang.senza_nome) : "";
   if (showUnit && item.unit) {
     displayName = displayName ? `${displayName} (${item.unit})` : `(${item.unit})`;
   }
 
-  // Categoria e Posizione (Destra Riga 2)
   let catLocText = "";
-
   const hasCat = showCategory && item.category && item.category.trim() !== "";
   const hasLoc = showLocation && item.location && item.location.trim() !== "";
 
@@ -665,11 +632,8 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
   let insideSpan = "";
 
   if (hasCat) {
-    // Verifica se il primo carattere è un'emoji
     const startsWithEmoji = /^\p{Extended_Pictographic}/u.test(item.category);
-
     if (startsWithEmoji) {
-      // Usiamo Array.from per non spezzare l'emoji in byte orfani
       const catChars = Array.from(item.category);
       outsideSpan = catChars.slice(0, 2).join("");
       insideSpan = catChars.slice(2).join("");
@@ -679,13 +643,11 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
   }
 
-  // Stile per lo span del testo (utilizziamo inline-block/inline in base alle esigenze)
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
 
-  // Avvolgiamo tutto in un unico blocco HTML per impedire al flex-direction: column di mandarli a capo
   const categoryHtml = (outsideSpan || insideSpan) 
     ? `<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
         ${outsideSpan ? `<span style="font-size: 0.8rem; vertical-align: middle;">${outsideSpan}</span>` : ''}
@@ -698,7 +660,6 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
     ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` 
     : `<span class="qty-display">${currentQty}</span>`;
 
-  // Liste To-Do per Modale Modifica
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {
@@ -713,7 +674,6 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
 
   const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
-  // Gestione Icona To-Do (Carrello)
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
     let todoName = item.todo_list || "";
@@ -729,19 +689,15 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
     autoAddHtml = `<span class="auto-add-icon" title="${tooltipText}" style="display: inline-flex; align-items: center;"><ha-icon icon="mdi:cart-plus"></ha-icon></span>`;
   }
 
-  // Icona Calendario condizionale
   const calendarHtml = (showExpiry && item.expiry_date) 
     ? `<span title="${expiryText}" style="color: ${calendarColor}; display: inline-flex; align-items: center;"><ha-icon icon="${calendarIcon}"></ha-icon></span>` 
     : '';
 
   return `
-    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
+    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; ${fontStyle}">
       
-      <!-- RIGA 1: Nome (sinistra) | Quantità (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px;">
-        <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>
-        
-        ${!isEditing ? `
+        <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>${!isEditing ? `
           <div class="item-actions" style="margin: 0; display: flex; align-items: center; gap: 4px;">
             <button class="btn-dec" data-name="${item.name}">-</button>
             ${centerDisplay}
@@ -750,7 +706,6 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
         ` : ''}
       </div>
 
-      <!-- RIGA 2: Icone (destra) | Categoria e Posizione (sinistra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; min-height: 24px;">
         <div style="display: flex; align-items: left; overflow: hidden; justify-content: flex-start; flex: 1;">
           ${categoryHtml}
@@ -758,8 +713,7 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
         
         <div style="display: flex; align-items: center; gap: 8px;">
           ${calendarHtml}
-          ${autoAddHtml}
-          ${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
+          ${autoAddHtml}${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
         </div>
       </div>
 
@@ -768,18 +722,14 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
   `;
 }
 
-  /**
- * LAYOUT 5:
- * - In alto a sinistra: nome e confezione
- * - In alto a destra: icona impostazioni (e carrello to-do se abilitato) come layout 1 e 2
- * - In basso a sinistra: scadenza (badge), categoria e posizione
- * - In basso a destra: pulsanti per la quantità (- qty +) come layout 3 e 4
+/**
+ * LAYOUT 5
  */
 export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   const currentQty = item.quantity !== undefined ? item.quantity : 0;
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
+  const fontStyle = getFontSizeStyle(cardInstance);
 
-  // Configurazione visibilità campi
   const showName = cardInstance.config.show_item_name !== false;
   const showUnit = cardInstance.config.show_item_unit !== false;
   const showExpiry = cardInstance.config.show_item_expiry !== false;
@@ -793,7 +743,7 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    return `rgba(${r},${g}, ${b},${alpha})`;
   };
 
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
@@ -803,7 +753,6 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   const qty1Val = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
   const qty3Val = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
 
-  // Gestione dinamica Scadenza: Icona, Colore e Tooltip
   let calendarIcon = "mdi:calendar-check";
   let calendarColor = "var(--secondary-text-color)";
   let expiryText = "";
@@ -839,7 +788,6 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
     }
   }
 
-  // Sfondi in base alla Quantità
   if (currentQty === qty0Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty0, cardInstance.config.alpha_qty0);
     customBorder = getRgbaColor(cardInstance.config.color_qty0, 50);
@@ -851,15 +799,12 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
     customBorder = getRgbaColor(cardInstance.config.color_qty3, 50);
   }
 
-  // Nome e Unità di misura
   let displayName = showName ? (item.name || lang.senza_nome) : "";
   if (showUnit && item.unit) {
     displayName = displayName ? `${displayName} (${item.unit})` : `(${item.unit})`;
   }
 
-  // Categoria e Posizione (Destra Riga 2)
   let catLocText = "";
-
   const hasCat = showCategory && item.category && item.category.trim() !== "";
   const hasLoc = showLocation && item.location && item.location.trim() !== "";
 
@@ -867,11 +812,8 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   let insideSpan = "";
 
   if (hasCat) {
-    // Verifica se il primo carattere è un'emoji
     const startsWithEmoji = /^\p{Extended_Pictographic}/u.test(item.category);
-
     if (startsWithEmoji) {
-      // Usiamo Array.from per non spezzare l'emoji in byte orfani
       const catChars = Array.from(item.category);
       outsideSpan = catChars.slice(0, 2).join("");
       insideSpan = catChars.slice(2).join("");
@@ -881,27 +823,23 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
   }
 
-  // Stile per lo span del testo (utilizziamo inline-block/inline in base alle esigenze)
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
 
-  // Avvolgiamo tutto in un unico blocco HTML per impedire al flex-direction: column di mandarli a capo
   const categoryHtml = (outsideSpan || insideSpan) 
     ? `<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
         ${outsideSpan ? `<span style="font-size: 0.8rem; vertical-align: middle;">${outsideSpan}</span>` : ''}
         ${insideSpan ? `<span style="${spanStyle}">${insideSpan}</span>` : ''}
       </div>` 
     : '';
-
   
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 
     ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` 
     : `<span class="qty-display">${currentQty}</span>`;
 
-  // Liste To-Do per Modale Modifica
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {
@@ -916,7 +854,6 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
 
   const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
-  // Gestione Icona To-Do (Carrello)
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
     let todoName = item.todo_list || "";
@@ -931,33 +868,24 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
 
     autoAddHtml = `<span class="auto-add-icon" title="${tooltipText}" style="display: inline-flex; align-items: center;"><ha-icon icon="mdi:cart-plus"></ha-icon></span>`;
   }
-
-  // Icona Calendario condizionale
-  //const calendarHtml = (showExpiry && item.expiry_date) 
-  //  ? `<span title="${expiryText}" style="color: ${calendarColor}; display: inline-flex; align-items: center;"><ha-icon icon="${calendarIcon}"></ha-icon></span>` 
-  //  : '';
   
-  let expiryBg = "transparent", expiryBorder = "transparent",expiryTextColor = "#fff";
-  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
+  let expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
+  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100\%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
 
   return `
-    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px;">
+    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px; ${fontStyle}">
       
-      <!-- RIGA 1: Nome (sinistra) | Quantità (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 2px;">
         <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>
         
         <div style="display: flex; align-items: center; gap: 2px;">
-          ${autoAddHtml}
-          ${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
+          ${autoAddHtml}${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
         </div>        
       </div>
 
-      <!-- RIGA 2: Icone (destra) | Categoria e Posizione (sinistra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 2px; min-height: 24px;">
         <div style="display: flex; flex-direction: column; align-items: left; overflow: hidden; justify-content: flex-start; flex: 1;">
-          ${calendarHtml}
-          ${categoryHtml}
+          ${calendarHtml}${categoryHtml}
         </div>
 
         ${!isEditing ? `
@@ -975,19 +903,14 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   `;
 }
 
-
-  /**
+/**
  * LAYOUT 6: ULTRACOMPACT
- * - In alto a sinistra: nome e confezione
- * - In alto a destra: icona impostazioni (e carrello to-do se abilitato) come layout 1 e 2
- * - In basso a sinistra: scadenza (badge), categoria e posizione
- * - In basso a destra: pulsanti per la quantità (- qty +) come layout 3 e 4
  */
 export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   const currentQty = item.quantity !== undefined ? item.quantity : 0;
   let customBg = "var(--secondary-background-color)", customBorder = "transparent";
+  const fontStyle = getFontSizeStyle(cardInstance);
 
-  // Configurazione visibilità campi
   const showName = cardInstance.config.show_item_name !== false;
   const showUnit = cardInstance.config.show_item_unit !== false;
   const showExpiry = cardInstance.config.show_item_expiry !== false;
@@ -1001,7 +924,7 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    return `rgba(${r},${g}, ${b},${alpha})`;
   };
 
   const days10d = cardInstance.config.days_10d !== undefined ? cardInstance.config.days_10d : 10;
@@ -1011,7 +934,6 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   const qty1Val = cardInstance.config.qty_1 !== undefined ? cardInstance.config.qty_1 : 1;
   const qty3Val = cardInstance.config.qty_3 !== undefined ? cardInstance.config.qty_3 : 3;
 
-  // Gestione dinamica Scadenza: Icona, Colore e Tooltip
   let calendarIcon = "mdi:calendar-check";
   let calendarColor = "var(--secondary-text-color)";
   let expiryText = "";
@@ -1047,7 +969,6 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
     }
   }
 
-  // Sfondi in base alla Quantità
   if (currentQty === qty0Val) {
     customBg = getRgbaColor(cardInstance.config.color_qty0, cardInstance.config.alpha_qty0);
     customBorder = getRgbaColor(cardInstance.config.color_qty0, 50);
@@ -1059,15 +980,12 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
     customBorder = getRgbaColor(cardInstance.config.color_qty3, 50);
   }
 
-  // Nome e Unità di misura
   let displayName = showName ? (item.name || lang.senza_nome) : "";
   if (showUnit && item.unit) {
     displayName = displayName ? `${displayName} (${item.unit})` : `(${item.unit})`;
   }
 
-  // Categoria e Posizione (Destra Riga 2)
   let catLocText = "";
-
   const hasCat = showCategory && item.category && item.category.trim() !== "";
   const hasLoc = showLocation && item.location && item.location.trim() !== "";
 
@@ -1075,11 +993,8 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   let insideSpan = "";
 
   if (hasCat) {
-    // Verifica se il primo carattere è un'emoji
     const startsWithEmoji = /^\p{Extended_Pictographic}/u.test(item.category);
-
     if (startsWithEmoji) {
-      // Usiamo Array.from per non spezzare l'emoji in byte orfani
       const catChars = Array.from(item.category);
       outsideSpan = catChars.slice(0, 2).join("");
       insideSpan = catChars.slice(2).join("");
@@ -1089,13 +1004,11 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
   }
 
-  // Stile per lo span del testo (utilizziamo inline-block/inline in base alle esigenze)
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
 
-  // Avvolgiamo tutto in un unico blocco HTML per impedire al flex-direction: column di mandarli a capo
   const categoryHtml = (outsideSpan || insideSpan) 
     ? `<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
         ${outsideSpan ? `<span style="font-size: 0.8rem; vertical-align: middle;">${outsideSpan}</span>` : ''}
@@ -1103,13 +1016,11 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
       </div>` 
     : '';
 
-  
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 
     ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` 
     : `<span class="qty-display">${currentQty}</span>`;
 
-  // Liste To-Do per Modale Modifica
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
     Object.keys(cardInstance._hass.states).forEach(entityId => {
@@ -1124,7 +1035,6 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
 
   const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
-  // Gestione Icona To-Do (Carrello)
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
     let todoName = item.todo_list || "";
@@ -1139,22 +1049,15 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
 
     autoAddHtml = `<span class="auto-add-icon" title="${tooltipText}" style="display: inline-flex; align-items: center;"><ha-icon icon="mdi:cart-plus"></ha-icon></span>`;
   }
-
-  // Icona Calendario condizionale
-  //const calendarHtml = (showExpiry && item.expiry_date) 
-  //  ? `<span title="${expiryText}" style="color: ${calendarColor}; display: inline-flex; align-items: center;"><ha-icon icon="${calendarIcon}"></ha-icon></span>` 
-  //  : '';
   
-  let expiryBg = "transparent", expiryBorder = "transparent",expiryTextColor = "#fff";
-  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color: ${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
+  let expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
+  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100\%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
 
   return `
-    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px;">
+    <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px; ${fontStyle}">
       
-      <!-- RIGA 1: Nome (sinistra) | Quantità (destra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 2px;">
-        <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>
-        ${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
+        <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>${!isEditing ? `<button class="edit-icon-btn" data-id="${item.id}" style="background: transparent; border: none; padding: 0; cursor: pointer; display: inline-flex; align-items: center; color: var(--secondary-text-color);"><ha-icon icon="mdi:cog-outline"></ha-icon></button>` : ''}
         
         <div style="display: flex; align-items: center; gap: 2px;">
           ${autoAddHtml}
@@ -1169,7 +1072,6 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
       </div>
       ${editFormHtml}
 
-      <!-- RIGA 2: Icone (destra) | Categoria e Posizione (sinistra) -->
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 2px;">
         <div style="display: flex; flex-direction: row; align-items: left; overflow: hidden; justify-content: flex-start; flex: 1;">
           ${calendarHtml}
@@ -1177,9 +1079,6 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
         <div style="display: flex; flex-direction: row; align-items: right; overflow: hidden; justify-content: flex-end; flex: 1;">
           ${categoryHtml}
         </div>
-
-
-
       </div>
 
     </div>

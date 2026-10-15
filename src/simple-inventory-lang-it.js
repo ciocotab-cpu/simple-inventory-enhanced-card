@@ -145,6 +145,9 @@ export const langIt = {
     ed_lbl_show_item_expiry: "Mostra Scadenza",
     ed_lbl_show_item_category: "Mostra Categoria",
     ed_lbl_show_item_location: "Mostra Posizione",
+    ed_fontsize_small: "Piccolo",
+    ed_fontsize_medium: "Medio",
+    ed_fontsize_large: "Grande",
 
     //Categorie Extra
     ed_lbl_show_category: "Mostra Categorie Base",

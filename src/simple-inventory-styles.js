@@ -41,7 +41,9 @@ export const cardStyles = `
   
   .inventory-grid { display: none; gap: var(--grid-gap); margin-top: 10px; }
   .inventory-grid.visible { display: grid; }
-  
+  .item-card, .item-card * {
+  font-size: var(--custom-font-size, 14px) !important;
+}
   .item-card { 
     background: var(--secondary-background-color); border-radius: 8px; padding: 6px 8px; 
     display: flex; flex-direction: column; justify-content: flex-start; gap: 6px; 

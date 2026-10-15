@@ -81,6 +81,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
           display: flex !important; flex-direction: row !important; gap: 12px !important; width: 100% !important; align-items: flex-end !important;
         }
         .coppia-row ha-form { flex: 1 !important; min-width: 0 !important; }
+        .coppia-row .select-option { flex: 1 !important; min-width: 0 !important; margin-top: 0 !important; }
 
         .color-row {
           display: grid !important;
@@ -237,26 +238,35 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_item_card || "👷 Item Product"}</div>
           <div class="form-row">
-            <div class="select-option">
-              <span class="select-label">${lang.ed_layout_label || "Item Product Layout Style"}</span>
-              <select id="card_layout" class="custom-dropdown">
-                <option value="layout1">Default</option>
-                <option value="layout2">Default Reversed</option>
-                <option value="layout3">Compact</option>
-                <option value="layout4">Compact Reversed</option>
-                <option value="layout5">Mobile</option>
-                <option value="layout6">UltraCompact</option>
-              </select>
+            <div class="coppia-row">
+              <div class="select-option">
+                <span class="select-label">${lang.ed_layout_label || "Item Product Layout Style"}</span>
+                <select id="card_layout" class="custom-dropdown">
+                  <option value="layout1">Default</option>
+                  <option value="layout2">Default Reversed</option>
+                  <option value="layout3">Compact</option>
+                  <option value="layout4">Compact Reversed</option>
+                  <option value="layout5">Mobile</option>
+                  <option value="layout6">UltraCompact</option>
+                </select>
+              </div>
+              <div class="select-option">
+                <span class="select-label">${lang.ed_fontsize_label || "Dimensione Caratteri"}</span>
+                <select id="font_size_scale" class="custom-dropdown">
+                  <option value="small">${lang.ed_fontsize_small || "Piccolo"}</option>
+                  <option value="medium">${lang.ed_fontsize_medium || "Medio"}</option>
+                  <option value="large">${lang.ed_fontsize_large || "Grande"}</option>
+                </select>
+              </div>
             </div>
             <div class="coppia-row">
-              <ha-form id="form-item-name"></ha-form>
               <ha-form id="form-item-unit"></ha-form>
+              <ha-form id="form-item-expiry"></ha-form>
             </div>
             <div class="coppia-row">
-              <ha-form id="form-item-expiry"></ha-form>
               <ha-form id="form-item-category"></ha-form>
+              <ha-form id="form-item-location"></ha-form>
             </div>
-            <ha-form id="form-item-location"></ha-form>
           </div>
         </ha-expansion-panel>
       </div>
@@ -265,6 +275,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.updateDefaultSortOptions(lang);
     this.setupSortListener(); 
     this.setupLayoutListener();
+    this.setupFontSizeListener();
     this._attachColorListeners();
     this._setupShiftListener();
     this._setupImportExportListeners();
@@ -493,7 +504,8 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     const showAlertQty = this._config.show_sort_alert_qty !== undefined ? this._config.show_sort_alert_qty : true;
     
     const cardLayout = this.shadowRoot.getElementById("card_layout");
-    if (!cardLayout) return;
+    const fontSizeScale = this.shadowRoot.getElementById("font_size_scale");
+    if (!cardLayout || !fontSizeScale) return;
 
     let optionsHtml = "";
     if (showAlpha) {
@@ -524,11 +536,12 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     selectSort.innerHTML = optionsHtml;
     selectSort.value = this._config.default_sort || "alpha";
     cardLayout.value = this._config.card_layout || 'layout1';
+    fontSizeScale.value = this._config.font_size_scale || 'medium';
   }
 
   renderForms(lang) {
     const defaultData = { 
-      title: "", columns: 2, summary_columns: 4, default_sort: "alpha", card_layout: "layout1",
+      title: "", columns: 2, summary_columns: 4, default_sort: "alpha", card_layout: "layout1", font_size_scale: "medium",
       show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_category: true,
       show_sort_alpha: true, show_sort_threshold: true, show_sort_expiry: true, 
       show_sort_category: true, show_sort_location: true, show_sort_alert_exp: true, show_sort_alert_qty: true,
@@ -656,6 +669,15 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     });
   }
 
+  setupFontSizeListener() {
+    const selectFontSize = this.shadowRoot.getElementById("font_size_scale");
+    if (!selectFontSize) return;
+    selectFontSize.addEventListener("change", () => {
+      this._config = { ...this._config, font_size_scale: selectFontSize.value };
+      this.fireConfigChanged();
+    });
+  }
+
   fireConfigChanged() { 
     this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._config }, bubbles: true, composed: true })); 
   }
@@ -673,6 +695,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
 
     const selectLayout = shadow.getElementById("card_layout");
     if (selectLayout) selectLayout.value = this._config.card_layout || "layout1";
+
+    const selectFontSize = shadow.getElementById("font_size_scale");
+    if (selectFontSize) selectFontSize.value = this._config.font_size_scale || "medium";
     
     ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
       const el = shadow.getElementById(`${id}_input`); 
