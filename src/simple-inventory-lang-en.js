@@ -145,6 +145,9 @@ export const langEn = {
     ed_lbl_show_item_expiry: "Show Expiry",
     ed_lbl_show_item_category: "Show Category",
     ed_lbl_show_item_location: "Show Location",
+    ed_fontsize_small: "Small",
+    ed_fontsize_medium: "Medium",
+    ed_fontsize_large: "Large",
 
     // Extra Categories
     ed_lbl_show_category: "Show Base Categories",

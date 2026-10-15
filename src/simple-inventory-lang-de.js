@@ -145,6 +145,9 @@ export const langDe = {
     ed_lbl_show_item_expiry: "Ablaufdatum anzeigen",
     ed_lbl_show_item_category: "Kategorie anzeigen",
     ed_lbl_show_item_location: "Standort anzeigen",
+    ed_fontsize_small: "Klein",
+    ed_fontsize_medium: "Mittel",
+    ed_fontsize_large: "Groß",
 
     // Categorie Extra
     ed_lbl_show_category: "Basiskategorien anzeigen",
