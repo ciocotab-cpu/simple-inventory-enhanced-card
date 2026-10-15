@@ -135,7 +135,7 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
   }
 
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
@@ -297,7 +297,7 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
   }
 
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
@@ -463,7 +463,7 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
   }
 
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
@@ -643,7 +643,7 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
   }
 
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
@@ -823,7 +823,7 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
   }
 
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
@@ -885,7 +885,7 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
 
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 2px; min-height: 24px;">
         <div style="display: flex; flex-direction: column; align-items: left; overflow: hidden; justify-content: flex-start; flex: 1;">
-          ${calendarHtml}${categoryHtml}
+          ${calendarHtml} ${categoryHtml}
         </div>
 
         ${!isEditing ? `
@@ -1004,7 +1004,7 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   }
 
   if (hasLoc) {
-    insideSpan = insideSpan ? `${insideSpan},${item.location}` : item.location;
+    insideSpan = insideSpan ? `${insideSpan}, ${item.location}` : item.location;
   }
 
   const spanStyle = `font-style: italic; font-size: 0.8rem; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; max-width: 100%; padding: 2px 0px 0px 0px; display: inline-block; vertical-align: middle;`;
@@ -1051,7 +1051,7 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   }
   
   let expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
-  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100\%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
+  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100\%; box-sizing: border-box; white-space: nowrap;">${expiryText} </div>` : '';
 
   return `
     <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px; ${fontStyle}">
