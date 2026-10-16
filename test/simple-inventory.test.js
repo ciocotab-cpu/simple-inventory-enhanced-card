@@ -7,7 +7,7 @@ import {
 } from '../src/simple-inventory-services.js';
 import {
   getAddPopupHtml,
-  getEditFormHtml
+  getEditPopupHtml
 } from '../src/simple-inventory-templates.js';
 
 function makeCard(items, options = {}) {
@@ -252,7 +252,7 @@ test('genera i campi e i valori iniziali corretti per il form di aggiunta', () =
 });
 
 test('precompila il form di modifica e seleziona categoria e To-Do', () => {
-  const html = getEditFormHtml({
+  const html = getEditPopupHtml({
     id: 'item-1',
     name: 'Riso',
     quantity: 2,

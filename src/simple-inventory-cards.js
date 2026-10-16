@@ -1,4 +1,4 @@
-import { getEditFormHtml } from './simple-inventory-templates.js';
+import { getEditPopupHtml } from './simple-inventory-templates.js';
 
 /**
  * Funzione principale usata per smistare il rendering in base al layout configurato
@@ -165,7 +165,7 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
   }
   todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-  const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
+  const editFormHtml = isEditing ? getEditPopupHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
@@ -192,7 +192,10 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
       ` : ''}
       <div style="display: flex; flex-direction: column; min-width: 0; width: 100%;">
         <div class="item-name" style="padding-right: 44px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayName}</div>
-        <div style="display: flex; align-items: center; width: 100%; margin-top: 4px; overflow: hidden;">${expiryHtml}${categoryHtml}</div>
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; margin-top: 4px; overflow: hidden; gap: 8px;">
+          <div style="display: flex; align-items: center; overflow: hidden; flex-shrink: 1;">${expiryHtml}</div>
+          <div style="display: flex; align-items: center; overflow: hidden; justify-content: flex-end; flex-shrink: 1; text-align: right;">${categoryHtml}</div>
+        </div>
       </div>
       ${!isEditing ? `<div class="item-actions"><button class="btn-dec" data-name="${item.name}">-</button>${centerDisplay}<button class="btn-inc" data-name="${item.name}">+</button></div>` : ''}
       ${editFormHtml}
@@ -327,7 +330,7 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
   }
   todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-  const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
+  const editFormHtml = isEditing ? getEditPopupHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
@@ -492,7 +495,7 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
   }
   todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-  const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
+  const editFormHtml = isEditing ? getEditPopupHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
@@ -672,7 +675,7 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
   }
   todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-  const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
+  const editFormHtml = isEditing ? getEditPopupHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
@@ -756,6 +759,7 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   let calendarIcon = "mdi:calendar-check";
   let calendarColor = "var(--secondary-text-color)";
   let expiryText = "";
+  let expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
 
   if (item.expiry_date && currentQty > 0) {
     const today = new Date(); today.setHours(0,0,0,0);
@@ -772,14 +776,21 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
     if (daysToExpiry < 0) {
       calendarIcon = "mdi:calendar-remove";
       calendarColor = getRgbaColor(cardInstance.config.color_expired, cardInstance.config.alpha_expired) || "#db4437";
+      expiryBg = calendarColor;
+      expiryBorder = getRgbaColor(cardInstance.config.color_expired, 50);
       expiryText = daysPast === 0 ? lang.scaduto_oggi : lang.scaduto_da_giorni.replace("{days}", daysPast);
     } else if (daysToExpiry <= days10d) {
       calendarIcon = "mdi:calendar-alert-outline";
       calendarColor = getRgbaColor(cardInstance.config.color_10d, cardInstance.config.alpha_10d) || "#e6a23c";
+      expiryBg = calendarColor;
+      expiryBorder = getRgbaColor(cardInstance.config.color_10d, 50);
       expiryText = lang.scadenza_data.replace("{date}", formattedLocaleDate);
     } else if (daysToExpiry <= days30d) {
       calendarIcon = "mdi:calendar-alert-outline";
       calendarColor = getRgbaColor(cardInstance.config.color_30d, cardInstance.config.alpha_30d) || "#ffeb3b";
+      expiryBg = calendarColor;
+      expiryTextColor = "#212121";
+      expiryBorder = getRgbaColor(cardInstance.config.color_30d, 50);
       expiryText = lang.scadenza_data.replace("{date}", formattedLocaleDate);
     } else {
       calendarIcon = "mdi:calendar-check";
@@ -804,7 +815,6 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
     displayName = displayName ? `${displayName} (${item.unit})` : `(${item.unit})`;
   }
 
-  let catLocText = "";
   const hasCat = showCategory && item.category && item.category.trim() !== "";
   const hasLoc = showLocation && item.location && item.location.trim() !== "";
 
@@ -852,7 +862,7 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   }
   todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-  const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
+  const editFormHtml = isEditing ? getEditPopupHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
@@ -869,8 +879,7 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
     autoAddHtml = `<span class="auto-add-icon" title="${tooltipText}" style="display: inline-flex; align-items: center;"><ha-icon icon="mdi:cart-plus"></ha-icon></span>`;
   }
   
-  let expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
-  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100\%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
+  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 4px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
 
   return `
     <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px; ${fontStyle}">
@@ -937,6 +946,7 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   let calendarIcon = "mdi:calendar-check";
   let calendarColor = "var(--secondary-text-color)";
   let expiryText = "";
+  let expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
 
   if (item.expiry_date && currentQty > 0) {
     const today = new Date(); today.setHours(0,0,0,0);
@@ -953,14 +963,21 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
     if (daysToExpiry < 0) {
       calendarIcon = "mdi:calendar-remove";
       calendarColor = getRgbaColor(cardInstance.config.color_expired, cardInstance.config.alpha_expired) || "#db4437";
+      expiryBg = calendarColor;
+      expiryBorder = getRgbaColor(cardInstance.config.color_expired, 50);
       expiryText = daysPast === 0 ? lang.scaduto_oggi : lang.scaduto_da_giorni.replace("{days}", daysPast);
     } else if (daysToExpiry <= days10d) {
       calendarIcon = "mdi:calendar-alert-outline";
       calendarColor = getRgbaColor(cardInstance.config.color_10d, cardInstance.config.alpha_10d) || "#e6a23c";
+      expiryBg = calendarColor;
+      expiryBorder = getRgbaColor(cardInstance.config.color_10d, 50);
       expiryText = lang.scadenza_data.replace("{date}", formattedLocaleDate);
     } else if (daysToExpiry <= days30d) {
       calendarIcon = "mdi:calendar-alert-outline";
       calendarColor = getRgbaColor(cardInstance.config.color_30d, cardInstance.config.alpha_30d) || "#ffeb3b";
+      expiryBg = calendarColor;
+      expiryTextColor = "#212121";
+      expiryBorder = getRgbaColor(cardInstance.config.color_30d, 50);
       expiryText = lang.scadenza_data.replace("{date}", formattedLocaleDate);
     } else {
       calendarIcon = "mdi:calendar-check";
@@ -985,7 +1002,6 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
     displayName = displayName ? `${displayName} (${item.unit})` : `(${item.unit})`;
   }
 
-  let catLocText = "";
   const hasCat = showCategory && item.category && item.category.trim() !== "";
   const hasLoc = showLocation && item.location && item.location.trim() !== "";
 
@@ -1033,7 +1049,7 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
   }
   todoListsArray.sort((a, b) => a.name.localeCompare(b.name));
 
-  const editFormHtml = isEditing ? getEditFormHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
+  const editFormHtml = isEditing ? getEditPopupHtml(item, lang, { categories: categoriesListArray, todoLists: todoListsArray }) : "";
 
   let autoAddHtml = "";
   if (item.auto_add_id_to_description_enabled) {
@@ -1050,8 +1066,7 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
     autoAddHtml = `<span class="auto-add-icon" title="${tooltipText}" style="display: inline-flex; align-items: center;"><ha-icon icon="mdi:cart-plus"></ha-icon></span>`;
   }
   
-  let expiryBg = "transparent", expiryBorder = "transparent", expiryTextColor = "#fff";
-  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 2px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100\%; box-sizing: border-box; white-space: nowrap;">${expiryText} </div>` : '';
+  const calendarHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 4px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
 
   return `
     <div class="item-card layout-4" style="background-color: ${customBg} !important; border: 1px solid ${customBorder}; padding: 2px 4px; display: flex; flex-direction: column; gap: 2px; ${fontStyle}">

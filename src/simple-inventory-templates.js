@@ -92,25 +92,25 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
             <label for="${p}_auto_add_checkbox" style="font-weight: bold; font-size: 0.85rem; cursor: pointer; color: var(--primary-text-color);">${lang.lbl_auto_add}</label>
           </div>
           
-          <div id="${p}_auto_add_subrow" style="display: ${!isEdit || autoChecked ? 'flex' : 'none'}; gap: 10px; flex-wrap: wrap; ${!isEdit ? 'opacity: 0.5;' : ''} transition: opacity 0.2s;">
-            <div class="edit-field" style="flex: 1; min-width: ${isEdit ? '160px' : '110px'};">
+          <div id="${p}_auto_add_subrow" style="display: ${autoChecked ? 'flex' : 'none'}; gap: 10px; flex-wrap: wrap; opacity: ${autoChecked ? '1' : '0.5'}; transition: opacity 0.2s;">
+            <div class="edit-field" style="flex: 1; min-width: 160px;">
               <label>${lang.lbl_min_qty}</label>
-              <input type="number" id="${p}_min_qty" value="${isEdit && item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : 2}" placeholder="${lang.lbl_min_qty_placeholder}" ${!isEdit || !autoChecked ? 'disabled' : ''}>
+              <input type="number" id="${p}_min_qty" value="${item.auto_add_to_list_quantity !== undefined ? item.auto_add_to_list_quantity : 2}" placeholder="${lang.lbl_min_qty_placeholder}" ${!autoChecked ? 'disabled' : ''}>
             </div>
             
-            <div class="edit-field" style="flex: 2; min-width: ${isEdit ? '110px' : '160px'};">
+            <div class="edit-field" style="flex: 2; min-width: 110px;">
               <label>${lang.lbl_todo}</label>
-              <select id="${p}_todo" ${!isEdit || !autoChecked ? 'disabled' : ''} style="width: 100%; padding: 6px 8px; border: 1px solid var(--divider-color); border-radius: 6px; background: var(--card-background-color); color: var(--primary-text-color); font-size: 0.85rem; height: 34px; outline: none; cursor: pointer;">
+              <select id="${p}_todo" ${!autoChecked ? 'disabled' : ''} style="width: 100%; padding: 6px 8px; border: 1px solid var(--divider-color); border-radius: 6px; background: var(--card-background-color); color: var(--primary-text-color); font-size: 0.85rem; height: 34px; outline: none; cursor: pointer;">
                 <option value="">${lang.lbl_todo_placeholder}</option>
-                ${todoLists.map(t => `<option value="${t.entity_id}" ${isEdit && item.todo_list === t.entity_id ? 'selected' : ''}>${t.name}</option>`).join('')}
+                ${todoLists.map(t => `<option value="${t.entity_id}" ${item.todo_list === t.entity_id ? 'selected' : ''}>${t.name}</option>`).join('')}
               </select>
             </div>
             
             <div class="edit-field" style="flex: 1.5; min-width: 130px;">
               <label>${lang.lbl_todo_placement}</label>
-              <select id="${p}_todo_placement" ${!isEdit || !autoChecked ? 'disabled' : ''} style="width: 100%; padding: 6px 8px; border: 1px solid var(--divider-color); border-radius: 6px; background: var(--card-background-color); color: var(--primary-text-color); font-size: 0.85rem; height: 34px; outline: none; cursor: pointer;">
-                <option value="name" ${isEdit && item.todo_quantity_placement === 'name' ? 'selected' : ''}>${lang.opt_placement_name}</option>
-                <option value="description" ${isEdit && item.todo_quantity_placement === 'description' ? 'selected' : ''}>${lang.opt_placement_desc}</option>
+              <select id="${p}_todo_placement" ${!autoChecked ? 'disabled' : ''} style="width: 100%; padding: 6px 8px; border: 1px solid var(--divider-color); border-radius: 6px; background: var(--card-background-color); color: var(--primary-text-color); font-size: 0.85rem; height: 34px; outline: none; cursor: pointer;">
+                <option value="name" ${item.todo_quantity_placement === 'name' ? 'selected' : ''}>${lang.opt_placement_name}</option>
+                <option value="description" ${item.todo_quantity_placement === 'description' ? 'selected' : ''}>${lang.opt_placement_desc}</option>
               </select>
             </div>
           </div>
@@ -125,8 +125,8 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
   `;
 }
 
-// Le esportazioni pubbliche rimangono intatte per non rompere il resto dell'applicazione:
-export function getEditFormHtml(item, lang, categoriesInput = [], dataObj = {}) {
+// Esportazioni pubbliche
+export function getEditPopupHtml(item, lang, categoriesInput = [], dataObj = {}) {
   const categoriesList = Array.isArray(categoriesInput) ? categoriesInput : (categoriesInput.categories || dataObj.categories || []);
   return renderItemFormHtml({
     isEdit: true,

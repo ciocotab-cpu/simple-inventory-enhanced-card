@@ -1,4 +1,4 @@
-import { getAddPopupHtml } from './simple-inventory-templates.js';
+//import { getAddPopupHtml } from './simple-inventory-templates.js';
 import { getTranslation } from './simple-inventory-lang.js';
 
 // Funzione helper per caricare lo script evitando i blocchi di DOM

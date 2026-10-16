@@ -565,13 +565,14 @@ export function renderCardContent(cardInstance) {
         
         editCheckbox.addEventListener("change", (e) => {
           const isChecked = e.target.checked;
-          
-          // Mostra/Nascondi il div
           editSubRow.style.display = isChecked ? "flex" : "none";
-          
-          // Abilita/Disabilita gli input interni
+          editSubRow.style.opacity = isChecked ? "1" : "0.5";
           editSubInputs.forEach(input => {
-            input.disabled = !isChecked;
+            if (isChecked) {
+              input.removeAttribute("disabled");
+            } else {
+              input.setAttribute("disabled", "true");
+            }
           });
         });
       }
@@ -681,7 +682,19 @@ export function renderCardContent(cardInstance) {
       const subRow = shadow.getElementById("new_auto_add_subrow");
       if (autoAddCheckbox && subRow) {
         const subInputs = subRow.querySelectorAll("input, select");
-        autoAddCheckbox.addEventListener("change", (e) => { const isChecked = e.target.checked; subRow.style.opacity = isChecked ? "1" : "0.5"; subInputs.forEach(input => { if (isChecked) input.removeAttribute("disabled"); else input.setAttribute("disabled", "true"); }); });
+        
+        autoAddCheckbox.addEventListener("change", (e) => {
+          const isChecked = e.target.checked;
+          subRow.style.display = isChecked ? "flex" : "none";
+          subRow.style.opacity = isChecked ? "1" : "0.5";
+          subInputs.forEach(input => {
+            if (isChecked) {
+              input.removeAttribute("disabled");
+            } else {
+              input.setAttribute("disabled", "true");
+            }
+          });
+        });
       }
 
       const addButtons = addPopupContainer.querySelectorAll(".btn-save-add, .btn-add, #btn-add-save");
