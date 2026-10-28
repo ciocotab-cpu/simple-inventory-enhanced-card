@@ -21,7 +21,7 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
   const autoChecked = isEdit && item.auto_add_id_to_description_enabled;
 
   return `
-    <div class="${isEdit ? 'item-edit-form' : 'item-add-popup'}" style="max-width: 650px; width: 95%;">
+    <div class="${isEdit ? 'item-edit-form' : 'item-add-popup'}" style="max-width: 650px; width: 95%; z-index: 999999;">
       <div style="font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid var(--divider-color); padding-bottom: 8px; margin-bottom: 12px; color: var(--primary-text-color);">${title}</div>
       <div style="display: flex; flex-direction: column; gap: 14px;">
         
