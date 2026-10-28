@@ -165,6 +165,7 @@ export const langEs = {
     lbl_cat_eggplant: "🍆 Berenjena",
     lbl_cat_chicken: "🍗 Pollo",
     lbl_cat_fries: "🍟 Patatas Fritas",
+    lbl_cat_snack: "🍿 Snack",
     lbl_cat_bread: "🥖 Pan",
     lbl_cat_fish: "🐟 Pescado",
     lbl_cat_rice: "🌾 Arroz",

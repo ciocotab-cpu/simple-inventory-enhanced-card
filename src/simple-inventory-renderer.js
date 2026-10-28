@@ -214,7 +214,7 @@ export function renderCardContent(cardInstance) {
       lang.lbl_cat_chicken, lang.lbl_cat_fries, lang.lbl_cat_bread, 
       lang.lbl_cat_fish, lang.lbl_cat_rice, lang.lbl_cat_vegetables, 
       lang.lbl_cat_wine, lang.lbl_cat_peppers, lang.lbl_cat_pizza, 
-      lang.lbl_cat_polpa, lang.lbl_cat_sugo,
+      lang.lbl_cat_polpa, lang.lbl_cat_sugo, lang.lbl_snack,
       lang.lbl_cat_parmigiana, lang.lbl_cat_pasta, lang.lbl_cat_ravioli
     );
   }
@@ -663,8 +663,8 @@ export function renderCardContent(cardInstance) {
       }
 
       const qtyInput = shadow.getElementById("new-qty");
-      const incBtn = shadow.getElementById("add-qty-inc");
-      const decBtn = shadow.getElementById("add-qty-dec");
+      const incBtn = shadow.getElementById("new-qty-inc");
+      const decBtn = shadow.getElementById("new-qty-dec");
       if (qtyInput && incBtn && decBtn) {
         incBtn.addEventListener("click", () => { qtyInput.value = (parseFloat(qtyInput.value) || 0) + 1; });
         decBtn.addEventListener("click", () => { const cur = parseFloat(qtyInput.value) || 0; if (cur > 0) qtyInput.value = cur - 1; });

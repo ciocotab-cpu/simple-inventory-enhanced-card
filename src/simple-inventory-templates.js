@@ -31,7 +31,8 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
           <div class="edit-field" style="flex: 3;"><label>${lang.field_qty}</label>
             <div style="display: flex; align-items: center; border: 1px solid var(--divider-color); border-radius: 6px; overflow: hidden; background: var(--card-background-color); height: 38px;">
               <button type="button" id="${p}-qty-dec" style="background: transparent; border: none; color: var(--primary-text-color); font-weight: bold; width: 32px; height: 100%; cursor: pointer; font-size: 1.2rem;">-</button>
-              <input type="number" id="${isEdit ? 'edit_qty' : 'new-qty'}" value="${qtyVal}" style="flex: 1; text-align: center; border: none; height: 100%; padding: 0; background: transparent; font-weight: bold; -moz-appearance: textfield;">
+              <!-- Sostituito 'edit_qty' con 'edit-qty' per coerenza con 'new-qty' -->
+              <input type="number" id="${isEdit ? 'edit-qty' : 'new-qty'}" value="${qtyVal}" style="flex: 1; text-align: center; border: none; height: 100%; padding: 0; background: transparent; font-weight: bold; -moz-appearance: textfield;">
               <button type="button" id="${p}-qty-inc" style="background: transparent; border: none; color: var(--primary-text-color); font-weight: bold; width: 32px; height: 100%; cursor: pointer; font-size: 1.2rem;">+</button>
             </div>
           </div>

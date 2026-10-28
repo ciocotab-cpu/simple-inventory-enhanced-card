@@ -165,6 +165,7 @@ export const langEn = {
     lbl_cat_eggplant: "🍆 Eggplant",
     lbl_cat_chicken: "🍗 Chicken",
     lbl_cat_fries: "🍟 Fries",
+    lbl_cat_snack: "🍿 Snack",
     lbl_cat_bread: "🥖 Bread",
     lbl_cat_fish: "🐟 Fish",
     lbl_cat_rice: "🌾 Rice",

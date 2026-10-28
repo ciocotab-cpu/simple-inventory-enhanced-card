@@ -196,6 +196,23 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         </ha-expansion-panel>
 
         <ha-expansion-panel>
+          <div slot="header" class="panel-header">${lang.ed_panel_barcode || "📷 Barcode Options"}</div>
+          <div class="form-row">
+            <div class="select-option">
+              <span class="select-label">${lang.ed_lbl_barcode_provider || "Barcode Search Country"}</span>
+              <select id="barcode_provider" class="custom-dropdown">
+                <option value="it">${lang.opt_country_it || "Italy"}</option>
+                <option value="fr">${lang.opt_country_fr || "France"}</option>
+                <option value="es">${lang.opt_country_es || "Spain"}</option>
+                <option value="de">${lang.opt_country_de || "Germany"}</option>
+                <option value="uk">${lang.opt_country_uk || "United Kingdom"}</option>
+                <option value="world">${lang.opt_country_us || "World / Global"}</option>
+              </select>
+            </div>
+          </div>
+        </ha-expansion-panel>
+
+        <ha-expansion-panel>
           <div slot="header" class="panel-header">${lang.ed_panel_summary}</div>
           <div class="form-row">
             <div class="coppia-row">
@@ -276,6 +293,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     this.setupSortListener(); 
     this.setupLayoutListener();
     this.setupFontSizeListener();
+    this.setupBarcodeProviderListener();
     this._attachColorListeners();
     this._setupShiftListener();
     this._setupImportExportListeners();
@@ -505,6 +523,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     
     const cardLayout = this.shadowRoot.getElementById("card_layout");
     const fontSizeScale = this.shadowRoot.getElementById("font_size_scale");
+    const barcodeProvider = this.shadowRoot.getElementById("barcode_provider");
     if (!cardLayout || !fontSizeScale) return;
 
     let optionsHtml = "";
@@ -537,11 +556,12 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     selectSort.value = this._config.default_sort || "alpha";
     cardLayout.value = this._config.card_layout || 'layout1';
     fontSizeScale.value = this._config.font_size_scale || 'medium';
+    if (barcodeProvider) barcodeProvider.value = this._config.barcode_provider || 'it';
   }
 
   renderForms(lang) {
     const defaultData = { 
-      title: "", columns: 2, summary_columns: 4, default_sort: "alpha", card_layout: "layout1", font_size_scale: "medium",
+      title: "", columns: 2, summary_columns: 4, default_sort: "alpha", card_layout: "layout1", font_size_scale: "medium", barcode_provider: "it",
       show_summary: true, show_items: true, show_add_form: true, show_search: true, show_sort: true, show_category: true,
       show_sort_alpha: true, show_sort_threshold: true, show_sort_expiry: true, 
       show_sort_category: true, show_sort_location: true, show_sort_alert_exp: true, show_sort_alert_qty: true,
@@ -678,6 +698,15 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     });
   }
 
+  setupBarcodeProviderListener() {
+    const selectProvider = this.shadowRoot.getElementById("barcode_provider");
+    if (!selectProvider) return;
+    selectProvider.addEventListener("change", () => {
+      this._config = { ...this._config, barcode_provider: selectProvider.value };
+      this.fireConfigChanged();
+    });
+  }
+
   fireConfigChanged() { 
     this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._config }, bubbles: true, composed: true })); 
   }
@@ -698,6 +727,9 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
 
     const selectFontSize = shadow.getElementById("font_size_scale");
     if (selectFontSize) selectFontSize.value = this._config.font_size_scale || "medium";
+
+    const selectBarcodeProvider = shadow.getElementById("barcode_provider");
+    if (selectBarcodeProvider) selectBarcodeProvider.value = this._config.barcode_provider || "it";
     
     ["color_expired", "color_10d", "color_30d", "color_qty0", "color_qty1", "color_qty3"].forEach(id => {
       const el = shadow.getElementById(`${id}_input`); 
@@ -716,6 +748,10 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     if (debugBox) {
       if (this._config.debug_mode) debugBox.classList.add("visible");
     }
+  }
+
+  static getConfigElement() {
+    return document.createElement("simple-inventory-enhanced-card-editor");
   }
 }
 

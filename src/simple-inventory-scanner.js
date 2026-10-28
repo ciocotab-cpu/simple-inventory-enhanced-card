@@ -21,16 +21,12 @@ function loadHtml5QrcodeScript() {
 
 /**
  * Pulisce il nome rimuovendo grammature/volumi e formatta la confezione.
- * Gestisce sia il formato '150g' / '150 gr' sia il formato 'GR150' / 'GR. 150'.
  */
 function parseProductNameAndUnit(rawName, rawQuantity) {
   let cleanName = rawName || "";
   let extractedUnit = "";
 
-  // 1. Regex per prefissi tipo: GR150, GR.150, GR 150, G150, KG1, L1.5
   const prefixSizeRegex = /\b(GR|G|KG|ML|CL|L)\.?\s*(\d+(?:[\.,]\d+)?)\b/gi;
-  
-  // 2. Regex per suffissi classici tipo: 150g, 150 gr, 1kg, 1.5l, 33cl, 250ml
   const suffixSizeRegex = /\b(\d+(?:[\.,]\d+)?)\s*(g|gr|grammi|kg|kilo|chili|ml|cl|dl|l|litri|litro)\b/gi;
 
   let match = prefixSizeRegex.exec(cleanName);
@@ -70,7 +66,6 @@ function parseProductNameAndUnit(rawName, rawQuantity) {
     }
   }
 
-  // Se non ha trovato l'unità nel nome, usa il campo quantity di OpenFoodFacts
   if (!extractedUnit && rawQuantity && rawQuantity.trim() !== "") {
     let qStr = rawQuantity.toLowerCase().trim();
     if (qStr.endsWith("g") || qStr.includes("gram")) {
@@ -84,7 +79,6 @@ function parseProductNameAndUnit(rawName, rawQuantity) {
     }
   }
 
-  // Pulisce simboli, trattini o spazi residui lasciati dalla rimozione
   cleanName = cleanName.replace(/[\s\-_,.]+$|^[\s\-_,.]+/, "").replace(/\s+/g, " ").trim();
 
   return {
@@ -93,9 +87,6 @@ function parseProductNameAndUnit(rawName, rawQuantity) {
   };
 }
 
-/**
- * Risolve il nome del prodotto partendo dalla lingua di sistema/scelta da Open Food Facts.
- */
 function resolveProductName(product, primaryLang) {
   if (!product) return "";
 
@@ -119,65 +110,73 @@ function resolveProductName(product, primaryLang) {
 }
 
 /**
- * Tenta di recuperare i dati del prodotto usando in sequenza:
- * 1. Open Food Facts
- * 2. UPC Item DB (Fallback)
+ * Tenta di recuperare i dati interrogando prima il subdomini Open Food Facts nazionale (es. it, fr, es, de, uk),
+ * poi il database mondiale (world) e infine UPC Item DB come fallback universale.
  */
-async function fetchProductData(barcodeText, primaryLangCode) {
+async function fetchProductData(barcodeText, primaryLangCode, countryCode = "it") {
   let result = { name: "", category: "", unit: "" };
 
-  // --- TENTATIVO 1: Open Food Facts ---
-  try {
-    const offResponse = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcodeText}.json`);
-    if (offResponse.ok) {
-      const offData = await offResponse.json();
-      if (offData && offData.product) {
-        const p = offData.product;
-        const rawName = resolveProductName(p, primaryLangCode);
+  const queryApi = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.product) {
+          const p = data.product;
+          const rawName = resolveProductName(p, primaryLangCode);
+          if (rawName) {
+            const parsed = parseProductNameAndUnit(rawName, p.quantity);
+            result.name = parsed.name;
+            result.unit = parsed.unit;
 
-        if (rawName) {
-          const parsed = parseProductNameAndUnit(rawName, p.quantity);
-          result.name = parsed.name;
-          result.unit = parsed.unit;
-
-          if (p.categories_tags && p.categories_tags.length > 0) {
-            const rawCat = p.categories_tags[0];
-            let cleanCat = rawCat.includes(":") ? rawCat.split(":")[1] : rawCat;
-            result.category = cleanCat.charAt(0).toUpperCase() + cleanCat.slice(1).replace(/-/g, " ");
+            if (p.categories_tags && p.categories_tags.length > 0) {
+              const rawCat = p.categories_tags[0];
+              let cleanCat = rawCat.includes(":") ? rawCat.split(":")[1] : rawCat;
+              result.category = cleanCat.charAt(0).toUpperCase() + cleanCat.slice(1).replace(/-/g, " ");
+            }
+            return true;
           }
-          return result; // Trovato su OFF!
         }
       }
-    }
-  } catch (err) {
-    console.warn("OpenFoodFacts non disponibile, provo con UPC Item DB...");
+    } catch (err) {}
+    return false;
+  };
+
+  // 1. Ricerca sul database nazionale selezionato (se non è "world")
+  let found = false;
+  if (countryCode && countryCode !== "world") {
+    found = await queryApi(`https://${countryCode}.openfoodfacts.org/api/v0/product/${barcodeText}.json`);
   }
 
-  // --- TENTATIVO 2: UPC Item DB (Fallback) ---
-  try {
-    const upcResponse = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${barcodeText}`);
-    if (upcResponse.ok) {
-      const upcData = await upcResponse.json();
-      if (upcData && upcData.items && upcData.items.length > 0) {
-        const item = upcData.items[0];
-        const rawName = item.title || item.description || "";
+  // 2. Se non trovato, ricerca sul database Mondiale di Open Food Facts
+  if (!found) {
+    found = await queryApi(`https://world.openfoodfacts.org/api/v0/product/${barcodeText}.json`);
+  }
 
-        if (rawName) {
-          const parsed = parseProductNameAndUnit(rawName, "");
-          result.name = parsed.name;
-          result.unit = parsed.unit;
-          if (item.category) {
-            result.category = item.category.split(">").pop().trim();
+  // 3. Se ancora non trovato, fallback su UPC Item DB
+  if (!found) {
+    try {
+      const upcResponse = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${barcodeText}`);
+      if (upcResponse.ok) {
+        const upcData = await upcResponse.json();
+        if (upcData && upcData.items && upcData.items.length > 0) {
+          const item = upcData.items[0];
+          const rawName = item.title || item.description || "";
+          if (rawName) {
+            const parsed = parseProductNameAndUnit(rawName, "");
+            result.name = parsed.name;
+            result.unit = parsed.unit;
+            if (item.category) {
+              result.category = item.category.split(">").pop().trim();
+            }
+            found = true;
           }
-          return result; // Trovato su UPC Item DB!
         }
       }
-    }
-  } catch (err) {
-    console.warn("Anche UPC Item DB ha fallito o è andato in timeout.");
+    } catch (err) {}
   }
 
-  return result; // Nessun dato trovato
+  return result;
 }
 
 export async function startCameraScanner(cardInstance, lang, onScanCallback) {
@@ -190,6 +189,8 @@ export async function startCameraScanner(cardInstance, lang, onScanCallback) {
   }
 
   const hassObj = (cardInstance && (cardInstance._hass || cardInstance.hass)) || {};
+  const configObj = (cardInstance && (cardInstance._config || cardInstance.config)) || {};
+  const countryCode = configObj.barcode_provider || "it";
   
   let t = {};
   try {
@@ -259,7 +260,6 @@ export async function startCameraScanner(cardInstance, lang, onScanCallback) {
       
       overlay.remove();
 
-      // Se è stata passata una callback specifica per un campo di input (es. edit_barcode o new_barcode)
       if (typeof onScanCallback === "function") {
         onScanCallback(barcodeText);
         return;
@@ -281,15 +281,14 @@ export async function startCameraScanner(cardInstance, lang, onScanCallback) {
       cardInstance._scannedBarcodeCache = barcodeText;
       cardInstance._scannedDataCache = { name: "", category: "", unit: "" };
 
-      // Chiamata alle API con strategia a cascata (OFF -> UPC Item DB)
-      const fetchedProduct = await fetchProductData(barcodeText, primaryLangCode);
+      // Chiamata con priorità nazionale -> mondiale -> UPC
+      const fetchedProduct = await fetchProductData(barcodeText, primaryLangCode, countryCode);
 
       if (fetchedProduct.name) {
         cardInstance._scannedDataCache.name = fetchedProduct.name;
         cardInstance._scannedDataCache.unit = fetchedProduct.unit;
         cardInstance._scannedDataCache.category = fetchedProduct.category;
       } else {
-        // Fallback finale sul messaggio di errore del file di lingua
         cardInstance._scannedDataCache.name = t.error_barcode || t.senza_nome || "Nessun Prodotto trovato con questo codice a barre";
       }
 
