@@ -1,5 +1,30 @@
 import { getTranslation } from './simple-inventory-lang.js';
 
+const INVENTORY_SERVICE_DOMAINS = ["simple_inventory_enhanced", "simple_inventory"];
+
+async function callInventoryService(cardInstance, serviceName, serviceData) {
+  let lastError = null;
+
+  for (const domain of INVENTORY_SERVICE_DOMAINS) {
+    try {
+      await cardInstance._hass.callService(domain, serviceName, serviceData);
+      return;
+    } catch (error) {
+      lastError = error;
+      const message = String(error && (error.message || error));
+      if (!/not found|unknown service|service .* not found|not supported/i.test(message)) {
+        throw error;
+      }
+    }
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+
+  throw new Error(`Service ${serviceName} not available on the active integration domain.`);
+}
+
 export async function handleSaveEditService(cardInstance, itemId, oldName) {
   const shadow = cardInstance.shadowRoot;
   if (!shadow) return;
@@ -85,7 +110,7 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
   }
 
   try {
-    await cardInstance._hass.callService("simple_inventory", "update_item", serviceData);
+    await callInventoryService(cardInstance, "update_item", serviceData);
     cardInstance._editingItemId = null;
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
@@ -182,7 +207,7 @@ export async function handleAddItemService(cardInstance) {
   }
 
   try {
-    await cardInstance._hass.callService("simple_inventory", "add_item", serviceData);
+    await callInventoryService(cardInstance, "add_item", serviceData);
     cardInstance._showAddPopup = false;
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
@@ -210,7 +235,7 @@ export async function deleteItemDefinitivelyService(cardInstance, itemName, item
       name: itemName
     };
     if (itemId) serviceData.item_id = itemId;
-    await cardInstance._hass.callService("simple_inventory", "remove_item", serviceData);
+    await callInventoryService(cardInstance, "remove_item", serviceData);
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
   } catch (err) {

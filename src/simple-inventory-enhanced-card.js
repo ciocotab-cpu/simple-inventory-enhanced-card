@@ -190,9 +190,9 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
 
     this._initialFetched = true;
     try {
-      this.log("[CARD] Invio richiesta WebSocket simple_inventory/list_items per ID:", inventoryId);
+      this.log("[CARD] Invio richiesta WebSocket simple_inventory_enhanced/list_items per ID:", inventoryId);
       const result = await this._hass.connection.sendMessagePromise({
-        type: "simple_inventory/list_items", inventory_id: inventoryId
+        type: "simple_inventory_enhanced/list_items", inventory_id: inventoryId
       });
       this.log("%c[CARD] Risposta WebSocket ricevuta:", "color: #4caf50", result);
       
@@ -267,7 +267,23 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
     const serviceName = diff > 0 ? "increment_item" : "decrement_item"; 
     const serviceData = { inventory_id: inventoryId, name: itemName, amount: Math.abs(diff) };
     if (itemId) serviceData.item_id = itemId;
-    await this._hass.callService("simple_inventory", serviceName, serviceData);
+    const domains = ["simple_inventory_enhanced", "simple_inventory"];
+    let lastError = null;
+    for (const domain of domains) {
+      try {
+        await this._hass.callService(domain, serviceName, serviceData);
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = String(error && (error.message || error));
+        if (!/not found|unknown service|service .* not found|not supported/i.test(message)) {
+          throw error;
+        }
+      }
+    }
+    if (lastError && !lastError.message) {
+      throw lastError;
+    }
     this._initialFetched = false; 
     this.fetchInventoryItems(); 
   }
