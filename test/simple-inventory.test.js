@@ -3,7 +3,8 @@ import test from 'node:test';
 import { filterAndSortItems } from '../src/simple-inventory-filters.js';
 import {
   handleAddItemService,
-  handleSaveEditService
+  handleSaveEditService,
+  deleteItemDefinitivelyService
 } from '../src/simple-inventory-services.js';
 import {
   getAddPopupHtml,
@@ -173,7 +174,7 @@ test('rifiuta nome vuoto e aggiunta automatica senza lista To-Do', async t => {
   assert.equal(alerts.length, 2);
 });
 
-test('incrementa la quantità quando nome, unità e scadenza coincidono', async () => {
+test('crea un nuovo articolo anche quando nome, unità e scadenza coincidono', async () => {
   const existing = { name: 'Caffè', quantity: 2, unit: 'busta', expiry_date: '2030-01-01' };
   const { card, calls } = makeServiceCard({
     items: [existing],
@@ -188,10 +189,31 @@ test('incrementa la quantità quando nome, unità e scadenza coincidono', async 
   await handleAddItemService(card);
 
   assert.equal(calls.length, 1);
-  assert.equal(calls[0][1], 'update_item');
-  assert.equal(calls[0][2].desired_quantity, 5);
-  assert.equal(calls[0][2].old_name, 'Caffè');
+  assert.equal(calls[0][1], 'add_item');
+  assert.equal(calls[0][2].name, 'Caffè (busta - 2030-01-01)');
+  assert.equal(calls[0][2].quantity, 3);
   assert.equal(card.fetchCount, 1);
+});
+
+test('aggiunge un suffisso progressivo se il nome generato esiste già', async () => {
+  const { card, calls } = makeServiceCard({
+    items: [
+      { name: 'Caffè', quantity: 2, unit: 'busta', expiry_date: '2030-01-01' },
+      { name: 'Caffè (busta - 2030-01-01)', quantity: 1, unit: 'busta', expiry_date: '2030-01-01' }
+    ],
+    values: {
+      'new-name': { value: 'Caffè' },
+      'new-qty': { value: '1' },
+      new_unit: { value: 'busta' },
+      new_expiry: { value: '2030-01-01' }
+    }
+  });
+
+  await handleAddItemService(card);
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0][1], 'add_item');
+  assert.equal(calls[0][2].name, 'Caffè (busta - 2030-01-01) (2)');
 });
 
 test('crea un articolo distinto se unità o scadenza differiscono', async () => {
@@ -217,7 +239,7 @@ test('salva i valori del form di modifica nel servizio corretto', async () => {
   const { card, calls } = makeServiceCard({
     values: {
       edit_name: { value: '  Riso integrale  ' },
-      edit_qty: { value: '4.5' },
+      'edit-qty': { value: '4.5' },
       edit_expiry: { value: '2030-03-04' },
       edit_unit: { value: ' confezione ' },
       edit_cat_select: { value: 'Dispensa' },
@@ -225,17 +247,34 @@ test('salva i valori del form di modifica nel servizio corretto', async () => {
     }
   });
 
-  await handleSaveEditService(card, 'item-1', 'Riso');
+  await handleSaveEditService(card, 'item-1');
 
   assert.equal(calls.length, 1);
   assert.equal(calls[0][1], 'update_item');
-  assert.equal(calls[0][2].old_name, 'Riso');
+  assert.equal(calls[0][2].item_id, 'item-1');
+  assert.equal('old_name' in calls[0][2], false);
   assert.equal(calls[0][2].name, 'Riso integrale');
   assert.equal(calls[0][2].desired_quantity, 4.5);
   assert.equal(calls[0][2].expiry_date, '2030-03-04');
   assert.equal(calls[0][2].unit, 'confezione');
   assert.equal(calls[0][2].category, 'Dispensa');
   assert.equal(calls[0][2].price, 2.75);
+});
+
+test('cancella un articolo identificandolo con item_id', async t => {
+  const originalConfirm = globalThis.confirm;
+  globalThis.confirm = () => true;
+  t.after(() => {
+    if (originalConfirm === undefined) delete globalThis.confirm;
+    else globalThis.confirm = originalConfirm;
+  });
+
+  const { card, calls } = makeServiceCard();
+  await deleteItemDefinitivelyService(card, 'item-1', 'Riso');
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0][1], 'remove_item');
+  assert.deepEqual(calls[0][2], { inventory_id: 'inventory-1', item_id: 'item-1' });
 });
 
 test('genera i campi e i valori iniziali corretti per il form di aggiunta', () => {
@@ -265,7 +304,7 @@ test('precompila il form di modifica e seleziona categoria e To-Do', () => {
   });
 
   assert.match(html, /id="edit_name" value="Riso"/);
-  assert.match(html, /id="edit_qty" value="2"/);
+  assert.match(html, /id="edit-qty" value="2"/);
   assert.match(html, /value="Dispensa" selected/);
   assert.match(html, /id="edit_auto_add_checkbox" checked/);
   assert.match(html, /value="todo\.shopping" selected/);

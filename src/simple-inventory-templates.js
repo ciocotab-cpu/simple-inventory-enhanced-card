@@ -26,7 +26,7 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
       <div style="display: flex; flex-direction: column; gap: 14px;">
         
         <!-- RIGA 1: Nome - Quantità -->
-        <div style="display: flex; gap: 12px; align-items: flex-end; width: 100%;">
+        <div style="display: flex; gap: 12px; align-items: flex-end; width: 100%; z-index: 999999;">
           <div class="edit-field" style="flex: 7;"><label>${lang.field_name}</label><input type="text" id="${isEdit ? 'edit_name' : 'new-name'}" value="${nameVal}" placeholder="${lang.field_name_placeholder}"></div>
           <div class="edit-field" style="flex: 3;"><label>${lang.field_qty}</label>
             <div style="display: flex; align-items: center; border: 1px solid var(--divider-color); border-radius: 6px; overflow: hidden; background: var(--card-background-color); height: 38px;">
@@ -120,7 +120,7 @@ function renderItemFormHtml({ isEdit, title, lang, item = {}, categoriesList = [
       </div>
       <div class="edit-form-actions">
         <button class="${isEdit ? 'btn-cancel-edit' : 'btn-cancel-add'}" ${!isEdit ? 'id="btn-add-cancel"' : ''}>${lang.btn_cancel}</button>
-        <button class="${isEdit ? 'btn-save-edit' : 'btn-save-add'}" ${isEdit ? `data-id="${item.id}" data-oldname="${item.name}"` : 'id="btn-add-save"'}>${isEdit ? lang.btn_save : lang.btn_add}</button>
+        <button class="${isEdit ? 'btn-save-edit' : 'btn-save-add'}" ${isEdit ? `data-id="${item.id}"` : 'id="btn-add-save"'}>${isEdit ? lang.btn_save : lang.btn_add}</button>
       </div>
     </div>
   `;

@@ -356,7 +356,7 @@ export function renderCardContent(cardInstance) {
             e.preventDefault();
             searchBar.value = ""; 
             cardInstance.searchQuery = "";
-            await cardInstance.adjustQuantity(exactMatch.name, 1);
+            await cardInstance.adjustQuantity(exactMatch.id, 1);
           } else {
             log("[simple-inventory-renderer] Nessuna corrispondenza esatta trovata per barcode:", rawCode);
           }
@@ -476,24 +476,24 @@ export function renderCardContent(cardInstance) {
     cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { 
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
-        log("[simple-inventory-renderer] Pulsante '+' premuto per:", btn.dataset.name);
-        cardInstance.adjustQuantity(btn.dataset.name, 1); 
+        log("[simple-inventory-renderer] Pulsante '+' premuto per ID:", btn.dataset.id);
+        cardInstance.adjustQuantity(btn.dataset.id, 1);
       }); 
     });
 
     cardInstance.content.querySelectorAll(".btn-dec").forEach(btn => { 
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
-        log("[simple-inventory-renderer] Pulsante '-' premuto per:", btn.dataset.name);
-        cardInstance.adjustQuantity(btn.dataset.name, -1); 
+        log("[simple-inventory-renderer] Pulsante '-' premuto per ID:", btn.dataset.id);
+        cardInstance.adjustQuantity(btn.dataset.id, -1);
       }); 
     });
 
     cardInstance.content.querySelectorAll(".btn-delete").forEach(btn => { 
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
-        log("[simple-inventory-renderer] Eliminazione richiesta per:", btn.dataset.name);
-        deleteItemDefinitivelyService(cardInstance, btn.dataset.name); 
+        log("[simple-inventory-renderer] Eliminazione richiesta per ID:", btn.dataset.id);
+        deleteItemDefinitivelyService(cardInstance, btn.dataset.id, btn.dataset.itemName);
       }); 
     });
     
@@ -519,7 +519,7 @@ export function renderCardContent(cardInstance) {
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
         log("[simple-inventory-renderer] Salvataggio modifica per ID:", btn.dataset.id);
-        handleSaveEditService(cardInstance, btn.dataset.id, btn.dataset.oldname); 
+        handleSaveEditService(cardInstance, btn.dataset.id);
       }); 
     });
 

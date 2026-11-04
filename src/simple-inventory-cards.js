@@ -149,7 +149,7 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
 
   const expiryHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 100\%; box-sizing: border-box; white-space: nowrap;">${expiryText}</div>` : '';
   const isEditing = cardInstance._editingItemId === item.id;
-  const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
+  const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-id="${item.id}" data-item-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
 
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
@@ -197,7 +197,7 @@ export function renderLayout1(item, cardInstance, lang, categoriesListArray) {
           <div style="display: flex; align-items: center; overflow: hidden; justify-content: flex-end; flex-shrink: 1; text-align: right;">${categoryHtml}</div>
         </div>
       </div>
-      ${!isEditing ? `<div class="item-actions"><button class="btn-dec" data-name="${item.name}">-</button>${centerDisplay}<button class="btn-inc" data-name="${item.name}">+</button></div>` : ''}
+      ${!isEditing ? `<div class="item-actions"><button class="btn-dec" data-id="${item.id}">-</button>${centerDisplay}<button class="btn-inc" data-id="${item.id}">+</button></div>` : ''}
       ${editFormHtml}
     </div>
   `;
@@ -314,7 +314,7 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
 
   const expiryHtml = (showExpiry && expiryText) ? `<div class="item-meta" style="background-color: ${expiryBg} !important; color:${expiryTextColor} !important; border: 1px solid ${expiryBorder}; padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content; max-width: 50\%; box-sizing: border-box; white-space: nowrap; text-align: right; margin-left: auto;">${expiryText}</div>` : '';
   const isEditing = cardInstance._editingItemId === item.id;
-  const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
+  const centerDisplay = currentQty === 0 ? `<button class="btn-delete" data-id="${item.id}" data-item-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` : `<span class="qty-display">${currentQty}</span>`;
 
   const todoListsArray = [];
   if (cardInstance._hass && cardInstance._hass.states) {
@@ -359,7 +359,7 @@ export function renderLayout2(item, cardInstance, lang, categoriesListArray) {
         <div class="item-name" style="padding-right: 44px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayName}</div>
         <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 4px; overflow: hidden; gap: 8px;">${categoryHtml}${expiryHtml}</div>
       </div>
-      ${!isEditing ? `<div class="item-actions"><button class="btn-dec" data-name="${item.name}">-</button>${centerDisplay}<button class="btn-inc" data-name="${item.name}">+</button></div>` : ''}
+      ${!isEditing ? `<div class="item-actions"><button class="btn-dec" data-id="${item.id}">-</button>${centerDisplay}<button class="btn-inc" data-id="${item.id}">+</button></div>` : ''}
       ${editFormHtml}
     </div>
   `;
@@ -480,7 +480,7 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
 
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 
-    ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` 
+    ? `<button class="btn-delete" data-id="${item.id}" data-item-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>`
     : `<span class="qty-display">${currentQty}</span>`;
 
   const todoListsArray = [];
@@ -522,9 +522,9 @@ export function renderLayout3(item, cardInstance, lang, categoriesListArray) {
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px;">
         <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>${!isEditing ? `
           <div class="item-actions" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-            <button class="btn-dec" data-name="${item.name}">-</button>
+            <button class="btn-dec" data-id="${item.id}">-</button>
             ${centerDisplay}
-            <button class="btn-inc" data-name="${item.name}">+</button>
+            <button class="btn-inc" data-id="${item.id}">+</button>
           </div>
         ` : ''}
       </div>
@@ -660,7 +660,7 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
 
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 
-    ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` 
+    ? `<button class="btn-delete" data-id="${item.id}" data-item-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>`
     : `<span class="qty-display">${currentQty}</span>`;
 
   const todoListsArray = [];
@@ -702,9 +702,9 @@ export function renderLayout4(item, cardInstance, lang, categoriesListArray) {
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px;">
         <div class="item-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-weight: bold;">${displayName}</div>${!isEditing ? `
           <div class="item-actions" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-            <button class="btn-dec" data-name="${item.name}">-</button>
+            <button class="btn-dec" data-id="${item.id}">-</button>
             ${centerDisplay}
-            <button class="btn-inc" data-name="${item.name}">+</button>
+            <button class="btn-inc" data-id="${item.id}">+</button>
           </div>
         ` : ''}
       </div>
@@ -847,7 +847,7 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
   
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 
-    ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` 
+    ? `<button class="btn-delete" data-id="${item.id}" data-item-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>`
     : `<span class="qty-display">${currentQty}</span>`;
 
   const todoListsArray = [];
@@ -899,9 +899,9 @@ export function renderLayout5(item, cardInstance, lang, categoriesListArray) {
 
         ${!isEditing ? `
           <div class="item-actions" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-            <button class="btn-dec" data-name="${item.name}">-</button>
+            <button class="btn-dec" data-id="${item.id}">-</button>
             ${centerDisplay}
-            <button class="btn-inc" data-name="${item.name}">+</button>
+            <button class="btn-inc" data-id="${item.id}">+</button>
           </div>
         ` : ''}
 
@@ -1034,7 +1034,7 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
 
   const isEditing = cardInstance._editingItemId === item.id;
   const centerDisplay = currentQty === 0 
-    ? `<button class="btn-delete" data-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>` 
+    ? `<button class="btn-delete" data-id="${item.id}" data-item-name="${item.name}" style="background:transparent; border:none; padding:0; height:26px; width:26px; cursor:pointer;"><ha-icon icon="mdi:trash-can-outline"></ha-icon></button>`
     : `<span class="qty-display">${currentQty}</span>`;
 
   const todoListsArray = [];
@@ -1079,9 +1079,9 @@ export function renderLayout6(item, cardInstance, lang, categoriesListArray) {
         </div>        
         ${!isEditing ? `
           <div class="item-actions" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-            <button class="btn-dec" data-name="${item.name}">-</button>
+            <button class="btn-dec" data-id="${item.id}">-</button>
             ${centerDisplay}
-            <button class="btn-inc" data-name="${item.name}">+</button>
+            <button class="btn-inc" data-id="${item.id}">+</button>
           </div>
         ` : ''}
       </div>

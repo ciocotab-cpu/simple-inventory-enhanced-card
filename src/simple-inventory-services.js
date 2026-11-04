@@ -1,6 +1,6 @@
 import { getTranslation } from './simple-inventory-lang.js';
 
-export async function handleSaveEditService(cardInstance, itemId, oldName) {
+export async function handleSaveEditService(cardInstance, itemId) {
   const shadow = cardInstance.shadowRoot;
   if (!shadow) return;
 
@@ -13,7 +13,7 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
   if (!inventoryId) return;
 
   const nameEl = shadow.getElementById("edit_name");
-  const qtyEl = shadow.getElementById("edit_qty");
+  const qtyEl = shadow.getElementById("edit-qty");
   const expiryEl = shadow.getElementById("edit_expiry");
   const expAlertEl = shadow.getElementById("edit_exp_alert");
   const unitEl = shadow.getElementById("edit_unit");
@@ -58,7 +58,7 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
 
   const serviceData = {
     inventory_id: inventoryId,
-    old_name: oldName,
+    item_id: itemId,
     name: newName,
     desired_quantity: qtyEl ? parseFloat(qtyEl.value) || 0 : 0,
     auto_add_id_to_description_enabled: isAutoAddChecked,
@@ -84,7 +84,7 @@ export async function handleSaveEditService(cardInstance, itemId, oldName) {
   }
 
   try {
-    await cardInstance._hass.callService("simple_inventory", "update_item", serviceData);
+    await cardInstance._hass.callService("simple_inventory_enhanced", "update_item", serviceData);
     cardInstance._editingItemId = null;
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
@@ -164,73 +164,26 @@ export async function handleAddItemService(cardInstance) {
     return itemName === baseName.toLowerCase() || itemName.startsWith(baseName.toLowerCase() + " (");
   });
 
-  // CHECK DEI 3 CAMPI: Cerca un match esatto per Nome, Confezione (Unità) e Data di Scadenza
-  const exactMatch = sameNameItems.find(item => {
-    const itemUnit = item.unit ? item.unit.trim().toLowerCase() : "";
-    const itemExpiry = item.expiry_date ? item.expiry_date.trim() : "";
-    
-    return itemUnit === inputUnit && itemExpiry === inputExpiry;
-  });
-
-  // 1. CASO MATCH ESAURIENTE: Stesso Nome, Stessa Confezione e Stessa Scadenza
-  if (exactMatch) {
-    const newQuantity = (parseFloat(exactMatch.quantity) || 0) + inputQuantity;
-
-    const updateData = {
-      inventory_id: inventoryId,
-      old_name: exactMatch.name,
-      name: exactMatch.name,
-      desired_quantity: newQuantity,
-      unit: exactMatch.unit || inputUnit,
-      expiry_date: exactMatch.expiry_date || inputExpiry,
-      expiry_alert_days: expAlertEl ? parseInt(expAlertEl.value) || 0 : (exactMatch.expiry_alert_days || 0),
-      category: finalCategory || exactMatch.category || "",
-      location: locEl ? locEl.value.trim() : (exactMatch.location || ""),
-      aliases: aliasesEl ? aliasesEl.value.trim() : (exactMatch.aliases || ""),
-      description: descEl ? descEl.value.trim() : (exactMatch.description || ""),
-      barcode: barcodeEl ? barcodeEl.value.trim() : (exactMatch.barcode || ""),
-      auto_add_id_to_description_enabled: isAutoAddChecked
-    };
-
-    if (isAutoAddChecked) {
-      if (todoEl) updateData.todo_list = todoEl.value.trim();
-      if (todoPlaceEl) updateData.todo_quantity_placement = todoPlaceEl.value;
-      if (minQtyEl) updateData.auto_add_to_list_quantity = parseInt(minQtyEl.value) || 2;
-    }
-
-    if (priceEl && priceEl.value.trim() !== "") {
-      const parsedPrice = parseFloat(priceEl.value);
-      if (!isNaN(parsedPrice)) updateData.price = parsedPrice;
-    }
-
-    try {
-      await cardInstance._hass.callService("simple_inventory", "update_item", updateData);
-      cardInstance._showAddPopup = false;
-      cardInstance._initialFetched = false;
-      cardInstance.fetchInventoryItems();
-    } catch (err) {
-      console.error("Errore durante l'incremento della quantità del prodotto:", err);
-      alert((lang.error_add_fail || "Failed to add item.\\nBackend Error: ") + err.message);
-    }
-    return;
-  }
-
-  // 2. CASO DIFFERENZE: Stesso nome, ma Confezione o Scadenza diverse
-  // Per evitare che il backend Python sovrascriva l'articolo esistente, generiamo un nome univoco
+  // Il backend identifica gli articoli per nome durante l'aggiunta: genera un nome libero.
   let nameToSave = baseName;
   if (sameNameItems.length > 0) {
     const details = [];
     if (inputUnit) details.push(inputUnit);
     if (inputExpiry) details.push(inputExpiry);
-    
-    if (details.length > 0) {
-      nameToSave = `${baseName} (${details.join(" - ")})`;
-    } else {
-      nameToSave = `${baseName} (${sameNameItems.length + 1})`;
+
+    const namePrefix = details.length > 0
+      ? `${baseName} (${details.join(" - ")})`
+      : `${baseName} (2)`;
+    nameToSave = namePrefix;
+    const existingNames = new Set(existingItems.map(item => (item.name || "").trim().toLowerCase()));
+    let suffix = 2;
+    while (existingNames.has(nameToSave.toLowerCase())) {
+      nameToSave = `${namePrefix} (${suffix})`;
+      suffix += 1;
     }
   }
 
-  // 3. NUOVO PRODOTTO / PRODOTTO CON DETTAGLI DIVERSI: Chiama add_item
+  // NUOVO PRODOTTO / PRODOTTO CON DETTAGLI DIVERSI: Chiama add_item
   const serviceData = {
     inventory_id: inventoryId,
     name: nameToSave,
@@ -258,7 +211,7 @@ export async function handleAddItemService(cardInstance) {
   }
 
   try {
-    await cardInstance._hass.callService("simple_inventory", "add_item", serviceData);
+    await cardInstance._hass.callService("simple_inventory_enhanced", "add_item", serviceData);
     cardInstance._showAddPopup = false;
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();
@@ -268,7 +221,7 @@ export async function handleAddItemService(cardInstance) {
   }
 }
 
-export async function deleteItemDefinitivelyService(cardInstance, itemName) {
+export async function deleteItemDefinitivelyService(cardInstance, itemId, itemName) {
   const lang = getTranslation(cardInstance._hass);
   if (!confirm((lang.confirm_delete || "Are you sure you want to permanently delete '{itemName}' from the inventory?").replace("{item}", itemName))) {
     return;
@@ -281,9 +234,9 @@ export async function deleteItemDefinitivelyService(cardInstance, itemName) {
   if (!inventoryId) return;
 
   try {
-    await cardInstance._hass.callService("simple_inventory", "remove_item", {
+    await cardInstance._hass.callService("simple_inventory_enhanced", "remove_item", {
       inventory_id: inventoryId,
-      name: itemName
+      item_id: itemId
     });
     cardInstance._initialFetched = false;
     cardInstance.fetchInventoryItems();

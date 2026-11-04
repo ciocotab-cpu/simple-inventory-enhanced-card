@@ -319,7 +319,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
         const inventoryId = stateObj.attributes.inventory_id;
         try {
           const result = await this._hass.connection.sendMessagePromise({
-            type: "simple_inventory/list_items", inventory_id: inventoryId
+            type: "simple_inventory_enhanced/list_items", inventory_id: inventoryId
           });
           const items = (result && result.items) ? result.items : [];
           if (items.length === 0) {
@@ -383,7 +383,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
                   description: item.description || "",
                   barcode: item.barcode || item.barcode_id || item.barcode || ""
                 };
-                await this._hass.callService("simple_inventory", "add_item", serviceData);
+                await this._hass.callService("simple_inventory_enhanced", "add_item", serviceData);
               }
               alert(lang.io_import_success || "Import completed successfully!");
             } catch (err) {
@@ -612,7 +612,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     
     this.setupForm("form-debug-toggle", [{ name: "debug_mode", selector: { boolean: {} } }], defaultData);
 
-    this.setupForm("form-base-ent", [{ name: "entity", selector: { entity: { domain: "sensor", filter: { integration: "simple_inventory" } } } }], defaultData);
+    this.setupForm("form-base-ent", [{ name: "entity", selector: { entity: { domain: "sensor", filter: { integration: "simple_inventory_enhanced" } } } }], defaultData);
     this.setupForm("form-base-title", [{ name: "title", selector: { text: {} } }], defaultData);
     this.setupForm("form-base-cols", [{ name: "columns", selector: { number: { min: 1, max: 6, mode: "box" } } }], defaultData);
     
