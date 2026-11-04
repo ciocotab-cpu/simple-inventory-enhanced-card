@@ -439,6 +439,12 @@ export function renderCardContent(cardInstance) {
   const summaryArea = cardInstance.shadowRoot.getElementById("summary-area");
   if (cardInstance.config.show_summary) {
     summaryArea.classList.add("visible");
+
+    const summaryFontSize = cardInstance.config.font_size_scale === "small" ? 12
+      : cardInstance.config.font_size_scale === "large" ? 16
+        : 14;
+    summaryArea.style.setProperty("--summary-font-size", `${summaryFontSize}px`);
+    summaryArea.style.setProperty("--summary-icon-size", `${summaryFontSize + 4}px`);
     
     const sumCols = cardInstance.config.summary_columns !== undefined ? parseInt(cardInstance.config.summary_columns) : 4;
     if (sumCols > 0) {
