@@ -24,7 +24,7 @@
 
 # 📦 Simple Inventory Enhanced Card
 
-An advanced, modular, and multilingual custom card for **Home Assistant**, designed to extend and elevate the user experience of the [**Simple Inventory**](https://github.com/blaineventurine/simple_inventory) custom integration. This card transforms pantry management into a professional system for stock tracking, expiration alerts, and shopping list automation.
+An advanced, modular, and multilingual custom card for **Home Assistant**, designed to extend and elevate the user experience of the [**Simple Inventory Enhanced**](https://github.com/ciocotab-cpu/simple_inventory_enhanced) custom integration. This card transforms pantry management into a professional system for stock tracking, expiration alerts, and shopping list automation.
 
 ---
 
@@ -66,10 +66,11 @@ An advanced, modular, and multilingual custom card for **Home Assistant**, desig
 8. Once downloaded, click **Reload** if prompted to refresh the browser cache.
 
 ### 2. Manual Installation (without HACS)
-1. Click the **pencil icon** (Edit Dashboard) in the upper right corner of your Home Assistant dashboard.
-2. Click the **three dots** in the upper right corner and select **Manage Resources**.
-3. Click the **Add Resource** button in the bottom right.
-4. Paste this URL into the text box: `https://github.com/ciocotab-cpu/simple-inventory-enhanced-card/simple-inventory-enhanced-card.js` 
+1. Copy dist/simple-inventory-enhanced-card.js to your www/community/simple-inventory-enhanced-card directory
+2. Click the **pencil icon** (Edit Dashboard) in the upper right corner of your Home Assistant dashboard.
+3. Click the **three dots** in the upper right corner and select **Manage Resources**.
+4. Click the **Add Resource** button in the bottom right.
+5. Paste this URL into the text box: `local/community/simple-inventory-enhanced-card/simple-inventory-enhanced-card.js` 
 5. Select **JavaScript Module** and click **Create**.
 6. Hard reload the page (CTRL + F5).
 
@@ -92,7 +93,7 @@ All card preferences can be managed and extended using the integrated **Interact
 
 ## 🛠️ Technologies Used
 
-1. **Backend Core:** [**Simple Inventory**](https://github.com/blaineventurine/simple_inventory) (Custom component for Home Assistant available via HACS).
+1. **Backend Core:** [**Simple Inventory Enhanced**](https://github.com/ciocotab-cpu/simple_inventory_enhanced) (Custom component for Home Assistant available via HACS).
 2. **Scanner Engine:** Html5-QRCode v2.3.8 (Local JavaScript library loaded *on-demand* to decode EAN-13, EAN-8, and Code-128 formats).
 3. **Database Provider:** Open Food Facts API v3 (Open-source database used for product information extraction).
 
@@ -225,12 +226,13 @@ Grazie alla predisposizione del repository, l'installazione e la gestione degli 
 8. Al termine del download, se richiesto, clicca su **Ricarica il browser** (*Reload*) per aggiornare la cache grafica di Home Assistant.
 
 ### 2. Guida all'Installazione manuale (senza HACS)
-1. Clicca sulla **matita** (Modifica la plancia) in alto a destra nella home page di Home Assistant.
-2. Clicca sui **tre puntini** in alto a destra e seleziona **Gestisci le Risorse** (*Custom Repositories*).
-3. Clicca sul pulsante **Aggiungi una risorsa** in basso a destra.
-4. Incolla questo l'URL nella casella di testo: `https://github.com/ciocotab-cpu/simple-inventory-enhanced-card/simple-inventory-enhanced-card.js` 
-5. Seleziona la voce **Modulo Javascript** e poi clicca su **Crea**.
-6. Ricarica la pagina con CTRL + F5.
+1. Copia dist/simple-inventory-enhanced-card.js nella cartella www/community/simple-inventory-enhanced-card
+2. Clicca sulla **matita** (Modifica la plancia) in alto a destra nella home page di Home Assistant.
+3. Clicca sui **tre puntini** in alto a destra e seleziona **Gestisci le Risorse** (*Custom Repositories*).
+4. Clicca sul pulsante **Aggiungi una risorsa** in basso a destra.
+5. Incolla questo l'URL nella casella di testo: `local/community/simple-inventory-enhanced-card/simple-inventory-enhanced-card.js` 
+6. Seleziona la voce **Modulo Javascript** e poi clicca su **Crea**.
+7. Ricarica la pagina con CTRL + F5.
 
 ---
 
@@ -251,7 +253,7 @@ Tutte le preferenze della card possono essere gestite ed estese comodamente tram
 
 ## 🛠️ Tecnologie Utilizzate
 
-1. **Backend Core:** [**Simple Inventory**](https://github.com/blaineventurine/simple_inventory) (componente personalizzato per Home Assistant presente su HACS).
+1. **Backend Core:** [**Simple Inventory Enhanced**](https://github.com/ciocotab-cpu/simple_inventory_enhanced) (componente personalizzato per Home Assistant presente su HACS).
 2. **Motore di Scansione:** Html5-QRCode v 2.3.8 (libreria JavaScript locale integrata *on-demand* per la decodifica dei formati EAN-13, EAN-8 e Code-128).
 3. **Database Informazioni:** Open Food Facts API v3 (servizio open-source per l'estrazione delle schede tecniche dei prodotti).
 
