@@ -612,7 +612,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     
     this.setupForm("form-debug-toggle", [{ name: "debug_mode", selector: { boolean: {} } }], defaultData);
 
-    this.setupForm("form-base-ent", [{ name: "entity", selector: { entity: { domain: "sensor", filter: { integration: "simple_inventory_enhanced" } } } }], defaultData);
+    this.setupForm("form-base-ent", [{ name: "entity", selector: { entity: { filter: [{ domain: "sensor", integration: "simple_inventory_enhanced" }] } } }], defaultData);
     this.setupForm("form-base-title", [{ name: "title", selector: { text: {} } }], defaultData);
     this.setupForm("form-base-cols", [{ name: "columns", selector: { number: { min: 1, max: 6, mode: "box" } } }], defaultData);
     
