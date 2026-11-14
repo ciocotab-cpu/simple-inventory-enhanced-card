@@ -16,7 +16,7 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
 
   static getStubConfig() {
     return {
-      title: "", card_layout: "layout1", columns: 2, summary_columns: 0, default_sort: "alpha", show_summary: true,
+      title: "", card_layout: "layout1", columns: 2, summary_columns: 4, default_sort: "alpha", show_summary: true,
       show_items: true, show_add_form: true, show_search: true, show_sort: true,
       show_sort_alpha: true, show_sort_threshold: true, show_sort_expiry: true,
       show_sort_category: true, show_sort_location: true, show_sort_alert_exp: true, show_sort_alert_qty: true,
@@ -92,7 +92,9 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
       title: baseConfig.title ? baseConfig.title : "",
       card_layout: baseConfig.card_layout || "layout1",
       columns: baseConfig.columns !== undefined ? baseConfig.columns : 2,
-      summary_columns: baseConfig.summary_columns !== undefined ? parseInt(baseConfig.summary_columns) : 0,
+      summary_columns: baseConfig.summary_columns !== undefined && parseInt(baseConfig.summary_columns) > 0
+        ? parseInt(baseConfig.summary_columns)
+        : 4,
       default_sort: baseConfig.default_sort || "alpha",
       show_summary: baseConfig.show_summary !== undefined ? baseConfig.show_summary : true,
       show_items: baseConfig.show_items !== undefined ? baseConfig.show_items : true,

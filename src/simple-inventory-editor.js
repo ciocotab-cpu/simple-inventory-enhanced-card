@@ -1,8 +1,18 @@
 import { getTranslation } from './simple-inventory-lang.js';
 
+function normalizeConfig(config) {
+  if (config?.summary_columns === undefined) return config || {};
+
+  const summaryColumns = parseInt(config.summary_columns);
+  return {
+    ...config,
+    summary_columns: summaryColumns > 0 ? summaryColumns : 4
+  };
+}
+
 export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   setConfig(config) { 
-    this._config = config || {}; 
+    this._config = normalizeConfig(config);
     if (this._hass && !this._initialized) {
       this.initEditor();
     } else if (this._initialized) {
@@ -13,7 +23,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   get config() { return this._config; }
   
   set config(config) { 
-    this._config = config || {}; 
+    this._config = normalizeConfig(config);
     if (this._initialized) { 
       this.syncData(); 
     } 
