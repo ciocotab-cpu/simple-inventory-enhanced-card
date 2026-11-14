@@ -233,7 +233,6 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
             </div>
           </div>
           <div id="summary-area" class="summary-box"></div>
-          <div id="add-popup-container"></div>
           <div id="controls-container" class="controls">
             <input type="text" class="search-bar" id="search-input">
             <select class="sort-select" id="sort-select"></select>
@@ -241,6 +240,10 @@ class SimpleInventoryEnhancedCard extends HTMLElement {
         </div>
         <div id="grid" class="inventory-grid"></div>
       </ha-card>
+      <div id="popup-layer">
+        <div id="add-popup-container"></div>
+        <div id="edit-popup-container"></div>
+      </div>
     `;
     this.content = this.shadowRoot.getElementById("grid");
     this.applyGridStyles();

@@ -31,6 +31,7 @@ export const cardStyles = `
   .summary-box.visible { display: grid; }
   .summary-item { display: flex; align-items: center; gap: 6px; font-size: var(--custom-font-size, 0.82rem); font-weight: 500; }
   .summary-item ha-icon { --mdc-icon-size: 18px; }
+  #popup-layer { position: relative; z-index: 999999; }
   
   .controls { display: none; gap: 8px; align-items: center; }
   .controls.visible { display: flex; }
