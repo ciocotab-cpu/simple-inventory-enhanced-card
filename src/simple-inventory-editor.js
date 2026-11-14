@@ -1,8 +1,18 @@
 import { getTranslation } from './simple-inventory-lang.js';
 
+function normalizeConfig(config) {
+  if (config?.summary_columns === undefined) return config || {};
+
+  const summaryColumns = parseInt(config.summary_columns);
+  return {
+    ...config,
+    summary_columns: summaryColumns > 0 ? summaryColumns : 4
+  };
+}
+
 export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   setConfig(config) { 
-    this._config = config || {}; 
+    this._config = normalizeConfig(config);
     if (this._hass && !this._initialized) {
       this.initEditor();
     } else if (this._initialized) {
@@ -13,7 +23,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
   get config() { return this._config; }
   
   set config(config) { 
-    this._config = config || {}; 
+    this._config = normalizeConfig(config);
     if (this._initialized) { 
       this.syncData(); 
     } 
@@ -612,7 +622,7 @@ export class SimpleInventoryEnhancedCardEditor extends HTMLElement {
     
     this.setupForm("form-debug-toggle", [{ name: "debug_mode", selector: { boolean: {} } }], defaultData);
 
-    this.setupForm("form-base-ent", [{ name: "entity", selector: { entity: { domain: "sensor", filter: { integration: "simple_inventory_enhanced" } } } }], defaultData);
+    this.setupForm("form-base-ent", [{ name: "entity", selector: { entity: { filter: [{ domain: "sensor", integration: "simple_inventory_enhanced" }] } } }], defaultData);
     this.setupForm("form-base-title", [{ name: "title", selector: { text: {} } }], defaultData);
     this.setupForm("form-base-cols", [{ name: "columns", selector: { number: { min: 1, max: 6, mode: "box" } } }], defaultData);
     

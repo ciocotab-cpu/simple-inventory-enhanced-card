@@ -439,6 +439,10 @@ export function renderCardContent(cardInstance) {
   const summaryArea = cardInstance.shadowRoot.getElementById("summary-area");
   if (cardInstance.config.show_summary) {
     summaryArea.classList.add("visible");
+
+    const fontScale = cardInstance.config.font_size_scale;
+    const summaryFontSize = fontScale === "small" ? "12px" : fontScale === "large" ? "16px" : "14px";
+    summaryArea.style.setProperty("--custom-font-size", summaryFontSize);
     
     const sumCols = cardInstance.config.summary_columns !== undefined ? parseInt(cardInstance.config.summary_columns) : 4;
     if (sumCols > 0) {
@@ -466,12 +470,17 @@ export function renderCardContent(cardInstance) {
   } else { summaryArea.classList.remove("visible"); }
 
   // 8. GRIGLIA PRODOTTI
+  const editPopupContainer = cardInstance.shadowRoot.getElementById("edit-popup-container");
+  editPopupContainer.innerHTML = "";
+
   if (cardInstance.inventoryItems && cardInstance.inventoryItems.length > 0) {
     const items = filterAndSortItems(cardInstance);
     log(`[simple-inventory-renderer] Rendering di ${items.length} articoli filtrati/ordinati.`);
 
     // Passiamo categoriesListArray unificato a ciascuna card singola
     cardInstance.content.innerHTML = items.map(item => renderSingleItemCard(item, cardInstance, lang, categoriesListArray)).join('');
+    const editPopup = cardInstance.content.querySelector(".item-edit-form");
+    if (editPopup) editPopupContainer.appendChild(editPopup);
 
     cardInstance.content.querySelectorAll(".btn-inc").forEach(btn => { 
       btn.addEventListener("click", (e) => { 
@@ -506,7 +515,7 @@ export function renderCardContent(cardInstance) {
       }); 
     });
     
-    cardInstance.content.querySelectorAll(".btn-cancel-edit").forEach(btn => { 
+    cardInstance.shadowRoot.querySelectorAll(".btn-cancel-edit").forEach(btn => {
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
         log("[simple-inventory-renderer] Annullamento modifica in corso");
@@ -515,7 +524,7 @@ export function renderCardContent(cardInstance) {
       }); 
     });
 
-    cardInstance.content.querySelectorAll(".btn-save-edit").forEach(btn => { 
+    cardInstance.shadowRoot.querySelectorAll(".btn-save-edit").forEach(btn => {
       btn.addEventListener("click", (e) => { 
         e.stopPropagation(); 
         log("[simple-inventory-renderer] Salvataggio modifica per ID:", btn.dataset.id);
