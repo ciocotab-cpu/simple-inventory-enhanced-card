@@ -29,7 +29,7 @@ export const cardStyles = `
     grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; border: 1px solid var(--divider-color); margin-bottom: 6px;
   }
   .summary-box.visible { display: grid; }
-  .summary-item { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 500; }
+  .summary-item { display: flex; align-items: center; gap: 6px; font-size: var(--custom-font-size, 0.82rem); font-weight: 500; }
   .summary-item ha-icon { --mdc-icon-size: 18px; }
   
   .controls { display: none; gap: 8px; align-items: center; }
@@ -74,7 +74,7 @@ export const cardStyles = `
     background: var(--mdc-theme-surface, var(--card-background-color, #fff));
     border-radius: 12px; box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
     border: 1px solid var(--divider-color); padding: 20px; z-index: 9999; box-sizing: border-box;
-    display: flex; flex-direction: column; gap: 16px; overflow-y: auto; animation: popupFadeIn 0.15s ease-out;
+    display: flex; flex-direction: column; gap: 16px; overflow-y: auto; animation: popupFadeIn 0.15s ease-out;z-index: 999999;
   }
   .item-edit-form::before, .item-add-popup::before { content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.45); z-index: -1; pointer-events: none; }
   @keyframes popupFadeIn { from { opacity: 0; transform: translate(-50%, -45%); } to { opacity: 1; transform: translate(-50%, -50%); } }

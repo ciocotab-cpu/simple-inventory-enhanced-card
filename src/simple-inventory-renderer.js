@@ -439,6 +439,10 @@ export function renderCardContent(cardInstance) {
   const summaryArea = cardInstance.shadowRoot.getElementById("summary-area");
   if (cardInstance.config.show_summary) {
     summaryArea.classList.add("visible");
+
+    const fontScale = cardInstance.config.font_size_scale;
+    const summaryFontSize = fontScale === "small" ? "12px" : fontScale === "large" ? "16px" : "14px";
+    summaryArea.style.setProperty("--custom-font-size", summaryFontSize);
     
     const sumCols = cardInstance.config.summary_columns !== undefined ? parseInt(cardInstance.config.summary_columns) : 4;
     if (sumCols > 0) {
